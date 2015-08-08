@@ -1,0 +1,20 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    tools:context="ecust.news.act_News_Detail">
+
+    <include layout="@layout/part_actionbar" />
+
+    <include layout="@layout/part_failurebar" />
+
+    <!--将所有的新闻内容都放到ListView里-->
+    <!--保证ListView能帮我自动回收图片，避免OOM-->
+    <ListView
+        android:id="@+id/news_detail_listview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+</LinearLayout>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/failurebar_all"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context="lib.clsFailureBar">
+
+    <!--专门用于include复用，显示加载中，加载失败框-->
+    <!--加载进度条-->
+    <ProgressBar
+        android:id="@+id/failurebar_progressbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <!--加载失败的布局-->
+    <LinearLayout
+        android:id="@+id/failure_msg_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <!--失败图片-->
+        <ImageView
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:src="@drawable/loaded_failed"
+            />
+
+        <!--一条错误信息-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:text="@string/NewsLoadFailureText"
+            android:textColor="#ff252525"
+            android:textSize="@dimen/NewsLoadFailureTextSize" />
+    </LinearLayout>
+</LinearLayout>

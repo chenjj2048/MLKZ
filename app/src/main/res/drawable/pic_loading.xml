@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--默认加载的灰色背景图片（图片加载中）-->
+    <solid android:color="#ffeeeeee" />
+    <size
+        android:width="1600dp"
+        android:height="1000dp" />
+</shape>

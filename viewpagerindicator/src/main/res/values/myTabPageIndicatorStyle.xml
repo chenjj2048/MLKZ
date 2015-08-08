@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="My.TabPageIndicator.BackGroundColor">#ff2b2b2b</color>
+    <dimen name="My.TabPageIndicator.TextPaddingLeftRight">12dp</dimen>
+    <dimen name="My.TabPageIndicator.TextPaddingTop">8dp</dimen>
+    <dimen name="My.TabPageIndicator.TextPaddingBottom">14dp</dimen>
+    <dimen name="My.TabPageIndicator.TextSize">20sp</dimen>
+
+</resources>

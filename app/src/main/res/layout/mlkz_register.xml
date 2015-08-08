@@ -1,0 +1,21 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="ecust.mlkz.act_MLKZ_Register">
+
+    <!--华理助手-->
+    <!--梅陇客栈-->
+    <!--账号注册 主界面-->
+
+    <include layout="@layout/part_actionbar" />
+
+    <TextView
+        android:id="@+id/register_step"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="新用户注册步骤"
+        android:textSize="20sp"/>
+
+</LinearLayout>

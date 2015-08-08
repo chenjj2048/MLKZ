@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="DefaultPadding">8dp</dimen>
+    <dimen name="DefaultTextSize">20sp</dimen>
+    <!--新闻类界面配置-->
+
+    <!--1.新闻主目录-->
+
+    <!--2.新闻详细界面(非学术讲座版块)-->
+    <string name="NewsLoadFailureText">加载失败,请稍后再试</string>
+    <dimen name="NewsLoadFailureTextSize">16sp</dimen>
+    <dimen name="NewsTextSize_CatalogName">12sp</dimen>
+    <dimen name="NewsTextSize_Title">20sp</dimen>
+    <dimen name="NewsTextSize_MoreInfo">16sp</dimen>
+    <dimen name="NewsTextSize_Time">16sp</dimen>
+    <dimen name="NewsTextSize_Detail">16sp</dimen>
+    <dimen name="NewsTextSize_Author">16sp</dimen>
+
+
+    <!--3.学术讲座版块)-->
+    <dimen name="ReportSplitLineWidth">8dp</dimen>
+    <dimen name="ReportSplitLineHeight">@dimen/DefaultTextSize</dimen>
+    <dimen name="ReportSplitLineMarginRight">10dp</dimen>
+</resources>

@@ -1,0 +1,184 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    tools:context="ecust.lecture.act_Lecture_Detail">
+
+    <include layout="@layout/part_actionbar" />
+
+    <include layout="@layout/part_failurebar" />
+
+    <!--学术讲座版块-->
+    <ScrollView
+        android:id="@+id/news_detail_report_scrollview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/DefaultPadding">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical">
+
+                <View
+                    android:layout_width="@dimen/ReportSplitLineWidth"
+                    android:layout_height="@dimen/ReportSplitLineHeight"
+                    android:layout_marginRight="@dimen/ReportSplitLineMarginRight"
+                    android:background="@android:color/holo_green_light" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="报告题目"
+                    android:textSize="@dimen/DefaultTextSize" />
+            </LinearLayout>
+
+            <!--报告题目-->
+            <TextView
+                android:id="@+id/news_detail_report_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical">
+
+                <View
+                    android:layout_width="@dimen/ReportSplitLineWidth"
+                    android:layout_height="@dimen/ReportSplitLineHeight"
+                    android:layout_marginRight="@dimen/ReportSplitLineMarginRight"
+                    android:background="@android:color/holo_purple" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="开始时间"
+                    android:textSize="@dimen/DefaultTextSize" />
+            </LinearLayout>
+
+            <!--开始时间-->
+            <TextView
+                android:id="@+id/news_detail_report_starttime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical">
+
+                <View
+                    android:layout_width="@dimen/ReportSplitLineWidth"
+                    android:layout_height="@dimen/ReportSplitLineHeight"
+                    android:layout_marginRight="@dimen/ReportSplitLineMarginRight"
+                    android:background="@android:color/holo_orange_light" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="报告地点"
+                    android:textSize="@dimen/DefaultTextSize" />
+            </LinearLayout>
+
+            <!--报告地点-->
+            <TextView
+                android:id="@+id/news_detail_report_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical">
+
+                <View
+                    android:layout_width="@dimen/ReportSplitLineWidth"
+                    android:layout_height="@dimen/ReportSplitLineHeight"
+                    android:layout_marginRight="@dimen/ReportSplitLineMarginRight"
+                    android:background="@android:color/holo_red_light" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="报告人"
+                    android:textSize="@dimen/DefaultTextSize" />
+            </LinearLayout>
+
+            <!--报告人-->
+            <TextView
+                android:id="@+id/news_detail_report_reporter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical">
+
+                <View
+                    android:layout_width="@dimen/ReportSplitLineWidth"
+                    android:layout_height="@dimen/ReportSplitLineHeight"
+                    android:layout_marginRight="@dimen/ReportSplitLineMarginRight"
+                    android:background="@android:color/holo_blue_bright" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="主办单位"
+                    android:textSize="@dimen/DefaultTextSize" />
+            </LinearLayout>
+
+            <!--主办单位-->
+            <TextView
+                android:id="@+id/news_detail_report_organization"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:id="@+id/news_detail_report_remark_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical">
+
+                <View
+                    android:layout_width="@dimen/ReportSplitLineWidth"
+                    android:layout_height="@dimen/ReportSplitLineHeight"
+                    android:layout_marginRight="@dimen/ReportSplitLineMarginRight"
+                    android:background="@android:color/holo_orange_dark" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="备注"
+                    android:textSize="@dimen/DefaultTextSize" />
+            </LinearLayout>
+
+            <!--备注-->
+            <TextView
+                android:id="@+id/news_detail_report_remark"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </ScrollView>
+
+    <!--添加讲座提醒-->
+    <!--<Button-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:gravity="center"-->
+        <!--android:padding="16dp"-->
+        <!--android:text="添加讲座提醒"-->
+        <!--android:textSize="20sp"-->
+        <!--android:textColor="@android:color/white"-->
+        <!--android:background="#ff0f9d58"/>-->
+</LinearLayout>
