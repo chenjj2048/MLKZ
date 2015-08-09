@@ -22,6 +22,7 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import ecust.main.R;
@@ -95,7 +96,11 @@ public class act_Lecture_Catalog extends MyBaseActivity implements
             nextPage++;   //有新数据加载后，就设置页数加一
 
         //去除重复数据
-        result = removeDuplicateData(result, mList);
+        Iterator<struct_LectureCatalogItem> iterator = result.iterator();
+        while (iterator.hasNext()) {
+            if (mList.contains(iterator.next()))
+                iterator.remove();
+        }
 
         //存入数据库
         if (result.size() > 0)
@@ -111,12 +116,17 @@ public class act_Lecture_Catalog extends MyBaseActivity implements
             logUtil.toast("服务器连接失败,请稍后再试");
         } else {
             //取出缓存数据
-            List<struct_LectureCatalogItem> rtnList = cacheData.get(url);
+            List<struct_LectureCatalogItem> result = cacheData.get(url);
 
-            if (rtnList != null) {
-                // 添加数据，重复数据会被过滤
-                addDataToMemory(rtnList, mList);
-                cacheData.remove(url);
+            if (result != null && result.size() > 0) {
+                // 添加数据，重复数据已被过滤
+                Iterator<struct_LectureCatalogItem> iterator = result.iterator();
+                while(iterator.hasNext()) {
+                    mList.add(iterator.next());
+                }
+                Collections.sort(mList);
+
+                cacheData.remove(url);      //去除引用
 
                 //ListView更新
                 mAdapter.notifyDataSetChanged();
@@ -268,8 +278,6 @@ public class act_Lecture_Catalog extends MyBaseActivity implements
      * 根据讲座Html页面数据解析数据
      */
     private List<struct_LectureCatalogItem> parseLectureCatalog(String html) {
-        final boolean outputLog = false;
-
         //解析完成后得到的数据集
         List<struct_LectureCatalogItem> rtnList = new ArrayList<>();
         try {
@@ -278,10 +286,8 @@ public class act_Lecture_Catalog extends MyBaseActivity implements
             Element left = doc.getElementsByClass("left").first();
 
             //提取分类标题
-            String catalogTitle = left.getElementsByClass("left_title").text().trim();
-
-            if (outputLog)
-                logUtil.i(this, "=========" + catalogTitle + "=========");         //日志
+//            String catalogTitle = left.getElementsByClass("left_title").text().trim();
+//            logUtil.i(this, "=========" + catalogTitle + "=========");         //日志
 
             //提取讲座目录主体部分
             Elements collection_li = left.getElementsByClass("content").first().select("ul").first().select("li");
@@ -297,8 +303,7 @@ public class act_Lecture_Catalog extends MyBaseActivity implements
                 item.url = Const.news_url + li.select("a").attr("href");
                 rtnList.add(item);
 
-                if (outputLog)
-                    logUtil.i(this, item.title + " " + item.url + " " + item.time);     //日志
+//                logUtil.i(this, item.title + " " + item.url + " " + item.time);     //日志
             }
             return rtnList;
         } catch (Exception e) {
@@ -307,53 +312,6 @@ public class act_Lecture_Catalog extends MyBaseActivity implements
         }
         return null;
     }
-
-    /**
-     * 对象中是否已经存在该数据
-     *
-     * @param item   单条数据
-     * @param target 数据集
-     * @return 是否存在
-     */
-    private boolean isItemExist(struct_LectureCatalogItem item, List<struct_LectureCatalogItem> target) {
-        for (int i = 0; i < target.size(); i++) {
-            //根据链接是否存在判断词条是否已存在
-            if (item.url.equals(target.get(i).url)) return true;
-        }
-        return false;
-    }
-
-    /**
-     * 去除重复数据
-     */
-    private List<struct_LectureCatalogItem> removeDuplicateData(List<struct_LectureCatalogItem> fromMemory,
-                                                                List<struct_LectureCatalogItem> targetMemory) {
-        //遍历查找数据
-        final int count = fromMemory.size();
-        for (int i = count - 1; i >= 0; i--) {
-            struct_LectureCatalogItem item = fromMemory.get(i);
-            if (isItemExist(item, targetMemory))
-                fromMemory.remove(i);  //去除重复数据
-        }
-        return fromMemory;
-    }
-
-    /**
-     * 添加数据，已去除重复项目
-     * 并且排序
-     */
-    private void addDataToMemory(List<struct_LectureCatalogItem> fromMemory, List<struct_LectureCatalogItem> targetMemory) {
-        //遍历添加数据
-        final int count = fromMemory.size();
-        for (int i = 0; i < count; i++) {
-            struct_LectureCatalogItem item = fromMemory.get(i);
-            targetMemory.add(item);     //添加至内存，缓存一下
-        }
-
-        //新数据按时间进行排序
-        Collections.sort(targetMemory);
-    }
-
 
     private class LectureAdapter extends BaseAdapter {
         private Context context;

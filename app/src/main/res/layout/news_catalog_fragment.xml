@@ -12,12 +12,12 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:cacheColorHint="#00000000"
-        android:divider="#19000000"
-        android:dividerHeight="4dp"
-        android:scrollbars="vertical"
+        android:divider="#ffffffff"
+        android:dividerHeight="0dp"
         android:fadingEdge="none"
         android:fastScrollEnabled="false"
         android:footerDividersEnabled="false"
         android:headerDividersEnabled="false"
+        android:scrollbars="vertical"
         android:smoothScrollbar="true" />
 </LinearLayout>

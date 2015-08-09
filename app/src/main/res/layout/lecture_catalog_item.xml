@@ -6,13 +6,12 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     app:cardCornerRadius="4dp"
-    app:cardElevation="5dp"
-    app:cardMaxElevation="10dp"
+    app:cardElevation="2dp"
     app:cardPreventCornerOverlap="true"
-    app:cardUseCompatPadding="true"
+    app:cardUseCompatPadding="false"
     tools:context="ecust.lecture.act_Lecture_Catalog">
     <!--详细属性值注释见attr_CardView.xml-->
-    <!--app:cardBackgroundColor="#ff0000"-->
+    <!--app:cardMaxElevation="20dp"-->
 
     <RelativeLayout
         android:layout_width="match_parent"

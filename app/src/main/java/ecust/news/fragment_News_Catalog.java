@@ -305,8 +305,6 @@ public class fragment_News_Catalog extends Fragment implements
          * @param html 页面
          */
         public List<struct_NewsCatalogItem> parseNewsCatalog(String html) {
-            final boolean outputLog = false;
-
             List<struct_NewsCatalogItem> rtnList = new ArrayList<>();       //解析完成后得到的数据集
             try {
                 Document doc = Jsoup.parse(html);
@@ -315,8 +313,7 @@ public class fragment_News_Catalog extends Fragment implements
                 //提取分类标题
                 String catalogTitle = left.getElementsByClass("left_title").text().trim();
                 //日志
-                if (outputLog)
-                    Global.log("=========" + catalogTitle + "=========");
+//                logUtil.i(this, "=========" + catalogTitle + "=========");
 
                 //提取新闻目录主体部分
                 Elements collection_li = left.getElementsByClass("content").first().select("ul").first().select("li");
@@ -328,8 +325,7 @@ public class fragment_News_Catalog extends Fragment implements
                     rtnList.add(item);
 
                     //日志
-                    if (outputLog)
-                        logUtil.i(this, item.title + " " + item.url + " " + item.time);
+//                    logUtil.i(this, item.title + " " + item.url + " " + item.time);
                 }
                 return rtnList;
             } catch (Exception e) {

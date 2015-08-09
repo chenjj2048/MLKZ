@@ -31,6 +31,7 @@ public class struct_LectureCatalogItem implements Comparable<struct_LectureCatal
         return para.time.compareTo(this.time);
     }
 
+    //url一致的话，肯定就是一样了
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -39,7 +40,6 @@ public class struct_LectureCatalogItem implements Comparable<struct_LectureCatal
         struct_LectureCatalogItem that = (struct_LectureCatalogItem) o;
 
         return !(url != null ? !url.equals(that.url) : that.url != null);
-
     }
 
     @Override

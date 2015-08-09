@@ -1,13 +1,17 @@
 package ecust.news;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.Html;
-import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -23,6 +27,7 @@ import java.util.List;
 
 import ecust.main.R;
 import lib.BaseActivity.MyBaseActivity;
+import lib.InputStreamUtils;
 import lib.clsFailureBar;
 import lib.clsGlobal.Const;
 import lib.clsGlobal.Global;
@@ -50,24 +55,37 @@ import lib.clsHttpAccess_CallBack;
  */
 public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnWebRetryListener,
         clsHttpAccess_CallBack.OnHttpVisitListener {
+    final int max_Thread_Pic_Download = 3;      //最大的下载线程数
+    int current_Thread_Pic_Download = 0;        //当前下载线程数
+
     String news_URL;            //新闻URL地址
     String catalogName;         //版块名称
     clsFailureBar wFailureBar;            //失败，加载条
-    DataCollection mNewsContent;        //存放全部新闻数据内容
-    NewsAdapter mAdapter = new NewsAdapter(this);
+    struct_NewsContent mNewsContent;        //存放全部新闻数据内容
+    NewsAdapter mAdapter = new NewsAdapter(this);           //BaseAdapter
+    ListView wListView;         //ListView控件
+
+    boolean activity_destoryed = false;
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        activity_destoryed = true;
         wFailureBar.setOnWebRetryListener(null);
     }
 
+    //这个函数只会被执行一次
     @Override
     public void onHttpBackgroundThreadLoadCompleted(String url, String cookie, boolean bSucceed, String rtnHtmlMessage) {
         if (!bSucceed) return;
 
         //解析数据
         mNewsContent = clsNewsParse.parseAllData(rtnHtmlMessage, catalogName);
+
+        //填充图片的引用，等会来这个数据集中找
+        for (String item_url : mNewsContent.pic_url) {
+            mNewsContent.bitmapHashMap.put(item_url, new PicHolder());
+        }
     }
 
     @Override
@@ -78,13 +96,97 @@ public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnW
             return;
         }
 
+        //传入数据进行更新
+        mAdapter.setCatalogName(this.catalogName);
+        mAdapter.setNewsContent(mNewsContent);
+
         //新闻消息到了，隐藏进度条
         wFailureBar.setStateSucceed();
     }
 
+    //加载单张图片(调用自getView，有时图片线程加载完也会调用这里)
+    public void loadSinglePicture(String url) {
+        //程序已退出就不再加载图片了
+        if (activity_destoryed) return;
+
+        //避免线程过多
+        if (current_Thread_Pic_Download >= max_Thread_Pic_Download) return;
+
+        PicHolder picHolder = mNewsContent.bitmapHashMap.get(url);
+        //根据状态判断要做的行为
+        switch (picHolder.state) {
+            case inMemory:
+                //已经有了就不再加载了
+                return;
+            case existInFile:
+                //
+                break;
+            case isLoading:
+                //正在加载就不再加载了
+                return;
+            case none:
+                logUtil.i(this, "[图片开始下载]" + url);
+                current_Thread_Pic_Download++;                  //线程加一
+                picHolder.state = PicHolder.pic_state.isLoading;     //修改状态
+                clsHttpAccess_CallBack.getSingleton().getBitmapBytes(url, this);
+                break;
+        }
+    }
+
+    //图片加载完成
     @Override
     public void onPictureLoadCompleted(String url, String cookie, boolean bSucceed, byte[] rtnPicBytes) {
+        PicHolder picHolder = mNewsContent.bitmapHashMap.get(url);
 
+        //设置图片
+        if (bSucceed) {
+            Bitmap bitmap = InputStreamUtils.bytesToBitmap(rtnPicBytes);        //获取图片
+            if (bitmap != null) {
+                //加载成功
+                picHolder.state = PicHolder.pic_state.inMemory;      //修改状态
+                picHolder.bitmap = bitmap;
+                if (picHolder.imageView != null)
+                    picHolder.imageView.setImageBitmap(bitmap);         //显示图片
+            } else {
+                //有消息回来，但转换失败
+                picHolder.state = PicHolder.pic_state.none;          //修改状态
+            }
+        } else {
+            picHolder.state = PicHolder.pic_state.none;     //修改状态
+        }
+
+        //已经是最后一个线程的话，就继续加载图片
+        current_Thread_Pic_Download--;          //线程减一
+        if (current_Thread_Pic_Download <= 0)
+            loadResidualPicture();       //查找未被加载的图片继续加载
+    }
+
+    //查找是否还有其他未被加载的图片需要进行加载
+    public void loadResidualPicture() {
+        //优先加载当前可见位置开始以下的图片
+        for (int pos = wListView.getFirstVisiblePosition() - 1; pos < mAdapter.getCount(); pos++) {
+            if (pos >= mNewsContent.content.size()) return;      //防止数组越界
+
+            String pic_url = mNewsContent.content.get(Math.abs(pos));
+            //不是URL就继续找下一个
+            if (pic_url == null || !pic_url.contains("http://")) continue;
+
+            //图片已经有了，就继续加载下一个
+            PicHolder picHolder = mNewsContent.bitmapHashMap.get(pic_url);
+            if (picHolder.state != PicHolder.pic_state.none) continue;
+
+            loadSinglePicture(pic_url);
+            return;
+        }
+
+        //可见区域的图片都已加载，加载上面的
+        for (String pic_url : mNewsContent.pic_url) {
+            PicHolder picHolder = mNewsContent.bitmapHashMap.get(pic_url);
+            if (picHolder.state != PicHolder.pic_state.none) continue;
+
+            loadSinglePicture(pic_url);     //拉新图片
+            return;
+        }
     }
 
     @Override
@@ -94,7 +196,6 @@ public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnW
         wFailureBar.setStateLoading();
         clsHttpAccess_CallBack.getSingleton().getHttp(news_URL, this);
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,130 +218,15 @@ public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnW
         wFailureBar = new clsFailureBar(this);
         wFailureBar.setOnWebRetryListener(this);
 
-        ListView listView = (ListView) findViewById(R.id.news_detail_listview);
-        listView.setAdapter(mAdapter);
+        wListView = (ListView) findViewById(R.id.news_detail_listview);
+        wListView.setAdapter(mAdapter);
     }
-
-    class NewsAdapter extends BaseAdapter {
-        Context context;
-
-        public NewsAdapter(Context context) {
-            this.context = context;
-        }
-
-        @Override
-        public int getCount() {
-            return 1 + 1 + 1;
-        }
-
-        @Override
-        public Object getItem(int i) {
-            return null;
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return i;
-        }
-
-        @Override
-        public View getView(int position, View view, ViewGroup viewGroup) {
-            View returnView;
-            //有图有字,不用convertView和ViewHolder
-            if (position == 0)
-                returnView = getHeadView(mNewsContent);
-            else if (position == getCount() - 1)
-                returnView = getBottomView(mNewsContent);
-            else
-                returnView = getBodyView(mNewsContent);
-
-            return returnView;
-        }
-
-        //获得头部内容(版块名称、标题、稿件信息、时间)
-        public View getHeadView(DataCollection mData) {
-            View header = getLayoutInflater().inflate(R.layout.news_detail_head, null);
-
-            //获取引用
-            TextView catalog = (TextView) header.findViewById(R.id.news_detail_section);
-            TextView title = (TextView) header.findViewById(R.id.news_detail_title);
-            TextView moreinfo = (TextView) header.findViewById(R.id.news_detail_moreinfo);
-            TextView detail_time = (TextView) header.findViewById(R.id.news_detail_time);
-
-            //设置版块名称
-            catalog.setText(catalogName);
-
-            //设置标题
-            title.setText(mData.title);
-
-            //设置新闻来源信息等
-            String info = "";
-            final String space = "    ";
-            if (!mData.news_Source.equals(""))
-                info += "稿件来源:" + mData.news_Source + space;
-            if (!mData.count_of_visit.equals(""))
-                info += "访问量:" + mData.count_of_visit + space;
-            moreinfo.setText(info);
-
-            //设置发表时间
-            if (!mData.release_time.equals("")) {
-                String time = mData.release_time + "    " + timeUtil.getDeltaTime(mData.release_time);
-                detail_time.setText(time.trim());
-            } else {
-                detail_time.setVisibility(View.GONE);
-            }
-            return header;
-        }
-
-        //获得新闻主体部分（图片及文字）
-        public View getBodyView(DataCollection mData) {
-            TextView tv = new TextView(context);
-            tv.setText(mData.body);
-
-            //设置字体大小
-            float size = getResources().getDimension(R.dimen.DefaultTextSize);
-            tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, size);
-
-            return tv;
-        }
-
-        //获得底部作者View（作者、摄影、编辑）
-        public View getBottomView(DataCollection mData) {
-            //设置新闻作者、摄影、编辑
-            final String space = "    ";
-            String strAuthor = "";
-            if (!mData.author.equals(""))
-                strAuthor += "作者:" + mData.author + space;
-            if (!mData.photo_author.equals(""))
-                strAuthor += "摄影:" + mData.photo_author + space;
-            if (!mData.editor.equals(""))
-                strAuthor += "编辑:" + mData.editor + space;
-
-            //设置内容
-            TextView authorInfo = new TextView(context);
-            if (strAuthor.length() > 0) {
-                float size = getResources().getDimension(R.dimen.NewsTextSize_Author);
-                authorInfo.setTextSize(TypedValue.COMPLEX_UNIT_PX, size);
-                authorInfo.setText("(" + strAuthor.trim() + ")");
-                authorInfo.setGravity(Gravity.END);
-
-                //设置Padding
-                int padding = Global.dimenConvert.dip2px(20);
-                authorInfo.setPadding(padding, padding, padding, padding);
-            } else {
-                authorInfo.setVisibility(View.GONE);
-            }
-            return authorInfo;
-        }
-    }
-
-
 }
 
 class clsNewsParse {
     //解析全部数据
-    public static DataCollection parseAllData(String html, String catalogName) {
-        DataCollection result = new DataCollection();
+    public static struct_NewsContent parseAllData(String html, String catalogName) {
+        struct_NewsContent result = new struct_NewsContent();
         try {
             //提取主要新闻部分
             Document doc = Jsoup.parse(html);
@@ -258,14 +244,9 @@ class clsNewsParse {
 
             //4.解析图片网址
             result.pic_url = clsNewsParse.parse_Img(content);
-//            int pic_count = 1;
-//            for (String t : result.pic_url) {
-//                logUtil.i("图片地址", "[图" + (pic_count++) + "]" + t);
-//            }
 
             //5.从纯文本中解析出一行行内容（图、文字交替）
-            result.content = clsNewsParse.parse_BodyLine(result.body);
-
+            result.content = clsNewsParse.parse_BodyLine(result);
         } catch (Exception e) {
             logUtil.e("详细新闻", "[数据解析错误]" + e.toString());
             e.printStackTrace();
@@ -307,7 +288,7 @@ class clsNewsParse {
      * @param targetData  解析后的数据要保存的位置
      * @param catalogName 版块名称
      */
-    public static void parse_Header(Element content, DataCollection targetData, String catalogName) {
+    public static void parse_Header(Element content, struct_NewsContent targetData, String catalogName) {
         try {
             //解析头部信息
             Element titles = content.getElementsByClass("titles").first();
@@ -437,41 +418,218 @@ class clsNewsParse {
      * 如果有图片，则为空行
      * 否则是文本内容
      */
-    public static List<String> parse_BodyLine(String body) {
+    public static List<String> parse_BodyLine(struct_NewsContent mData) {
         List<String> result = new ArrayList<>();
-
-        String[] lines = body.split("\\[img\\]");
-        int len = lines.length;
-        for (int i = 0; i < len; i++) {
-            String line = lines[i].trim();
-            if (!line.equals("")) {
-                line = (i == 0 ? "" : "\r\n") + line + "\r\n";
-                line = line.replace("\r\n\r\n", "\r\n");
-                result.add(line);                     //添加文本
+        try {
+            String[] lines = mData.body.split("\\[img\\]");
+            for (int i = 0; i < lines.length; i++) {
+                String line = lines[i].trim();
+                if (!line.equals("")) {
+                    line = (i == 0 ? "" : "\r\n") + line + "\r\n";
+                    line = line.replace("\r\n\r\n", "\r\n");
+                    result.add(line);                     //添加文本
+                }
+                //非最后一行
+                if (i != lines.length - 1) {
+                    result.add(mData.pic_url.get(i));     //添加图片加载地址
+                }
             }
-            //非最后一行
-            if (i != lines.length - 1) {
-                result.add("IMG"); //再添加图片控件（此处为默认加载图片）
-            }
+        } catch (Exception e) {
+            logUtil.e("parse_BodyLine", "数据解析错误");
+            e.printStackTrace();
         }
         return result;
     }
 }
 
-//新闻数据集
-class DataCollection {
-    String title = "";           //新闻标题
+//BaseAdapter
+class NewsAdapter extends BaseAdapter implements View.OnClickListener {
+    Context context;
+    struct_NewsContent mNewsContent;
+    String catalogName;
+    act_News_Detail mActivity;
 
-    String release_time = "";    //发表日期
-    String news_Source = "";      //稿件来源、来稿单位
-    String author = "";             //作者
-    String photo_author = "";        //摄影
-    String editor = "";              //编辑
-    String count_of_visit = "";      //访问量
+    public NewsAdapter(act_News_Detail mActivity) {
+        this.context = mActivity;
+        this.mActivity = mActivity;
+    }
 
-    String body = "";               //新闻文字部分
+    //只能这么写，写在构造函数时，传进来的会是null
+    public void setNewsContent(struct_NewsContent mNewsContent) {
+        this.mNewsContent = mNewsContent;
+    }
 
-    List<String> pic_url;       //图片地址
-    List<String> content;          //文字部分
+    //用构造函数传过来时，还是空
+    public void setCatalogName(String catalogName) {
+        this.catalogName = catalogName;
+    }
+
+    //点击事件
+    @Override
+    public void onClick(View v) {
+        String str = (String) v.getTag();
+        logUtil.toast(str + "\r\n" +
+                this.mActivity.wListView.getFirstVisiblePosition() + " " + this.mActivity.wListView.getLastVisiblePosition());
+    }
+
+    @Override
+    public int getCount() {
+        int body_content_lines;     //新闻内容共多少行
+
+        if (mNewsContent == null)
+            return 0;               //避免空指针
+        else if (mNewsContent.content == null || mNewsContent.content.size() <= 0)
+            body_content_lines = 0;
+        else
+            body_content_lines = mNewsContent.content.size();
+
+        //头 + 主体部分 + 尾
+        return 1 + body_content_lines + 1;
+    }
+
+    @Override
+    public Object getItem(int i) {
+        return null;
+    }
+
+    @Override
+    public long getItemId(int i) {
+        return i;
+    }
+
+    @Override
+    public View getView(int position, View view, ViewGroup viewGroup) {
+        View returnView;
+        //有图有字,不用convertView和ViewHolder
+        if (position == 0)
+            returnView = getHeadView(mNewsContent);     //加载头部
+        else if (position == getCount() - 1)
+            returnView = getBottomView(mNewsContent);   //加载底部
+        else
+            returnView = getBodyView(mNewsContent, position - 1);        //加载正文部分
+
+        return returnView;
+    }
+
+    //获得头部内容(版块名称、标题、稿件信息、时间)
+    public View getHeadView(struct_NewsContent mData) {
+        View header = LayoutInflater.from(context).inflate(R.layout.news_detail_head, null);
+
+        //获取引用
+        TextView catalog = (TextView) header.findViewById(R.id.news_detail_section);
+        TextView title = (TextView) header.findViewById(R.id.news_detail_title);
+        TextView moreinfo = (TextView) header.findViewById(R.id.news_detail_moreinfo);
+        TextView detail_time = (TextView) header.findViewById(R.id.news_detail_time);
+
+        //设置版块名称
+        catalog.setText(this.catalogName);
+
+        //设置标题
+        title.setText(mData.title);
+
+        //设置新闻来源信息等
+        String info = "";
+        final String space = "    ";
+        if (!mData.news_Source.equals(""))
+            info += "稿件来源:" + mData.news_Source + space;
+        if (!mData.count_of_visit.equals(""))
+            info += "访问量:" + mData.count_of_visit + space;
+        moreinfo.setText(info);
+
+        //设置发表时间
+        if (!mData.release_time.equals("")) {
+            String time = mData.release_time + "    " + timeUtil.getDeltaTime(mData.release_time);
+            detail_time.setText(time.trim());
+        } else {
+            detail_time.setVisibility(View.GONE);
+        }
+        return header;
+    }
+
+    //获得新闻主体部分（图片及文字）
+    public View getBodyView(struct_NewsContent mData, int pos) {
+        String str = mData.content.get(pos);
+        //判断是文本还是图片
+        if (str.startsWith("http://"))
+            return createNewImageView(str);          //返回图片
+        else
+            return createNewTextView(str);          //返回文本
+    }
+
+
+    //建立新闻内容的TextView
+    public TextView createNewTextView(String str) {
+        TextView textView = new TextView(context);
+        textView.setText(str);       //数据内容
+
+        //设置Padding
+        int padding = (int) context.getResources().getDimension(R.dimen.DefaultPadding);
+        textView.setPadding(padding, 0, padding, 0);
+
+        return textView;
+    }
+
+    //建立新闻内容的ImageView
+    public ImageView createNewImageView(String url) {
+        //从表中查下有木有Bitmap
+        PicHolder picHolder = mNewsContent.bitmapHashMap.get(url);
+        ImageView imageView;        //返回的图片
+
+        //已经存在imageView了，就不再创建新的
+        if (picHolder.imageView != null) {
+            imageView = picHolder.imageView;
+        } else {
+            //没有则创建新的imageView
+            imageView = new ImageView(context);
+            imageView.setTag(url);                      //设置Tag
+            imageView.setOnClickListener(this);         //设置点击事件
+
+            if (picHolder.bitmap != null) {
+                imageView.setImageBitmap(picHolder.bitmap);                 //内存已缓存的话就加载
+            } else {
+                imageView.setImageResource(R.drawable.pic_loading);      //设置默认图片
+            }
+
+            //不加这句，图片上下会有空白
+            imageView.setAdjustViewBounds(true);
+
+            AbsListView.LayoutParams lp = new AbsListView.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+
+            //,设置图片间距多少多少dp
+            int padding = (int) context.getResources().getDimension(R.dimen.DefaultPadding);
+            imageView.setPadding(padding, padding / 2, padding, padding / 2);
+            imageView.setLayoutParams(lp);
+
+            //保存imageView，类似于将ViewHolder存至tag
+            picHolder.imageView = imageView;
+        }
+        this.mActivity.loadSinglePicture(url);         //不管如何，加载下图片，图片有可能没有
+
+        return imageView;
+    }
+
+    //获得底部作者View（作者、摄影、编辑）
+    public View getBottomView(struct_NewsContent mData) {
+        //设置新闻作者、摄影、编辑
+        final String space = "    ";
+        String strAuthor = "";
+        if (!mData.author.equals(""))
+            strAuthor += "作者:" + mData.author + space;
+        if (!mData.photo_author.equals(""))
+            strAuthor += "摄影:" + mData.photo_author + space;
+        if (!mData.editor.equals(""))
+            strAuthor += "编辑:" + mData.editor + space;
+
+        //设置内容
+        TextView authorInfo = createNewTextView("");
+        if (strAuthor.length() > 0) {
+            authorInfo.setText("(" + strAuthor.trim() + ")");       //数据内容
+            authorInfo.setGravity(Gravity.END);
+        } else {
+            authorInfo.setVisibility(View.GONE);
+        }
+        return authorInfo;
+    }
 }
-

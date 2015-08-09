@@ -6,10 +6,15 @@ package lib;
  * 来源：http://zhoujingxian.iteye.com/blog/1682480
  */
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import lib.clsGlobal.logUtil;
 
 public class InputStreamUtils {
 
@@ -64,5 +69,29 @@ public class InputStreamUtils {
     public static String byteTOString(byte[] in) throws Exception {
         InputStream is = byteTOInputStream(in);
         return InputStreamTOString(is);
+    }
+
+    //==============================以下为自己写===================================
+    //字节流转图片
+    public static Bitmap bytesToBitmap(byte[] in){
+        InputStream is = null;
+        Bitmap bitmap=null;
+        try {
+            is = InputStreamUtils.byteTOInputStream(in);
+            BitmapFactory.Options opts = new BitmapFactory.Options();
+//            opts.inSampleSize = 2;
+            opts.inPreferredConfig = Bitmap.Config.RGB_565;
+             bitmap = BitmapFactory.decodeStream(is, null, opts);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (is != null)
+                try {
+                    is.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+        }
+        return bitmap;
     }
 }
