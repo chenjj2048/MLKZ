@@ -14,8 +14,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import lib.clsGlobal.logUtil;
-
 public class InputStreamUtils {
 
     final static int BUFFER_SIZE = 4096;
@@ -73,15 +71,15 @@ public class InputStreamUtils {
 
     //==============================以下为自己写===================================
     //字节流转图片
-    public static Bitmap bytesToBitmap(byte[] in){
+    public static Bitmap bytesToBitmap(byte[] in) {
         InputStream is = null;
-        Bitmap bitmap=null;
+        Bitmap bitmap = null;
         try {
             is = InputStreamUtils.byteTOInputStream(in);
             BitmapFactory.Options opts = new BitmapFactory.Options();
 //            opts.inSampleSize = 2;
             opts.inPreferredConfig = Bitmap.Config.RGB_565;
-             bitmap = BitmapFactory.decodeStream(is, null, opts);
+            bitmap = BitmapFactory.decodeStream(is, null, opts);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

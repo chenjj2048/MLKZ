@@ -33,7 +33,7 @@ import lib.clsGlobal.logUtil;
 //讲座版块数据库
 public class DataBase_Lecture extends SQLiteOpenHelper {
     private static final int currentVersion = 1;                    //当前版本
-    private static final String dataBaseName = Const.storagePath + "lecture.db";        //数据库名称
+    private static final String dataBaseName = Const.getSQLDataBaseStoragePath() + "lecture.db";        //数据库名称
 
     private static DataBase_Lecture db_singleton;       //单例模式
     public clsCatalog catalog;        //catalog对象（讲座目录）

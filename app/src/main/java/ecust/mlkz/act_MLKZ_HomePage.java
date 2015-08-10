@@ -79,6 +79,12 @@ public class act_MLKZ_HomePage extends MyBaseActivity {
                     public void onPictureLoadCompleted(String url, String cookie, boolean bSucceed, byte[] pic) {
 
                     }
+
+
+                    @Override
+                    public void onPictureBackgroundThreadLoadCompleted(String url, String cookie, boolean bSucceed, byte[] rtnPicBytes) {
+                    }
+
                 });
     }
 

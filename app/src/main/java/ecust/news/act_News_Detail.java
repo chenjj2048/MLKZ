@@ -1,7 +1,7 @@
 package ecust.news;
 
 import android.content.Context;
-import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.Gravity;
@@ -24,13 +24,18 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.zip.CRC32;
 
+import de.greenrobot.event.EventBus;
+import de.greenrobot.event.Subscribe;
 import ecust.main.R;
 import lib.BaseActivity.MyBaseActivity;
 import lib.InputStreamUtils;
 import lib.clsFailureBar;
 import lib.clsGlobal.Const;
 import lib.clsGlobal.Global;
+import lib.clsGlobal.clsApplication;
+import lib.clsGlobal.fileUtil;
 import lib.clsGlobal.logUtil;
 import lib.clsGlobal.timeUtil;
 import lib.clsHttpAccess_CallBack;
@@ -54,10 +59,11 @@ import lib.clsHttpAccess_CallBack;
  * Copyright (C) 2015 彩笔怪盗基德
  */
 public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnWebRetryListener,
-        clsHttpAccess_CallBack.OnHttpVisitListener {
+        clsHttpAccess_CallBack.OnHttpVisitListener, View.OnClickListener,
+        AbsListView.OnScrollListener {
     final int max_Thread_Pic_Download = 3;      //最大的下载线程数
+    boolean activity_destoryed = false;
     int current_Thread_Pic_Download = 0;        //当前下载线程数
-
     String news_URL;            //新闻URL地址
     String catalogName;         //版块名称
     clsFailureBar wFailureBar;            //失败，加载条
@@ -65,13 +71,38 @@ public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnW
     NewsAdapter mAdapter = new NewsAdapter(this);           //BaseAdapter
     ListView wListView;         //ListView控件
 
-    boolean activity_destoryed = false;
+    //根据url获得唯一的hash值（碰到一样的几乎不可能）
+    public static String getURLHash(String url) {
+        //计算CRC32值
+        CRC32 crc32 = new CRC32();
+        crc32.update(url.getBytes());
+
+        String result = url.hashCode() + "" + crc32.getValue();
+        result = result.replace("-", "");
+
+        //设置后缀为.jpg
+        return result + ".jpg";
+    }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         activity_destoryed = true;
         wFailureBar.setOnWebRetryListener(null);
+
+        recycleAllPictures();       //收回全部图片
+        EventBus.getDefault().unregister(this);
+
+        super.onDestroy();
+    }
+
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+    }
+
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
     }
 
     //这个函数只会被执行一次
@@ -82,9 +113,43 @@ public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnW
         //解析数据
         mNewsContent = clsNewsParse.parseAllData(rtnHtmlMessage, catalogName);
 
+        initPicHolders();       //初始化图片集合
+    }
+
+    //初始化图片集合
+    public void initPicHolders() {
         //填充图片的引用，等会来这个数据集中找
-        for (String item_url : mNewsContent.pic_url) {
-            mNewsContent.bitmapHashMap.put(item_url, new PicHolder());
+        for (String url : mNewsContent.pic_url) {
+            PicHolder picHolder = new PicHolder();
+
+            //第一次加载，创建新的imageView
+            ImageView imageView = new ImageView(this);
+
+            //关联imageView，类似于将ViewHolder存至tag
+            picHolder.imageView = imageView;
+
+            imageView.setTag(url);                      //设置Tag
+            imageView.setOnClickListener(this);         //设置点击事件
+
+            imageView.setImageResource(R.drawable.pic_loading);      //设置默认图片
+
+            //不加这句，图片上下会有空白
+            imageView.setAdjustViewBounds(true);
+
+            AbsListView.LayoutParams lp = new AbsListView.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+
+            //,设置图片间距多少多少dp
+            int padding = (int) getResources().getDimension(R.dimen.DefaultPadding);
+            imageView.setPadding(padding, padding / 2, padding, padding / 2);
+            imageView.setLayoutParams(lp);
+
+            //设置图片地址（类没写好，又重复了一次，悲剧）
+            picHolder.url = url;
+
+            //添加到数据集
+            mNewsContent.bitmapHashMap.put(url, picHolder);
         }
     }
 
@@ -104,33 +169,45 @@ public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnW
         wFailureBar.setStateSucceed();
     }
 
-    //加载单张图片(调用自getView，有时图片线程加载完也会调用这里)
-    public void loadSinglePicture(String url) {
+    /**
+     * 从网络加载图片（此时数据集中肯定没有图片，缓存文件中也没有）
+     *
+     * @param url 图片地址
+     */
+    public void getPictureOnWebsite(String url) {
         //程序已退出就不再加载图片了
         if (activity_destoryed) return;
 
         //避免线程过多
         if (current_Thread_Pic_Download >= max_Thread_Pic_Download) return;
 
+        //没网络就不加载图片了
+        if (!clsApplication.receiver.isWebConnected()) return;
+
         PicHolder picHolder = mNewsContent.bitmapHashMap.get(url);
-        //根据状态判断要做的行为
-        switch (picHolder.state) {
-            case inMemory:
-                //已经有了就不再加载了
-                return;
-            case existInFile:
-                //
-                break;
-            case isLoading:
-                //正在加载就不再加载了
-                return;
-            case none:
-                logUtil.i(this, "[图片开始下载]" + url);
-                current_Thread_Pic_Download++;                  //线程加一
-                picHolder.state = PicHolder.pic_state.isLoading;     //修改状态
-                clsHttpAccess_CallBack.getSingleton().getBitmapBytes(url, this);
-                break;
+
+        //没有在加载
+        if (!picHolder.isLoading) {
+            picHolder.loadTimes++;          //网络尝试次数+1
+            current_Thread_Pic_Download++;                  //线程加一
+
+            picHolder.isLoading = true;     //正在加载
+
+            clsHttpAccess_CallBack.getSingleton().getBitmapBytes(url, this);        //下载
+            logUtil.i(this, "[图片开始下载-线程数量" + current_Thread_Pic_Download + "]" + url);
         }
+    }
+
+    @Override
+    public void onPictureBackgroundThreadLoadCompleted(String url, String cookie, boolean bSucceed, byte[] rtnPicBytes) {
+        if (!bSucceed) return;
+
+        //保存文件
+        fileUtil.saveCacheFile("News", getURLHash(url), rtnPicBytes);
+
+        //设置图片
+        PicHolder picHolder = mNewsContent.bitmapHashMap.get(url);
+        picHolder.setBitmap(InputStreamUtils.bytesToBitmap(rtnPicBytes));
     }
 
     //图片加载完成
@@ -138,54 +215,97 @@ public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnW
     public void onPictureLoadCompleted(String url, String cookie, boolean bSucceed, byte[] rtnPicBytes) {
         PicHolder picHolder = mNewsContent.bitmapHashMap.get(url);
 
-        //设置图片
-        if (bSucceed) {
-            Bitmap bitmap = InputStreamUtils.bytesToBitmap(rtnPicBytes);        //获取图片
-            if (bitmap != null) {
-                //加载成功
-                picHolder.state = PicHolder.pic_state.inMemory;      //修改状态
-                picHolder.bitmap = bitmap;
-                if (picHolder.imageView != null)
-                    picHolder.imageView.setImageBitmap(bitmap);         //显示图片
-            } else {
-                //有消息回来，但转换失败
-                picHolder.state = PicHolder.pic_state.none;          //修改状态
+        if (bSucceed && picHolder.getBitmap() != null) {
+            //加载成功
+            picHolder.found = true;
+
+            //处于可见位置区域
+            if (wListView.indexOfChild(picHolder.imageView) >= 0) {
+                new pictureShowAsyncTask().execute(picHolder);   //图片下载完成，逐渐显示图片
             }
-        } else {
-            picHolder.state = PicHolder.pic_state.none;     //修改状态
         }
+        picHolder.isLoading = false;
 
         //已经是最后一个线程的话，就继续加载图片
         current_Thread_Pic_Download--;          //线程减一
-        if (current_Thread_Pic_Download <= 0)
+        if (current_Thread_Pic_Download < 2)       //最多开两个线程
             loadResidualPicture();       //查找未被加载的图片继续加载
     }
 
     //查找是否还有其他未被加载的图片需要进行加载
     public void loadResidualPicture() {
-        //优先加载当前可见位置开始以下的图片
-        for (int pos = wListView.getFirstVisiblePosition() - 1; pos < mAdapter.getCount(); pos++) {
-            if (pos >= mNewsContent.content.size()) return;      //防止数组越界
+        //1.优先查找当前页面
+        final int start = wListView.getFirstVisiblePosition();
+        final int end = wListView.getLastVisiblePosition();
 
-            String pic_url = mNewsContent.content.get(Math.abs(pos));
-            //不是URL就继续找下一个
-            if (pic_url == null || !pic_url.contains("http://")) continue;
+        for (int i = start; i <= end; i++) {
+            //去头去尾
+            if (i == 0 || i == mAdapter.getCount() - 1) continue;
+            int index = i - 1;      //去除顶部的一块View
+            String url = mNewsContent.content.get(index);
+            //跳过TextView
+            if (!url.startsWith("http://")) continue;
 
-            //图片已经有了，就继续加载下一个
-            PicHolder picHolder = mNewsContent.bitmapHashMap.get(pic_url);
-            if (picHolder.state != PicHolder.pic_state.none) continue;
+            //取到图片引用
+            PicHolder picHolder = mNewsContent.bitmapHashMap.get(url);
+            if (picHolder.isLoading || picHolder.found) continue;      //跳过正在加载的和已找到的
 
-            loadSinglePicture(pic_url);
+            //加载没有找到的网络图片
+            getPictureOnWebsite(url);
             return;
         }
 
-        //可见区域的图片都已加载，加载上面的
-        for (String pic_url : mNewsContent.pic_url) {
-            PicHolder picHolder = mNewsContent.bitmapHashMap.get(pic_url);
-            if (picHolder.state != PicHolder.pic_state.none) continue;
+        //2.再找一遍是否有遗漏的图片没有
+        for (String url : mNewsContent.pic_url) {
+            PicHolder picHolder = mNewsContent.bitmapHashMap.get(url);
 
-            loadSinglePicture(pic_url);     //拉新图片
-            return;
+            if (picHolder.found) continue;      //如果已经有了就找下一张图
+
+            if (picHolder.loadTimes > picHolder.max_loadTimes) continue;    //失败次数过多，找一张
+
+            getPictureOnWebsite(url);       //加载网络图片
+
+            break;
+        }
+    }
+
+    //手工回收图片
+    public void recyclePicture(String url) {
+        PicHolder picHolder = mNewsContent.bitmapHashMap.get(url);
+        if (picHolder.getBitmap() != null && !picHolder.getBitmap().isRecycled()) {
+            picHolder.imageView.setImageResource(R.drawable.pic_loading);      //先还原默认图片
+            picHolder.show = false;
+            picHolder.getBitmap().recycle();
+            picHolder.setBitmap(null);
+//            logUtil.i(this, "[图片被回收]" + url);
+        }
+    }
+
+    //回收全部图片(onDestory时)
+    public void recycleAllPictures() {
+        for (String url : mNewsContent.pic_url)
+            recyclePicture(url);
+    }
+
+    //点击事件
+    @Override
+    public void onClick(View v) {
+        String url = (String) v.getTag();       //取得URL
+
+        //失败的话，继续尝试加载
+        PicHolder picHolder = mNewsContent.bitmapHashMap.get(url);
+        if (picHolder.getBitmap() == null) {
+            picHolder.loadTimes = 0;        //重置失败次数
+        }
+
+        Global.setTitle(this, String.format("%,d", mNewsContent.sum_bytes_of_bitmap));
+        recyclePicture(url);
+
+
+        if (url.contains("http://172.") && picHolder.getBitmap() == null) {
+            logUtil.toast("当前非校园网，无法加载内网图片!");
+        } else {
+            logUtil.toast(url);
         }
     }
 
@@ -205,10 +325,12 @@ public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnW
         //获取新闻地址URL、所在分类版块
         news_URL = getIntent().getStringExtra("URL");
         catalogName = getIntent().getStringExtra("catalogName");
-        Global.log("[新闻详细内容加载]" + news_URL);
+        logUtil.i(this, "[新闻详细内容加载]" + news_URL);
 
         Global.setTitle(this, "新闻详情");
         initCompents();     //初始化组件引用
+
+        EventBus.getDefault().register(this);
 
         //获取新闻文本内容
         clsHttpAccess_CallBack.getSingleton().getHttp(news_URL, this);
@@ -220,7 +342,18 @@ public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnW
 
         wListView = (ListView) findViewById(R.id.news_detail_listview);
         wListView.setAdapter(mAdapter);
+        wListView.setOnScrollListener(this);
     }
+
+    //修改位图占用总大小
+    @Subscribe
+    public void EventBusMethod(eventbus_BitmapMemorySizeChanged event) {
+        int memory_size_changed = event.bytesChanged;
+        mNewsContent.sum_bytes_of_bitmap += memory_size_changed;        //修改位图占用大小标记
+
+        logUtil.i(this, "[全部Bitmap占用大小] " + String.format("%,d", mNewsContent.sum_bytes_of_bitmap));
+    }
+
 }
 
 class clsNewsParse {
@@ -443,7 +576,7 @@ class clsNewsParse {
 }
 
 //BaseAdapter
-class NewsAdapter extends BaseAdapter implements View.OnClickListener {
+class NewsAdapter extends BaseAdapter {
     Context context;
     struct_NewsContent mNewsContent;
     String catalogName;
@@ -462,14 +595,6 @@ class NewsAdapter extends BaseAdapter implements View.OnClickListener {
     //用构造函数传过来时，还是空
     public void setCatalogName(String catalogName) {
         this.catalogName = catalogName;
-    }
-
-    //点击事件
-    @Override
-    public void onClick(View v) {
-        String str = (String) v.getTag();
-        logUtil.toast(str + "\r\n" +
-                this.mActivity.wListView.getFirstVisiblePosition() + " " + this.mActivity.wListView.getLastVisiblePosition());
     }
 
     @Override
@@ -500,6 +625,7 @@ class NewsAdapter extends BaseAdapter implements View.OnClickListener {
     @Override
     public View getView(int position, View view, ViewGroup viewGroup) {
         View returnView;
+
         //有图有字,不用convertView和ViewHolder
         if (position == 0)
             returnView = getHeadView(mNewsContent);     //加载头部
@@ -573,41 +699,48 @@ class NewsAdapter extends BaseAdapter implements View.OnClickListener {
     public ImageView createNewImageView(String url) {
         //从表中查下有木有Bitmap
         PicHolder picHolder = mNewsContent.bitmapHashMap.get(url);
-        ImageView imageView;        //返回的图片
 
-        //已经存在imageView了，就不再创建新的
-        if (picHolder.imageView != null) {
-            imageView = picHolder.imageView;
-        } else {
-            //没有则创建新的imageView
-            imageView = new ImageView(context);
-            imageView.setTag(url);                      //设置Tag
-            imageView.setOnClickListener(this);         //设置点击事件
+        if (picHolder == null)
+            throw new NullPointerException();       //放心，这个不会为空的！
 
-            if (picHolder.bitmap != null) {
-                imageView.setImageBitmap(picHolder.bitmap);                 //内存已缓存的话就加载
-            } else {
-                imageView.setImageResource(R.drawable.pic_loading);      //设置默认图片
+        //没有图片
+        if (picHolder.getBitmap() == null) {
+//            //1.先查找是否有本地缓存
+//            byte[] bytes = fileUtil.getCacheFile("News", act_News_Detail.getURLHash(url));
+//
+//            if (bytes != null) {
+//                picHolder.setBitmap(InputStreamUtils.bytesToBitmap(bytes));        //获取图片
+//                picHolder.found = true;
+//                new pictureShowAsyncTask().execute(picHolder);  //getView，显示图片
+//            }
+//
+//            //2.加载网络图片
+//            if (bytes == null) {
+//                this.mActivity.getPictureOnWebsite(url);
+//            }
+
+
+            //1.先查找是否有本地缓存
+            boolean found = fileUtil.existCacheFile("News", act_News_Detail.getURLHash(url));
+
+            if (found) {
+                picHolder.found = true;
+
+                //异步任务根据URL读取文件加载，避免主线程卡顿
+                new pictureShowAsyncTask().execute(picHolder);   //getView，显示图片
             }
 
-            //不加这句，图片上下会有空白
-            imageView.setAdjustViewBounds(true);
-
-            AbsListView.LayoutParams lp = new AbsListView.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT);
-
-            //,设置图片间距多少多少dp
-            int padding = (int) context.getResources().getDimension(R.dimen.DefaultPadding);
-            imageView.setPadding(padding, padding / 2, padding, padding / 2);
-            imageView.setLayoutParams(lp);
-
-            //保存imageView，类似于将ViewHolder存至tag
-            picHolder.imageView = imageView;
+            //2.加载网络图片
+            if (!found) {
+                this.mActivity.getPictureOnWebsite(url);
+            }
+        } else {
+            //图片已在内存，但没显示
+            if (!picHolder.show) {
+                new pictureShowAsyncTask().execute(picHolder);   //getView，显示图片
+            }
         }
-        this.mActivity.loadSinglePicture(url);         //不管如何，加载下图片，图片有可能没有
-
-        return imageView;
+        return picHolder.imageView;
     }
 
     //获得底部作者View（作者、摄影、编辑）
@@ -631,5 +764,79 @@ class NewsAdapter extends BaseAdapter implements View.OnClickListener {
             authorInfo.setVisibility(View.GONE);
         }
         return authorInfo;
+    }
+}
+
+//图片透明度变化，逐渐显示
+class pictureShowAsyncTask extends AsyncTask<PicHolder, Float, Void> {
+    final int length_Of_ShowTime = 200;    //总的显示时长(ms)
+    final int length_Of_IntervalTime = 40;    //刷新时间(ms)
+    boolean firstLoad = true;
+
+    PicHolder picHolder;        //获取图片及ImageView
+
+    //透明度渐变
+    @Override
+    protected Void doInBackground(PicHolder... params) {
+        //传进来1个参数
+        if (params.length != 1) throw new NullPointerException();
+
+        picHolder = params[0];          //第一个参数
+
+        //如果bitmap为空，但缓存文件中有，就读取之
+        if (picHolder.getBitmap() == null) {
+            byte[] bytes = fileUtil.getCacheFile("News", act_News_Detail.getURLHash(picHolder.url));
+
+            if (bytes == null) throw new NullPointerException();
+
+            //设置图片
+            picHolder.setBitmap(InputStreamUtils.bytesToBitmap(bytes));
+        }
+
+        //正式开始透明度渐变过程
+        float current_time = 0;   //时间进度
+        while (current_time <= length_Of_ShowTime) {
+            publishProgress(current_time / length_Of_ShowTime);
+            current_time += length_Of_IntervalTime;             //进度增加
+
+            //休息一会
+            try {
+                Thread.sleep(length_Of_IntervalTime);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    //UI更新
+    @Override
+    protected void onProgressUpdate(Float... values) {
+        super.onProgressUpdate(values);
+
+        //设置透明度
+        float alpha = values[0];
+        if (values[0] < 0.3)
+            alpha = 0.3f;
+        else if (values[0] > 1)
+            alpha = 1;
+
+        if (picHolder.imageView == null) throw new NullPointerException();
+
+        //设置图片透明度
+        if (picHolder.getBitmap() != null) {
+            if (firstLoad) {
+                firstLoad = false;
+                picHolder.show = true;
+                picHolder.imageView.setImageBitmap(picHolder.getBitmap());       //第一次时设置图片
+            }
+            picHolder.imageView.setAlpha(alpha);
+            picHolder.imageView.invalidate();       //刷新
+        }
+    }
+
+    @Override
+    protected void onPostExecute(Void aVoid) {
+        super.onPostExecute(aVoid);
     }
 }

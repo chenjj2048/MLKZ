@@ -282,6 +282,10 @@ public class fragment_News_Catalog extends Fragment implements
     public void onPictureLoadCompleted(String url, String cookie, boolean bSucceed, byte[] rtnPicBytes) {
     }
 
+    @Override
+    public void onPictureBackgroundThreadLoadCompleted(String url, String cookie, boolean bSucceed, byte[] rtnPicBytes) {
+    }
+
     //设置当前Fragment是否为可见,初始化加载下数据
     public void setSelected(boolean visible) {
         this.currentIsVisible = visible;

@@ -72,6 +72,9 @@ public class act_Lecture_Detail extends MyBaseActivity implements clsFailureBar.
     public void onPictureLoadCompleted(String url, String cookie, boolean bSucceed, byte[] pic) {
     }
 
+    @Override
+    public void onPictureBackgroundThreadLoadCompleted(String url, String cookie, boolean bSucceed, byte[] rtnPicBytes) {
+    }
 
     /**
      * 来自clsFailureBar

@@ -16,5 +16,9 @@
         android:id="@+id/news_detail_listview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:cacheColorHint="#ff000000"
+        android:divider="#ffffffff"
+        android:dividerHeight="0dp"
+        android:listSelector="@android:color/transparent" />
 </LinearLayout>

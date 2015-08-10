@@ -82,6 +82,10 @@ public class bak_act_News_Detail extends MyBaseActivity implements clsFailureBar
     }
 
     @Override
+    public void onPictureBackgroundThreadLoadCompleted(String url, String cookie, boolean bSucceed, byte[] rtnPicBytes) {
+    }
+
+    @Override
     public void onPictureLoadCompleted(String url, String cookie, boolean bSucceed, byte[] rtnPicBytes) {
         //判断是否数据返回成功
         ImageViewTag imageViewTag = mNewsDetail.findImageViewTag(url);
@@ -117,7 +121,6 @@ public class bak_act_News_Detail extends MyBaseActivity implements clsFailureBar
 
                 //2.设置图片
                 imageView.setImageBitmap(bitmap);
-
 
                 //3.加载下一幅图片
                 mNewsDetail.loadNextPicture(mNewsDetail.mData.collection_pic);

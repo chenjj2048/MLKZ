@@ -12,7 +12,6 @@
         android:layout_centerInParent="true"
         android:padding="10dp"
         android:singleLine="true"
-        android:text="自定义ActionBar"
         android:textColor="@color/white"
         android:textSize="20sp" />
 </RelativeLayout>

@@ -123,6 +123,9 @@ public class clsHttpAccess_CallBack {
 
         //pic为图片字节流
         void onPictureLoadCompleted(String url, String cookie, boolean bSucceed, byte[] rtnPicBytes);
+
+        //子线程中
+        void onPictureBackgroundThreadLoadCompleted(String url, String cookie, boolean bSucceed, byte[] rtnPicBytes);
     }
 
     /**
@@ -170,16 +173,18 @@ public class clsHttpAccess_CallBack {
                 byte[] result = new BaseAccessUnit().HttpGetBitmap(item.url, item.cookie, 0, 0);
                 item.pic = result;                    //设置返回消息
                 item.succeed = (result != null);     //设置是否成功
+                //子线程送一遍消息（图片）
+                if (item.listener != null)
+                    item.listener.onPictureBackgroundThreadLoadCompleted(item.url, item.cookie, item.succeed, item.pic);
             } else {
                 //下载文本
                 String result = new BaseAccessUnit().HttpGetString(item.url, item.cookie, 0, 0);
                 item.html = result;                      //设置返回消息
                 item.succeed = result.length() > 0;     //设置是否成功
+                //子线程送一遍消息（文本）
+                if (item.listener != null)
+                    item.listener.onHttpBackgroundThreadLoadCompleted(item.url, item.cookie, item.succeed, item.html);
             }
-
-            //子线程送一遍消息（仅限文本）
-            if (item.listener != null && !item.requestIsPic)
-                item.listener.onHttpBackgroundThreadLoadCompleted(item.url, item.cookie, item.succeed, item.html);
 
             //设置Handler返回消息
             Message message = new Message();

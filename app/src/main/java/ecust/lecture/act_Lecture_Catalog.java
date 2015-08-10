@@ -141,6 +141,10 @@ public class act_Lecture_Catalog extends MyBaseActivity implements
     }
 
     @Override
+    public void onPictureBackgroundThreadLoadCompleted(String url, String cookie, boolean bSucceed, byte[] rtnPicBytes) {
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.lecture_catalog);

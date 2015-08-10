@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo.State;
+import android.widget.Toast;
 
 /**
  * =============================================================================
@@ -73,6 +74,7 @@ public class clsNetworkChangeReceiver extends BroadcastReceiver {
 
         if (!isStateOK(wifi) && isStateOK(mobile)) {
             strStatus = "移动网络已连接";
+            showDialog();                           //显示提示消息，提醒流量资费！！！
             result = true;
         } else if (!isStateOK(wifi) && !isStateOK(mobile)) {
             strStatus = "无可用网络";
@@ -111,7 +113,14 @@ public class clsNetworkChangeReceiver extends BroadcastReceiver {
         this.networkStateChangeListener = listener;
     }
 
+    //显示网络提示消息，避免没注意，在用移动网络
+    public void showDialog() {
+        String msg = "您当前正在使用移动网络\r\n可能产生较大数据流量，敬请注意";
+        Toast.makeText(clsApplication.getContext(), msg, Toast.LENGTH_LONG).show();
+    }
+
     public interface OnNetworkStateChangeListener {
         void onNetworkStateChangeCompleted(boolean webConnected);
     }
 }
+

@@ -29,8 +29,23 @@ public class Const {
     public final static String lecture_url = "http://news.ecust.edu.cn/reports";   //讲座信息主目录
     public final static String packageName = "cjj.ecust.helper";
 
-    //    public final static String storagePath = "";          //数据库存储地址（应用内）
-    public final static String storagePath = Environment.getExternalStorageDirectory().getPath() +
-            "/" + Const.packageName + "/";          //数据库存储地址(存储卡)
+    //获取SQL数据库存放位置
+    public static String getSQLDataBaseStoragePath() {
+        final boolean saved_in_SDCard = true;
+        String result;
+        if (saved_in_SDCard) {
+            //数据库存储地址(存储卡)
+            result = Environment.getExternalStorageDirectory().getPath() + "/" + Const.packageName + "/";
+        } else {
+            //数据库存储地址（应用内）
+            result = "";
+        }
+        return result;
+    }
 
+    //获取存在SD卡中的位置
+    public static String getSDCardSavedPath() {
+        return Environment.getExternalStorageDirectory().getPath() + "/" + Const.packageName;
+    }
 }
+

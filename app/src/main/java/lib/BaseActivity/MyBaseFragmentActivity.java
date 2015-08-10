@@ -39,6 +39,7 @@ public class MyBaseFragmentActivity extends FragmentActivity {
     protected void onDestroy() {
         super.onDestroy();
         Global.clsActivity.onDestory(this);
+        System.gc();
     }
 
     @Override
@@ -46,6 +47,7 @@ public class MyBaseFragmentActivity extends FragmentActivity {
         super.onResume();
         Global.clsActivity.onResume(this);
         Global.activity = this;
+        System.gc();
     }
 
     @Override
