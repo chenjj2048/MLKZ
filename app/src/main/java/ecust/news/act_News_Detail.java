@@ -23,7 +23,9 @@ import org.jsoup.select.Elements;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.zip.CRC32;
 
 import de.greenrobot.event.EventBus;
@@ -61,8 +63,10 @@ import lib.clsHttpAccess_CallBack;
 public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnWebRetryListener,
         clsHttpAccess_CallBack.OnHttpVisitListener, View.OnClickListener,
         AbsListView.OnScrollListener {
+    static int listview_scroll_items_per_second;   //ListView滚动速度
     final int max_Thread_Pic_Download = 3;      //最大的下载线程数
-    boolean activity_destoryed = false;
+    final int max_Bitmap_Memory_Sum = 20 * 1024 * 1024;       //图片总共占用多少内存，超过就回收内存
+    boolean activity_destoryed = false;         //页面销毁，标记，用来停止其他正在进行的线程
     int current_Thread_Pic_Download = 0;        //当前下载线程数
     String news_URL;            //新闻URL地址
     String catalogName;         //版块名称
@@ -70,6 +74,10 @@ public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnW
     struct_NewsContent mNewsContent;        //存放全部新闻数据内容
     NewsAdapter mAdapter = new NewsAdapter(this);           //BaseAdapter
     ListView wListView;         //ListView控件
+    float listview_scroll_statistics_time = 3000;     //ListView滚动速度统计时间
+    boolean nearToTop = true;      //标记更靠近头还是更靠近尾
+    int lastVisibleItem = -1;    //上次ListView最顶的位置
+    Queue<struct_Time_Data> queue = new LinkedList<>();   //时间-数据 队列
 
     //根据url获得唯一的hash值（碰到一样的几乎不可能）
     public static String getURLHash(String url) {
@@ -89,20 +97,61 @@ public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnW
         activity_destoryed = true;
         wFailureBar.setOnWebRetryListener(null);
 
-        recycleAllPictures();       //收回全部图片
         EventBus.getDefault().unregister(this);
+        recycleAllPictures();       //收回全部图片
 
         super.onDestroy();
     }
 
+    //ListView滚动状态
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {
-
+        switch (scrollState) {
+            case SCROLL_STATE_IDLE:
+                listview_scroll_items_per_second = 0;
+                break;
+            case SCROLL_STATE_TOUCH_SCROLL:
+                break;
+            case SCROLL_STATE_FLING:
+                break;
+        }
     }
 
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+//        logUtil.i(this, "speed = " + listview_scroll_items_per_second + " size=" + queue.size());
 
+        if (lastVisibleItem == firstVisibleItem && queue.peek() != null)
+            if (Math.abs(queue.peek().time - System.currentTimeMillis()) < 1000)
+                return;
+
+        //ListView当前项更靠近头还是更靠近尾
+        nearToTop = (firstVisibleItem <= totalItemCount / 2);
+
+        int data = Math.abs(firstVisibleItem - lastVisibleItem);    //变化的差值
+        lastVisibleItem = firstVisibleItem;
+
+        queue.offer(new struct_Time_Data(data));    //添加一个数据
+
+        //先移除过期数据
+        while (true) {
+            struct_Time_Data t = queue.peek();
+            if (Math.abs(System.currentTimeMillis() - t.time) > listview_scroll_statistics_time) {
+                //超过统计时间
+                queue.poll();
+            } else {
+                //在统计时间内
+                break;
+            }
+        }
+
+        //计算平均数，结束时至少有一个数据，不必检查Null
+        float sum = 0;
+        for (struct_Time_Data t : queue)
+            sum += t.data;
+
+        //算出平均值
+        listview_scroll_items_per_second = (int) (sum / listview_scroll_statistics_time * 1000);
     }
 
     //这个函数只会被执行一次
@@ -174,7 +223,7 @@ public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnW
      *
      * @param url 图片地址
      */
-    public void getPictureOnWebsite(String url) {
+    public void loadSinglePictureOnWebsite(String url) {
         //程序已退出就不再加载图片了
         if (activity_destoryed) return;
 
@@ -251,7 +300,7 @@ public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnW
             if (picHolder.isLoading || picHolder.found) continue;      //跳过正在加载的和已找到的
 
             //加载没有找到的网络图片
-            getPictureOnWebsite(url);
+            loadSinglePictureOnWebsite(url);
             return;
         }
 
@@ -263,28 +312,65 @@ public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnW
 
             if (picHolder.loadTimes > picHolder.max_loadTimes) continue;    //失败次数过多，找一张
 
-            getPictureOnWebsite(url);       //加载网络图片
+            loadSinglePictureOnWebsite(url);       //加载网络图片
 
             break;
         }
     }
 
+    //回收图片，空出更多内存，不必做循环，这个已经构成了一个函数循环链了
+    public void recyclePictureForMoreMemory() {
+        //尚未达到占用上限
+        if (mNewsContent.sum_bytes_of_bitmap <= max_Bitmap_Memory_Sum) return;
+
+        //循环找图
+        for (int i = 0; i < mNewsContent.pic_url.size(); i++) {
+            //判断回收从顶部还是底部开始
+            int index = nearToTop ? mNewsContent.pic_url.size() - 1 - i : i;
+            String url = mNewsContent.pic_url.get(index);
+
+            PicHolder picHolder = mNewsContent.bitmapHashMap.get(url);
+
+            if (picHolder.getBitmap() == null) continue;
+
+            //判断图片是否可见
+            index = mNewsContent.content.indexOf(url);
+            int start = wListView.getFirstVisiblePosition();
+            int end = wListView.getLastVisiblePosition();
+
+            final int distance = 3;    //前后多少图片距离
+            if (start - distance <= index && index <= end + distance) continue;
+
+            //找到图片了
+            recyclePicture(url);
+
+            return;
+        }
+    }
+
     //手工回收图片
     public void recyclePicture(String url) {
-        PicHolder picHolder = mNewsContent.bitmapHashMap.get(url);
-        if (picHolder.getBitmap() != null && !picHolder.getBitmap().isRecycled()) {
-            picHolder.imageView.setImageResource(R.drawable.pic_loading);      //先还原默认图片
-            picHolder.show = false;
-            picHolder.getBitmap().recycle();
-            picHolder.setBitmap(null);
-//            logUtil.i(this, "[图片被回收]" + url);
+        try {
+            PicHolder picHolder = mNewsContent.bitmapHashMap.get(url);
+            if (picHolder.getBitmap() != null && !picHolder.getBitmap().isRecycled()) {
+                picHolder.imageView.setImageResource(R.drawable.pic_loading);      //先还原默认图片
+                picHolder.show = false;
+                picHolder.getBitmap().recycle();
+                picHolder.setBitmap(null);
+//                logUtil.i(this, "[回收后Bitmap占用总大小] " +
+//                        String.format("%,d", mNewsContent.sum_bytes_of_bitmap));
+            }
+        } catch (Exception e) {
+            logUtil.e(this, e.toString());
+            e.printStackTrace();
         }
     }
 
     //回收全部图片(onDestory时)
     public void recycleAllPictures() {
-        for (String url : mNewsContent.pic_url)
-            recyclePicture(url);
+        if (mNewsContent != null && mNewsContent.pic_url != null)
+            for (String url : mNewsContent.pic_url)
+                recyclePicture(url);
     }
 
     //点击事件
@@ -345,13 +431,13 @@ public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnW
         wListView.setOnScrollListener(this);
     }
 
-    //修改位图占用总大小
+    //修改位图占用总大小，如果占用过大，则回收图片
     @Subscribe
-    public void EventBusMethod(eventbus_BitmapMemorySizeChanged event) {
+    public void eventBusMemorySizeChanged(eventbus_BitmapMemorySizeChanged event) {
         int memory_size_changed = event.bytesChanged;
         mNewsContent.sum_bytes_of_bitmap += memory_size_changed;        //修改位图占用大小标记
 
-        logUtil.i(this, "[全部Bitmap占用大小] " + String.format("%,d", mNewsContent.sum_bytes_of_bitmap));
+        recyclePictureForMoreMemory();      //回收图片
     }
 
 }
@@ -705,21 +791,6 @@ class NewsAdapter extends BaseAdapter {
 
         //没有图片
         if (picHolder.getBitmap() == null) {
-//            //1.先查找是否有本地缓存
-//            byte[] bytes = fileUtil.getCacheFile("News", act_News_Detail.getURLHash(url));
-//
-//            if (bytes != null) {
-//                picHolder.setBitmap(InputStreamUtils.bytesToBitmap(bytes));        //获取图片
-//                picHolder.found = true;
-//                new pictureShowAsyncTask().execute(picHolder);  //getView，显示图片
-//            }
-//
-//            //2.加载网络图片
-//            if (bytes == null) {
-//                this.mActivity.getPictureOnWebsite(url);
-//            }
-
-
             //1.先查找是否有本地缓存
             boolean found = fileUtil.existCacheFile("News", act_News_Detail.getURLHash(url));
 
@@ -732,7 +803,7 @@ class NewsAdapter extends BaseAdapter {
 
             //2.加载网络图片
             if (!found) {
-                this.mActivity.getPictureOnWebsite(url);
+                this.mActivity.loadSinglePictureOnWebsite(url);
             }
         } else {
             //图片已在内存，但没显示
@@ -769,8 +840,8 @@ class NewsAdapter extends BaseAdapter {
 
 //图片透明度变化，逐渐显示
 class pictureShowAsyncTask extends AsyncTask<PicHolder, Float, Void> {
-    final int length_Of_ShowTime = 200;    //总的显示时长(ms)
     final int length_Of_IntervalTime = 40;    //刷新时间(ms)
+    int length_Of_ShowTime = 200;    //总的显示时长(ms)
     boolean firstLoad = true;
 
     PicHolder picHolder;        //获取图片及ImageView
@@ -778,6 +849,15 @@ class pictureShowAsyncTask extends AsyncTask<PicHolder, Float, Void> {
     //透明度渐变
     @Override
     protected Void doInBackground(PicHolder... params) {
+        //滚动过快的话，就缩短时间
+        if (act_News_Detail.listview_scroll_items_per_second > 5)
+            length_Of_ShowTime /= 10;
+        else if (act_News_Detail.listview_scroll_items_per_second > 3)
+            length_Of_ShowTime /= 5;
+        else if (act_News_Detail.listview_scroll_items_per_second > 2)
+            length_Of_ShowTime /= 2;
+
+
         //传进来1个参数
         if (params.length != 1) throw new NullPointerException();
 
@@ -838,5 +918,18 @@ class pictureShowAsyncTask extends AsyncTask<PicHolder, Float, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
+        picHolder.imageView.setAlpha(1f);
+        picHolder.imageView.invalidate();
+    }
+}
+
+//求ListView滚动速度的一个辅助类
+class struct_Time_Data {
+    long time;      //记录的时间
+    int data;       //数据
+
+    public struct_Time_Data(int data) {
+        this.data = data;
+        this.time = System.currentTimeMillis();   //自动记录当前时间
     }
 }

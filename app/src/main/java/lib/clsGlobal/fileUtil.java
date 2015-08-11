@@ -26,6 +26,13 @@ import java.io.IOException;
  * .
  */
 
+
+///////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////
+//                   缓存文件需要被删掉！！！！！
+///////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////
+
 //用来管理缓存文件
 public class fileUtil {
     final static String cacheDirectory = "/Cache/";
@@ -112,6 +119,9 @@ public class fileUtil {
                 e.printStackTrace();
             }
         }
+
+
+        logUtil.e("fileUtil.java","=============缓存文件需要及时删除========");
         return result;
     }
 
@@ -133,4 +143,6 @@ public class fileUtil {
         logUtil.i("文件存在", fileName + " 是否存在：" + file.exists());
         return file.exists();
     }
+
+
 }
