@@ -5,8 +5,10 @@ import android.widget.ImageView;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
-import de.greenrobot.event.EventBus;
+import lib.clsGlobal.logUtil;
 
 /**
  * =============================================================================
@@ -29,7 +31,8 @@ import de.greenrobot.event.EventBus;
  */
 
 //新闻详细内容
-public class struct_NewsContent {
+//观察者模式，监视位图内存占用
+public class struct_NewsContent implements Observer {
     int sum_bytes_of_bitmap = 0;       //位图占的内存总大小
     String title = "";           //新闻标题
     String release_time = "";    //发表日期
@@ -42,9 +45,19 @@ public class struct_NewsContent {
     List<String> pic_url;       //图片地址
     List<String> content;          //文字-图片URL交替部分（一行文字、一行图片交替）（重要数据在这里）
     HashMap<String, PicHolder> bitmapHashMap = new HashMap<>();       //在内存中暂存Bitmap（内存不够就及时回收）
+
+    //位图占用空间变化
+    @Override
+    public void update(Observable observable, Object data) {
+        int memory_size_changed = (int) data;
+        this.sum_bytes_of_bitmap += memory_size_changed;        //修改位图占用大小标记
+//        logUtil.i(this, "[位图占用内存大小变化后] " +
+//                String.format("%,d", this.sum_bytes_of_bitmap) + " 字节");
+    }
 }
 
-class PicHolder {
+//被观察者，内存占用
+class PicHolder extends Observable {
     final int max_loadTimes = 3;      //最多加载次数，避免重复陷入死循环
     ImageView imageView;        //imageView（始终保持）
     int loadTimes = 0;            //加载次数，避免不停地加载失败
@@ -72,18 +85,10 @@ class PicHolder {
         //修改位图占内存的变化
         int memory_size_changed = input_bytes - origin_bytes;
 
-        //EvnetBus传消息，不然代码耦合性太高
-        EventBus.getDefault().post(new eventbus_BitmapMemorySizeChanged(memory_size_changed));
+        //通知观察者
+        super.setChanged();
+        super.notifyObservers(memory_size_changed);
 
         this.bitmap = bitmap;
-    }
-}
-
-//用来修改 struct_NewsContent 中 sum_bytes_of_bitmap
-class eventbus_BitmapMemorySizeChanged {
-    int bytesChanged;      //改变的字节大小，增加为正，减少为负
-
-    public eventbus_BitmapMemorySizeChanged(int bytesChanged) {
-        this.bytesChanged = bytesChanged;
     }
 }

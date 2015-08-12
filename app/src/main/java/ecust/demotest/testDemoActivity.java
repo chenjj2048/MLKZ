@@ -37,51 +37,15 @@ import lib.clsGlobal.logUtil;
  * Copyright (C) 2015 彩笔怪盗基德
  */
 public class testDemoActivity extends MyBaseActivity implements View.OnClickListener {
-    TextView tv;
-    ListView listview;
-    List<structMy> mData = new ArrayList<>();
-    myadapter adapter;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_test_demo);
+        setContentView(R.layout.test_demo);
 
+//        mMenu = (SlidingMenu) findViewById(R.id.id_menu);
 
-        tv = (TextView) findViewById(R.id.demo_textview);
-        listview = (ListView) findViewById(R.id.demo_listview);
-
-
-        mData.add(new structMy("url=12", 5));
-        mData.add(new structMy("d", 1));
-        mData.add(new structMy("cc", 4));
-        mData.add(new structMy("cc", 2));
-        mData.add(new structMy("ww", 1));
-        mData.add(new structMy("z", 3));
-        mData.add(new structMy("z", 3));
-        mData.add(new structMy("tt", 0));
-
-        Collections.sort(mData);
-
-        logUtil.i(this, "==============");
-        Iterator<structMy> ggg = mData.iterator();
-        while (ggg.hasNext()) {
-            structMy tmp = ggg.next();
-            logUtil.i(this, tmp.toString());
-            if (tmp.age == 1)
-                ggg.remove();
-        }
-        logUtil.i(this, "==============");
-        ggg = mData.iterator();
-        while (ggg.hasNext()) {
-            structMy tmp = ggg.next();
-            logUtil.i(this, tmp.toString());
-        }
-
-
-        adapter = new myadapter(this);
-        listview.setAdapter(adapter);
 
     }
 
@@ -89,80 +53,4 @@ public class testDemoActivity extends MyBaseActivity implements View.OnClickList
     public void onClick(View v) {
     }
 
-    public class myadapter extends BaseAdapter {
-        private Context context;
-
-        public myadapter(Context context) {
-            this.context = context;
-        }
-
-        @Override
-        public int getCount() {
-            return mData.size();
-        }
-
-        @Override
-        public Object getItem(int i) {
-            return null;
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return i;
-        }
-
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-            TextView tv = new TextView(context);
-//            structMy f[] = (structMy[]) mData.toArray();
-//            String str =f[i].toString();
-            tv.setText("aaa");
-            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-            return tv;
-        }
-    }
-}
-
-class structMy implements Comparable<structMy> {
-    String name;
-    int age;
-
-    public structMy(String name, int age) {
-        this.name = name;
-        this.age = age;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        logUtil.e(this, "equals");
-
-        structMy t = (structMy) o;
-        if (this.age == t.age)
-            return true;
-        else
-            return false;
-    }
-
-    @Override
-    public int hashCode() {
-        logUtil.e(this, "hashcode");
-        int result = name.hashCode();
-        result = 31 * result + age;
-        return result;
-    }
-
-    @Override
-    public int compareTo(structMy another) {
-        if (this.age < another.age)
-            return 1;
-        else if (this.age > another.age)
-            return -1;
-        else
-            return 0;
-    }
-
-    @Override
-    public String toString() {
-        return "姓名：" + name + "  年龄：" + age;
-    }
 }

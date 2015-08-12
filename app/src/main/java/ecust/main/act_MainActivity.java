@@ -10,8 +10,7 @@ import ecust.lecture.act_Lecture_Catalog;
 import ecust.mlkz.act_MLKZ_HomePage;
 import ecust.news.act_News_Catalog;
 import lib.BaseActivity.MyBaseActivity;
-import lib.clsGlobal.logUtil;
-import lib.clsGlobal.timeUtil;
+
 /**
  * =============================================================================
  * This program is free software: you can redistribute it and/or modify
@@ -39,21 +38,19 @@ public class act_MainActivity extends MyBaseActivity implements View.OnClickList
 
         //初始化组件
         initComponents();
-
-        //仅供测试使用
-        final boolean demotest = false;
-        if (demotest)
-            startActivity(new Intent(this, testDemoActivity.class));
     }
 
     private void initComponents() {
         Button mlkz = (Button) findViewById(R.id.mainActivity_MLKZ);
         Button news = (Button) findViewById(R.id.mainActivity_News);
         Button lecture = (Button) findViewById(R.id.mainActivity_Lecture);
+        Button test = (Button) findViewById(R.id.mainActivity_Test);
+
 
         mlkz.setOnClickListener(this);
         news.setOnClickListener(this);
         lecture.setOnClickListener(this);
+        test.setOnClickListener(this);
     }
 
     @Override
@@ -72,6 +69,11 @@ public class act_MainActivity extends MyBaseActivity implements View.OnClickList
             //讲座信息
             case R.id.mainActivity_Lecture:
                 startActivity(new Intent(this, act_Lecture_Catalog.class));
+                finish();
+                break;
+            //测试
+            case R.id.mainActivity_Test:
+                startActivity(new Intent(this, testDemoActivity.class));
                 finish();
                 break;
         }
