@@ -7,7 +7,7 @@ import android.widget.Button;
 
 import ecust.demotest.testDemoActivity;
 import ecust.lecture.act_Lecture_Catalog;
-import ecust.mlkz.act_MLKZ_HomePage;
+import ecust.mlkz.act_MLKZ_Home;
 import ecust.news.act_News_Catalog;
 import lib.BaseActivity.MyBaseActivity;
 
@@ -58,7 +58,7 @@ public class act_MainActivity extends MyBaseActivity implements View.OnClickList
         switch (v.getId()) {
             //梅陇客栈
             case R.id.mainActivity_MLKZ:
-                startActivity(new Intent(this, act_MLKZ_HomePage.class));
+                startActivity(new Intent(this, act_MLKZ_Home.class));
                 finish();
                 break;
             //华理新闻

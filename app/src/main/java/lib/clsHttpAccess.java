@@ -14,7 +14,6 @@ import org.apache.http.params.CoreConnectionPNames;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
-import ecust.mlkz.act_MLKZ_HomePage;
 import ecust.mlkz.act_MLKZ_LoginPage;
 import ecust.mlkz.clsLogin;
 import lib.clsGlobal.Global;
@@ -116,7 +115,7 @@ public class clsHttpAccess {
                         ((act_MLKZ_LoginPage) Global.activity).handle_Login(rtnMessage);
                         break;
                     case Global.action_mlkz_homepage:
-//                        ((act_MLKZ_HomePage) Global.activity).handle_HomePage(rtnMessage);
+//                        ((act_MLKZ_Home_bak) Global.activity).handle_HomePage(rtnMessage);
                         break;
                     case Global.action_timeout:                                                     //超时
                         Global.toastMsg("服务器连接异常,请稍后再试");

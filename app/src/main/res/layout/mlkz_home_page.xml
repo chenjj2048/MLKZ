@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="ecust.mlkz.act_MLKZ_HomePage">
+    tools:context="ecust.mlkz.act_MLKZ_Home_bak">
 
     <!--华理助手-->
     <!--梅陇客栈 主界面-->

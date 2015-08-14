@@ -26,7 +26,7 @@ import lib.BaseActivity.MyBaseActivity;
 import lib.clsGlobal.Global;
 import lib.clsHttpAccess_CallBack;
 
-public class act_MLKZ_HomePage extends MyBaseActivity {
+public class act_MLKZ_Home_bak extends MyBaseActivity {
 
     //存放梅陇客栈首页结构
     //如：华理知道itemBean(标题，新消息数量，超链接)→ArrayList数组→华理信息Map

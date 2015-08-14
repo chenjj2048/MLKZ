@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="ecust.mlkz.act_MLKZ_Home">
+
+    <!--梅陇客栈主页面框架-->
+    <include layout="@layout/part_actionbar" />
+
+    <!--侧滑菜单、主体组合部分-->
+    <ecust.mlkz.SlidingMenu
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <!--左侧侧滑菜单-->
+            <LinearLayout
+                android:id="@+id/mlkz_home_slidingmenu_left"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@android:color/holo_orange_light"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="30dp"
+                    android:text="menu"
+                    android:textSize="30sp" />
+            </LinearLayout>
+
+            <!--主体部分-->
+            <LinearLayout
+                android:id="@+id/mlkz_home_slidingmenu_body"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal" />
+        </LinearLayout>
+
+    </ecust.mlkz.SlidingMenu>
+</LinearLayout>
