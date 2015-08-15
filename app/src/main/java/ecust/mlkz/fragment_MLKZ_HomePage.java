@@ -1,11 +1,15 @@
 package ecust.mlkz;
 
-import android.content.SharedPreferences;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -13,10 +17,11 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import ecust.main.R;
-import lib.clsGlobal.Global;
+import lib.clsGlobal.Const;
 import lib.clsGlobal.logUtil;
 import lib.clsHttpAccess_CallBack;
 
@@ -42,7 +47,9 @@ import lib.clsHttpAccess_CallBack;
  */
 public class fragment_MLKZ_HomePage extends Fragment implements clsHttpAccess_CallBack.OnHttpVisitListener {
 
-    private List<struct_mlkz_home_primary> content = new ArrayList<>();     //存储所有数据内容
+    private List<struct_MLKZ_Home_Section> mContent = new ArrayList<>();     //存储所有数据内容
+    private bbsCatalogAdapter mAdapter;     //适配器
+    private ListView listView;          //ListView
 
     public fragment_MLKZ_HomePage() {
     }
@@ -50,11 +57,17 @@ public class fragment_MLKZ_HomePage extends Fragment implements clsHttpAccess_Ca
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        SharedPreferences sp = getActivity().getSharedPreferences(Global.sp_Config, 0);
-        String cookie = sp.getString(Global.sp_Cookie, "");
+//        SharedPreferences sp = getActivity().getSharedPreferences(Global.sp_Config, 0);
+//        String cookie = sp.getString(Global.sp_Cookie, "");
 
-        //返回布局
-        return inflater.inflate(R.layout.mlkz_home_page_fragment, container, false);
+        View view = inflater.inflate(R.layout.mlkz_home_page_fragment, container, false);
+        //适配器
+        mAdapter = new bbsCatalogAdapter(getActivity(), mContent);
+        //ListView
+        listView = (ListView) view.findViewById(R.id.mlkz_home_page_listview);
+        listView.setAdapter(mAdapter);
+
+        return view;    //返回布局
     }
 
     @Override
@@ -68,8 +81,9 @@ public class fragment_MLKZ_HomePage extends Fragment implements clsHttpAccess_Ca
 
     @Override
     public void onHttpLoadCompleted(String url, String cookie, boolean bSucceed, String rtnHtmlMessage) {
-
-
+        //设置数据，通知更新
+        mAdapter.setList(mContent);
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -77,10 +91,10 @@ public class fragment_MLKZ_HomePage extends Fragment implements clsHttpAccess_Ca
         if (!bSucceed) return;
 
         //解析数据
-        content = parseAllData(rtnHtmlMessage);
+        mContent = parseAllData(rtnHtmlMessage);
 
         //输出日志
-        printAllDataLog(content);
+//        printAllDataLog(mContent);
     }
 
     @Override
@@ -92,25 +106,25 @@ public class fragment_MLKZ_HomePage extends Fragment implements clsHttpAccess_Ca
     }
 
     //输出所有数据
-    public void printAllDataLog(List<struct_mlkz_home_primary> mData) {
-        for (struct_mlkz_home_primary s0 : mData) {
+    public void printAllDataLog(List<struct_MLKZ_Home_Section> mData) {
+        for (struct_MLKZ_Home_Section s0 : mData) {
             logUtil.i(this, "====" + s0.getSectionName() + "====");
-            for (struct_mlkz_home_secondary s1 : s0.getContentList()) {
-                logUtil.i(this, s1.getTitle() + " = " + s1.getUrl() + " = " + s1.getNew_Message_Count());
+            for (struct_MLKZ_Home_SubSection s1 : s0.getContentList()) {
+                logUtil.i(this, s1.getTitle() + "  " + s1.getUrl() + "  " + s1.getNew_Message_Count());
             }
         }
     }
 
     //解析全部数据
-    public List<struct_mlkz_home_primary> parseAllData(String html) {
-        List<struct_mlkz_home_primary> mData = new ArrayList<>();
+    public List<struct_MLKZ_Home_Section> parseAllData(String html) {
+        List<struct_MLKZ_Home_Section> mData = new ArrayList<>();
 
         //开始解析
         Document document = Jsoup.parse(html);
         Elements fl_collection = document.getElementsByClass("fl");
         for (Element fl : fl_collection) {
             //创建存储的数据集
-            struct_mlkz_home_primary mContent = new struct_mlkz_home_primary();
+            struct_MLKZ_Home_Section mContent = new struct_MLKZ_Home_Section();
             //取得标题（华理信息、励志书院、谈天说地、娱乐休闲、特色板块、站务管理）
             mContent.parseCatalog(fl.toString());
             mContent.parseStruct(fl.toString());   //取得子集
@@ -121,15 +135,15 @@ public class fragment_MLKZ_HomePage extends Fragment implements clsHttpAccess_Ca
 }
 
 //大板块（一级）
-class struct_mlkz_home_primary {
+class struct_MLKZ_Home_Section {
     private String section;     //版块名称
-    private List<struct_mlkz_home_secondary> contentList = new ArrayList<>();   //版块内容
+    private List<struct_MLKZ_Home_SubSection> contentList = new ArrayList<>();   //版块内容
 
     public String getSectionName() {
         return section;
     }
 
-    public List<struct_mlkz_home_secondary> getContentList() {
+    public List<struct_MLKZ_Home_SubSection> getContentList() {
         return contentList;
     }
 
@@ -149,7 +163,7 @@ class struct_mlkz_home_primary {
         Elements elements = document.getElementsByClass("bm_c_add");
         for (Element element : elements) {
             //创建数据集
-            struct_mlkz_home_secondary mContent = new struct_mlkz_home_secondary();
+            struct_MLKZ_Home_SubSection mContent = new struct_MLKZ_Home_SubSection();
             mContent.parseStruct(element.toString());
             this.contentList.add(mContent);
         }
@@ -157,7 +171,7 @@ class struct_mlkz_home_primary {
 }
 
 //大板块下的小分类（二级）
-class struct_mlkz_home_secondary {
+class struct_MLKZ_Home_SubSection {
     private String title;   //子标题
     private String url;     //链接地址
     private String new_message_count;   //新消息数量
@@ -182,9 +196,12 @@ class struct_mlkz_home_secondary {
         this.title = document.text().trim();
         if (this.title.contains("("))
             this.title = this.title.substring(0, this.title.indexOf("("));
+        //新生报到！！！标题一定要长！！！（这版块名字这么长做甚！！！）
+        if (this.title.contains("！"))
+            this.title = this.title.substring(0, this.title.indexOf("！"));
 
         //Url地址
-        this.url = Global.bbs + "/" + document.getElementsByTag("a").first().attr("href");
+        this.url = Const.bbs + "/" + document.getElementsByTag("a").first().attr("href");
 
         //新消息数量
         if (html.contains("<font"))             //有新消息则进行解析，否则为0
@@ -194,3 +211,157 @@ class struct_mlkz_home_secondary {
             this.new_message_count = "0";
     }
 }
+
+//ListView适配器
+class bbsCatalogAdapter extends BaseAdapter implements View.OnClickListener {
+    private final int total_columns = 2;        //双栏
+    private int count_of_data = 0;              //ListView行的数量
+    private Context context;
+    private List<struct_MLKZ_Home_Section> mList;       //数据集
+    private List<View> mView;           //视图页面
+
+    public bbsCatalogAdapter(Context context, List<struct_MLKZ_Home_Section> mList) {
+        this.context = context;
+        this.mList = mList;
+    }
+
+    public void setList(List<struct_MLKZ_Home_Section> mList) {
+        this.mList = mList;
+        this.count_of_data = getCount_Of_Data(mList);       //数据集改变时，修改数量尺寸
+        this.mView = initViews();
+    }
+
+    @Override
+    public void onClick(View v) {
+        struct_MLKZ_Home_SubSection tag = (struct_MLKZ_Home_SubSection) v.getTag();
+        logUtil.toast(tag.getTitle() + " " + tag.getUrl());
+        logUtil.e(this, "=========================");
+    }
+
+    //初始化所有视图,一次设置索引，方便查找
+    public List<View> initViews() {
+        List<View> returnViews = new ArrayList<>(30);     //结果集合
+
+        //寻找对应项目
+        Iterator<struct_MLKZ_Home_Section> sectionIterator = mList.iterator();
+        while (sectionIterator.hasNext()) {
+            //获取单一版块
+            struct_MLKZ_Home_Section section = sectionIterator.next();
+            returnViews.add(createSectionView(section));          //添加版块名称视图
+
+            //搜索子项
+            Iterator<struct_MLKZ_Home_SubSection> subSectionIterator = section.getContentList().iterator();
+            while (subSectionIterator.hasNext()) {
+                //左栏
+                struct_MLKZ_Home_SubSection left_subsection = subSectionIterator.next();
+                //右栏（可能为空）
+                struct_MLKZ_Home_SubSection right_subsection = null;
+                if (subSectionIterator.hasNext())
+                    right_subsection = subSectionIterator.next();
+
+                returnViews.add(createSubSectionView(left_subsection, right_subsection));  //返回子版块视图
+            }
+        }
+        return returnViews;
+    }
+
+    //返回需要多少行内容
+    public int getCount_Of_Data(List<struct_MLKZ_Home_Section> mData) {
+        int count = 0;      //总共多少行
+        Iterator<struct_MLKZ_Home_Section> sectionIterator = mData.iterator();
+        while (sectionIterator.hasNext()) {
+            //获取单一版块
+            int current_column = 0;   //列数
+            struct_MLKZ_Home_Section section = sectionIterator.next();
+            count++;
+            Iterator<struct_MLKZ_Home_SubSection> subSectionIterator = section.getContentList().iterator();
+            while (subSectionIterator.hasNext()) {
+                //一条条的子项
+                struct_MLKZ_Home_SubSection subsection = subSectionIterator.next();
+
+                if (current_column++ == 0)
+                    count++;     //行数加一
+                current_column = current_column % this.total_columns;     //取模，此处为双栏
+            }
+        }
+        return count;
+    }
+
+    //返回数据量
+    @Override
+    public int getCount() {
+        return this.count_of_data;       //返回ListView行数
+    }
+
+    @Override
+    public Object getItem(int position) {
+        return null;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return 0;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        return this.mView.get(position);
+    }
+
+    //创建版块视图
+    public View createSectionView(struct_MLKZ_Home_Section para) {
+        //版块名称
+        LayoutInflater layoutInflater = LayoutInflater.from(this.context);
+
+        //加载布局
+        View view = layoutInflater.inflate(R.layout.mlkz_home_page_fragment_listview_item_section, null);
+        TextView textView = (TextView) view.findViewById(R.id.mlkz_home_page_sectionname);
+        textView.setText(para.getSectionName());        //设置版块名称
+        return view;
+    }
+
+    //创建子版块视图
+    public View createSubSectionView(struct_MLKZ_Home_SubSection left,
+                                     struct_MLKZ_Home_SubSection right) {
+        //版块名称
+        LayoutInflater layoutInflater = LayoutInflater.from(this.context);
+
+        //加载布局
+        View view = layoutInflater.inflate(R.layout.mlkz_home_page_fragment_listview_item_subsection, null);
+
+        //查找引用（左侧）
+        ViewGroup leftViewGroup = (ViewGroup) view.findViewById(R.id.mlkz_home_page_viewgroup_left);
+        TextView leftSubSectionName = (TextView) view.findViewById(R.id.mlkz_home_page_subsectionname_left);
+        TextView leftNewMessage = (TextView) view.findViewById(R.id.mlkz_home_page_subsection_new_message_left);
+        //查找引用（右侧）
+        ViewGroup rightViewGroup = (ViewGroup) view.findViewById(R.id.mlkz_home_page_viewgroup_right);
+        TextView rightSubSectionName = (TextView) view.findViewById(R.id.mlkz_home_page_subsectionname_right);
+        TextView rightNewMessage = (TextView) view.findViewById(R.id.mlkz_home_page_subsection_new_message_right);
+
+        //设置数据（左侧）
+        if (left != null) {
+            leftViewGroup.setTag(left);
+            leftViewGroup.setOnClickListener(this);                 //设置点击事件
+            leftSubSectionName.setText(left.getTitle());            //设置版块名称（左侧）
+            leftNewMessage.setText(left.getNew_Message_Count());    //设置新消息数量（左侧）
+        } else {
+            throw new NullPointerException();       //肯定不会为空
+        }
+
+        //设置数据（右侧）
+        if (right != null) {
+            rightViewGroup.setTag(right);
+            rightViewGroup.setOnClickListener(this);                //设置点击事件
+            rightSubSectionName.setText(right.getTitle());          //设置版块名称（左侧）
+            rightNewMessage.setText(right.getNew_Message_Count());  //设置新消息数量（左侧）
+        } else {
+            rightViewGroup.setVisibility(View.GONE);       //隐藏
+        }
+
+        return view;
+    }
+}
+
+
+
+

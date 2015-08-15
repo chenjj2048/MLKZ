@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:baselineAligned="false"
+    android:orientation="horizontal"
+    android:weightSum="2"
+    tools:context="ecust.mlkz.fragment_MLKZ_HomePage">
+
+    <!--左侧-->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:baselineAligned="false"
+        android:padding="10dp">
+
+        <RelativeLayout
+            android:id="@+id/mlkz_home_page_viewgroup_left"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/selector_mlkz_homepage_item"
+            android:padding="6dp">
+
+            <!--子版块名称-->
+            <TextView
+                android:id="@+id/mlkz_home_page_subsectionname_left"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:textColor="@android:color/black" />
+
+            <!--新消息数量-->
+            <TextView
+                android:id="@+id/mlkz_home_page_subsection_new_message_left"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:textColor="@android:color/black" />
+
+        </RelativeLayout>
+    </LinearLayout>
+
+    <!--右侧-->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:baselineAligned="false"
+        android:padding="10dp">
+
+        <RelativeLayout
+            android:id="@+id/mlkz_home_page_viewgroup_right"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/selector_mlkz_homepage_item"
+            android:padding="6dp">
+
+            <!--子版块名称-->
+            <TextView
+                android:id="@+id/mlkz_home_page_subsectionname_right"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:textColor="@android:color/black" />
+
+            <!--新消息数量-->
+            <TextView
+                android:id="@+id/mlkz_home_page_subsection_new_message_right"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:textColor="@android:color/black" />
+
+        </RelativeLayout>
+    </LinearLayout>
+</LinearLayout>

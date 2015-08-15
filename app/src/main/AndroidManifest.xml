@@ -45,9 +45,6 @@
             android:name="ecust.mlkz.act_MLKZ_Home"
             android:label="@string/title_activity_act__mlkz__home_page" />
         <activity
-            android:name="ecust.mlkz.act_MLKZ_Home_bak"
-            android:label="梅陇客栈备份版！！！！" />
-        <activity
             android:name="ecust.news.act_News_Catalog"
             android:label="@string/title_activity_act__ecust__news" />
         <activity

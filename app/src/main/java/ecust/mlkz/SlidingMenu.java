@@ -35,6 +35,7 @@ public class SlidingMenu extends HorizontalScrollView {
     private int mScreenWidth;       //屏幕宽度
     private boolean firstRun = true;
     private int mMenuWidth;         //侧滑菜单宽度
+    private boolean canShow;        //允许侧滑菜单显示
 
     public SlidingMenu(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -79,8 +80,17 @@ public class SlidingMenu extends HorizontalScrollView {
         int action = ev.getAction();
 
         switch (action) {
-            //进行判断，如果显示区域大于菜单宽度一半则完全显示，否则隐藏
+            case MotionEvent.ACTION_DOWN:
+
+
+                break;
+
+            case MotionEvent.ACTION_MOVE:
+                break;
             case MotionEvent.ACTION_UP:
+
+
+                //进行判断，如果显示区域大于菜单宽度一半则完全显示，否则隐藏
                 int scrollX = getScrollX();
                 if (scrollX > mMenuWidth / 2)
                     this.smoothScrollTo(mMenuWidth, 0);

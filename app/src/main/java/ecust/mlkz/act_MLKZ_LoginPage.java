@@ -123,7 +123,7 @@ public class act_MLKZ_LoginPage extends Activity {
 
             //跳转至主界面梅陇客栈
             Intent activity_new = new Intent();
-            activity_new.setClass(this, act_MLKZ_Home_bak.class);
+            activity_new.setClass(this, act_MLKZ_Home.class);
             startActivity(activity_new);                                                            //启动MLKZ主页
             finish();                                                                               //登录成功，销毁界面
         } else {

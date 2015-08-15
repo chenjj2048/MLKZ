@@ -28,6 +28,7 @@ public class Const {
     public final static String news_url = "http://news.ecust.edu.cn";
     public final static String lecture_url = "http://news.ecust.edu.cn/reports";   //讲座信息主目录
     public final static String packageName = "cjj.ecust.helper";
+    public final static String bbs = "http://bbs.ecust.edu.cn";                     //梅陇客栈
 
     //获取SQL数据库存放位置
     public static String getSQLDataBaseStoragePath() {

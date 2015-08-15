@@ -8,4 +8,9 @@
     <color name="grey1">#ffc8c8c8</color>
     <color name="blue2">#ff009fd3</color>
     <color name="black">#ff000000</color>
+
+    <!--浅灰-->
+    <color name="grey240">#fff0f0f0</color>
+    <!--略深灰-->
+    <color name="grey230">#ffe6e6e6</color>
 </resources>

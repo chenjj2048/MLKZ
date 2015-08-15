@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context="ecust.mlkz.fragment_MLKZ_HomePage">
 
-    <TextView
-        android:id="@+id/testtest"
-        android:layout_width="wrap_content"
+    <!--梅陇客栈 目录-->
+    <ListView
+        android:id="@+id/mlkz_home_page_listview"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="fragment"
-        android:textSize="16sp" />
+        android:background="@android:color/white"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp"
+        android:listSelector="@android:color/transparent"
+        android:scrollbars="none" />
+
 </LinearLayout>
