@@ -32,24 +32,28 @@ import lib.BaseActivity.MyBaseFragmentActivity;
 import lib.clsGlobal.Global;
 
 public class act_MLKZ_Home extends MyBaseFragmentActivity {
-    private FragmentManager mFragmentManager;
-    private fragment_MLKZ_HomePage fragment_mlkz_homePage;
+    public SlidingMenu slidingMenu;        //滑动控件
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.mlkz_home_frame);           //加载梅陇客栈 主框架布局
 
-        fragment_mlkz_homePage = new fragment_MLKZ_HomePage();       //主布局
-
         //Fragment管理
-        mFragmentManager = getSupportFragmentManager();
+        FragmentManager mFragmentManager = getSupportFragmentManager();
 
         FragmentTransaction trans = mFragmentManager.beginTransaction();
-        //替换主体部分为Fragment
-        trans.replace(R.id.mlkz_home_slidingmenu_body, fragment_mlkz_homePage, null);
+
+        //1.设置左侧侧滑菜单Fragment
+        trans.replace(R.id.mlkz_home_slidingmenu_left, new fragment_MLKZ_LeftMenu(), null);
+
+        //2.设置主体部分Fragment
+        trans.replace(R.id.mlkz_home_slidingmenu_body, new fragment_MLKZ_HomePage(), null);
 
         trans.commit();
+
+        //寻找滑动视图
+        slidingMenu = (SlidingMenu) findViewById(R.id.mlkz_home_slidingmenu);
 
         Global.setTitle(this, "梅陇客栈");
     }
@@ -58,6 +62,7 @@ public class act_MLKZ_Home extends MyBaseFragmentActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        //回首页
         Intent homePage = new Intent(this, act_MainActivity.class);
         startActivity(homePage);
     }

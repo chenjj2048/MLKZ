@@ -13,4 +13,7 @@
     <color name="grey240">#fff0f0f0</color>
     <!--略深灰-->
     <color name="grey230">#ffe6e6e6</color>
+
+    <!--黑色-->
+    <color name="black26">#ff1a1a1a</color>
 </resources>

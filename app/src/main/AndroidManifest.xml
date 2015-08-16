@@ -2,13 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ecust.main"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="1.0">
 
-    <!-- 必须解决OOM， -->
-    <!-- 【哀思忆先生】光影中的成思危先生与华理 -->
-    <!-- http://news.ecust.edu.cn/news/35235?important=1&category_id= -->
-    <!-- 发布日期：2015年07月13日17时03分 -->
-    <!-- 图片过多啊 -->
     <uses-sdk
         android:minSdkVersion="15"
         android:targetSdkVersion="22" />
@@ -19,22 +14,15 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
 
-
     <application
         android:name="lib.clsGlobal.clsApplication"
         android:allowBackup="true"
         android:icon="@mipmap/logo"
         android:label="@string/app_name"
-        android:theme="@style/AppBaseTheme" >
-        <activity
-            android:name="ecust.mlkz.act_MLKZ_LoginPage"
-            android:label="@string/title_activity_login_page" />
-        <activity
-            android:name="ecust.mlkz.act_MLKZ_Register"
-            android:label="@string/title_activity_act_register" />
+        android:theme="@style/AppBaseTheme">
         <activity
             android:name=".act_MainActivity"
-            android:label="@string/title_activity_act__main_page" >
+            android:label="@string/title_activity_act__main_page">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -44,6 +32,9 @@
         <activity
             android:name="ecust.mlkz.act_MLKZ_Home"
             android:label="@string/title_activity_act__mlkz__home_page" />
+        <activity
+            android:name="ecust.mlkz.act_MLKZ_Login"
+            android:label="梅陇客栈-账户登陆" />
         <activity
             android:name="ecust.news.act_News_Catalog"
             android:label="@string/title_activity_act__ecust__news" />

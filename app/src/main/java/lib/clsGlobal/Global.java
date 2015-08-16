@@ -32,10 +32,6 @@ import ecust.main.R;
  * Copyright (C) 2015 彩笔怪盗基德
  */
 public class Global {
-    //HttpAccess类中常量
-    public static final int action_mlkz_loginpage = 1;
-    public static final int action_mlkz_homepage = 2;
-    public static final int action_timeout = 3;
     //SharedPreferences配置信息
     public static final String sp_Config = "config";
     public static final String sp_Username = "username";
@@ -43,43 +39,9 @@ public class Global {
     public static final String sp_Cookie = "cookie";
 
     private static final boolean isDebug = true;                                                           //Debug、Releas标签
-    private static final boolean showActivityThreadChangeLog = false;
-    public static String bbs = "http://bbs.ecust.edu.cn";
     //公共的Activity
     public static Activity activity;
-    private static int count_of_thread;
-    private static String lastToastMsg = "";
-    private static long lastToastTime;
 
-    /**
-     * 保证Toast不会短时间内产生大量消息
-     */
-    public static void toastMsg(String str) {
-        final long diffSec = 2000;                                                                  //Toast时间间隔
-
-        if (str == null) return;
-        if (str.equals("")) return;
-
-        long nowTime = new Date().getTime();
-
-        if (nowTime - lastToastTime <= diffSec && str.equals(lastToastMsg)) return;
-
-        lastToastMsg = str;
-        lastToastTime = nowTime;
-        Toast.makeText(clsApplication.getContext(), str, Toast.LENGTH_SHORT).show();
-    }
-
-    public static void addThread() {
-        count_of_thread++;
-        if (showActivityThreadChangeLog)
-            log("[线程增加]thread=" + count_of_thread);
-    }
-
-    public static void deleteThread() {
-        count_of_thread--;
-        if (showActivityThreadChangeLog)
-            log("[线程减少]thread=" + count_of_thread);
-    }
 
     public static void log(String msg) {
         String tag = "";
@@ -115,18 +77,6 @@ public class Global {
         String result = sb.toString();
         Global.log(result);
         return result;
-    }
-
-    /**
-     * 产生唯一的EventBus事件ID
-     */
-    public static class eventBus {
-        private static long uniqueEventBusID = 0;
-
-        //获取唯一的EventID
-        public static long getID() {
-            return uniqueEventBusID++;
-        }
     }
 
     /**

@@ -93,12 +93,23 @@ public class SlidingMenu extends HorizontalScrollView {
                 //进行判断，如果显示区域大于菜单宽度一半则完全显示，否则隐藏
                 int scrollX = getScrollX();
                 if (scrollX > mMenuWidth / 2)
-                    this.smoothScrollTo(mMenuWidth, 0);
+                    switchToBody();
                 else
-                    this.smoothScrollTo(0, 0);
+                    switchToLeftMenu();
+
                 return true;
         }
         return super.onTouchEvent(ev);
+    }
+
+    //滑动至主页
+    public void switchToBody() {
+        this.smoothScrollTo(mMenuWidth, 0);
+    }
+
+    //滑动至左侧菜单
+    public void switchToLeftMenu() {
+        this.smoothScrollTo(0, 0);
     }
 }
 

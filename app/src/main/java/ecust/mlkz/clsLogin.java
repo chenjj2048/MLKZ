@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import lib.clsGlobal.Global;
-import lib.clsHttpAccess;
 
 /**
  * Created by 1 on 2015/5/23.
@@ -47,7 +46,8 @@ public class clsLogin {
     private String GetFirstHandShakeResult() {
         String URL_MLKZ_Login = "http://bbs.cjj.ecust.edu.cn/member.php?mod=logging&action=login&mobile=yes";
         //无参数访问登陆页面
-        return clsHttpAccess.HttpGetString(URL_MLKZ_Login, null);
+//        return clsHttpAccess.HttpGetString(URL_MLKZ_Login, null);
+        return null;
     }
 
     //2.获得表单的formhash值
@@ -150,7 +150,7 @@ public class clsLogin {
         strHtml = strHtml.substring(i, i + 80);                                                     //登录失败，您还可以尝试 4 次
         String[] tmp = strHtml.split("p>");                                                         //密码错误次数过多，请 15 分钟后重新登录
         strHtml = tmp[1].replace("</", "");
-        Global.log( strHtml);
+        Global.log(strHtml);
         return strHtml;
     }
 
@@ -160,8 +160,8 @@ public class clsLogin {
         SharedPreferences.Editor editor = sp.edit();
         editor.putString(Global.sp_Username, username);                                             //保存用户名
         editor.putString(Global.sp_Password, password);                                             //保存密码
-        editor.putString(Global.sp_Cookie,cookie);                                                  //保存cookie
+        editor.putString(Global.sp_Cookie, cookie);                                                  //保存cookie
         editor.apply();
-        Global.log( "[登录成功，信息已保存]\r\n" + username + " " + password + " " + cookie);
+        Global.log("[登录成功，信息已保存]\r\n" + username + " " + password + " " + cookie);
     }
 }

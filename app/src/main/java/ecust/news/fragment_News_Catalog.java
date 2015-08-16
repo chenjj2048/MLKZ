@@ -27,7 +27,6 @@ import java.util.List;
 
 import ecust.main.R;
 import lib.clsGlobal.Const;
-import lib.clsGlobal.Global;
 import lib.clsGlobal.clsApplication;
 import lib.clsGlobal.clsExpiredTimeMangment;
 import lib.clsGlobal.logUtil;
@@ -127,7 +126,7 @@ public class fragment_News_Catalog extends Fragment implements
     //加载下一页
     public void loadNextPage() {
         if (mNewsCatalog.nextPage == mNewsCatalog.itemIsLastOne) {
-            Global.toastMsg("已无更多数据");
+            logUtil.toast("已无更多数据");
         } else {
             //不要重复加载
             if (!isLoading && clsApplication.receiver.isWebConnected()) {

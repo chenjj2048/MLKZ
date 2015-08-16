@@ -67,20 +67,18 @@ public class fragment_MLKZ_HomePage extends Fragment implements clsHttpAccess_Ca
         listView = (ListView) view.findViewById(R.id.mlkz_home_page_listview);
         listView.setAdapter(mAdapter);
 
-        return view;    //返回布局
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
         //加载网页
         String url = "http://bbs.ecust.edu.cn/forum.php?mobile=yes";
         String cookie = "";
         clsHttpAccess_CallBack.getSingleton().getHttp(url, cookie, this);
+
+        return view;    //返回布局
     }
 
     @Override
     public void onHttpLoadCompleted(String url, String cookie, boolean bSucceed, String rtnHtmlMessage) {
+        if (!bSucceed) return;
+
         //设置数据，通知更新
         mAdapter.setList(mContent);
         mAdapter.notifyDataSetChanged();
@@ -94,7 +92,7 @@ public class fragment_MLKZ_HomePage extends Fragment implements clsHttpAccess_Ca
         mContent = parseAllData(rtnHtmlMessage);
 
         //输出日志
-//        printAllDataLog(mContent);
+        printAllDataLog(mContent);
     }
 
     @Override
@@ -213,7 +211,7 @@ class struct_MLKZ_Home_SubSection {
 }
 
 //ListView适配器
-class bbsCatalogAdapter extends BaseAdapter implements View.OnClickListener {
+class bbsCatalogAdapter extends BaseAdapter implements View.OnClickListener, View.OnTouchListener {
     private final int total_columns = 2;        //双栏
     private int count_of_data = 0;              //ListView行的数量
     private Context context;
@@ -227,15 +225,31 @@ class bbsCatalogAdapter extends BaseAdapter implements View.OnClickListener {
 
     public void setList(List<struct_MLKZ_Home_Section> mList) {
         this.mList = mList;
-        this.count_of_data = getCount_Of_Data(mList);       //数据集改变时，修改数量尺寸
+        //数据集改变时，修改数量尺寸（1为最后一个底部空白）
+        this.count_of_data = getCount_Of_Data(mList) + 1;
         this.mView = initViews();
     }
 
     @Override
     public void onClick(View v) {
-        struct_MLKZ_Home_SubSection tag = (struct_MLKZ_Home_SubSection) v.getTag();
-        logUtil.toast(tag.getTitle() + " " + tag.getUrl());
-        logUtil.e(this, "=========================");
+    }
+
+    //onClick点击后经常无反应，滚动后才会响应点击事件，这里用onTouch替代
+    //但又来了个新问题，selector不起作用
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                break;
+            case MotionEvent.ACTION_UP:
+                //取代灵异的onClick事件
+                struct_MLKZ_Home_SubSection tag = (struct_MLKZ_Home_SubSection) v.getTag();
+
+                if (tag != null)
+                    logUtil.toast(tag.getTitle() + " = " + tag.getUrl());
+                break;
+        }
+        return false;
     }
 
     //初始化所有视图,一次设置索引，方便查找
@@ -262,6 +276,14 @@ class bbsCatalogAdapter extends BaseAdapter implements View.OnClickListener {
                 returnViews.add(createSubSectionView(left_subsection, right_subsection));  //返回子版块视图
             }
         }
+
+        //添加底部空白边距
+        if (mList != null && mList.size() > 0) {
+            View bottomView = createSectionView(mList.get(0));
+            bottomView.setVisibility(View.INVISIBLE);
+            returnViews.add(bottomView);
+        }
+
         return returnViews;
     }
 
@@ -316,6 +338,7 @@ class bbsCatalogAdapter extends BaseAdapter implements View.OnClickListener {
         //加载布局
         View view = layoutInflater.inflate(R.layout.mlkz_home_page_fragment_listview_item_section, null);
         TextView textView = (TextView) view.findViewById(R.id.mlkz_home_page_sectionname);
+
         textView.setText(para.getSectionName());        //设置版块名称
         return view;
     }
@@ -341,6 +364,7 @@ class bbsCatalogAdapter extends BaseAdapter implements View.OnClickListener {
         //设置数据（左侧）
         if (left != null) {
             leftViewGroup.setTag(left);
+            leftViewGroup.setOnTouchListener(this);
             leftViewGroup.setOnClickListener(this);                 //设置点击事件
             leftSubSectionName.setText(left.getTitle());            //设置版块名称（左侧）
             leftNewMessage.setText(left.getNew_Message_Count());    //设置新消息数量（左侧）
@@ -351,6 +375,7 @@ class bbsCatalogAdapter extends BaseAdapter implements View.OnClickListener {
         //设置数据（右侧）
         if (right != null) {
             rightViewGroup.setTag(right);
+            rightViewGroup.setOnTouchListener(this);
             rightViewGroup.setOnClickListener(this);                //设置点击事件
             rightSubSectionName.setText(right.getTitle());          //设置版块名称（左侧）
             rightNewMessage.setText(right.getNew_Message_Count());  //设置新消息数量（左侧）

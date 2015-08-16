@@ -17,6 +17,7 @@ import lib.clsFailureBar;
 import lib.clsGlobal.Global;
 import lib.clsGlobal.logUtil;
 import lib.clsHttpAccess_CallBack;
+
 /**
  * =============================================================================
  * This program is free software: you can redistribute it and/or modify
@@ -185,7 +186,7 @@ public class act_Lecture_Detail extends MyBaseActivity implements clsFailureBar.
                         }
                     }
                 } catch (Exception e) {
-                    Global.log(e.toString());
+                    logUtil.i(this, e.toString());
                     e.printStackTrace();
                 }
             }

@@ -86,7 +86,7 @@ public class clsNetworkChangeReceiver extends BroadcastReceiver {
             strStatus = "未知网络";
             result = false;
         }
-        Global.log("[网络状态改变]" + strStatus);
+        logUtil.i(this, "[网络状态改变]" + strStatus);
         return result;
     }
 
