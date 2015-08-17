@@ -58,7 +58,7 @@ public class fragment_MLKZ_HomePage extends Fragment implements clsHttpAccess_Ca
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 //        SharedPreferences sp = getActivity().getSharedPreferences(Global.sp_Config, 0);
-//        String cookie = sp.getString(Global.sp_Cookie, "");
+//        String cookieReturn = sp.getString(Global.sp_Cookie, "");
 
         View view = inflater.inflate(R.layout.mlkz_home_page_fragment, container, false);
         //适配器

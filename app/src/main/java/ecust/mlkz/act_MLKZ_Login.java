@@ -68,12 +68,22 @@ public class act_MLKZ_Login extends MyBaseActivity implements TextWatcher, View.
         }
 
         //进行登陆
-        login(username.getText().toString(), password.getText().toString());
+        loginAndGetCookie(username.getText().toString(), password.getText().toString());
+        password.setText("");
     }
 
     //登陆获取cookie
-    public void login(String strUsername, String strPassword) {
+    public void loginAndGetCookie(String strUsername, String strPassword) {
+        cls_MLKZ_Login mLogin = new cls_MLKZ_Login().setUsername(strUsername).setPassword(strPassword);
+        mLogin.setOnLoginStatusReturn(new cls_MLKZ_Login.OnLoginStatusReturn() {
+            @Override
+            public void OnLoginStatusReturn() {
+                //登陆消息返回
 
+
+            }
+        });
+        mLogin.login();     //开始登陆
     }
 
     @Override
