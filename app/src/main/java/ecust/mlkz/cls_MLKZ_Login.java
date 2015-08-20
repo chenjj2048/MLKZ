@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 import lib.clsBaseAccessInThread;
-import lib.clsGlobal.Global;
 import lib.clsGlobal.logUtil;
 
 /**
@@ -42,12 +41,21 @@ import lib.clsGlobal.logUtil;
 
 //梅陇客栈登陆
 //用于读取保存cookie
+//很早写的，类写的有点烂，囧
 public class cls_MLKZ_Login {
+    private final String MLKZ_LOGIN_INFORMATION = "mlkz_login_information";   //Preference
+    private final String USERNAME = "username";
+    private final String PASSWORD = "password";
+    private final String COOKIE = "cookie";
     private String username;
     private String password;
     private OnLoginStatusReturn onLoginStatusReturn;        //回调接口
     private String cookieReturn;        //获得的cookie
+    private Context context;
 
+    public cls_MLKZ_Login(Context context) {
+        this.context = context;
+    }
 
     //设置用户名
     public cls_MLKZ_Login setUsername(String username) {
@@ -63,7 +71,8 @@ public class cls_MLKZ_Login {
 
     //获取Cookie
     public String getCookie() {
-        return null;
+        SharedPreferences sp = context.getSharedPreferences(this.MLKZ_LOGIN_INFORMATION, Context.MODE_PRIVATE);
+        return sp.getString(this.COOKIE, "");       //读取cookie
     }
 
     //进行登陆
@@ -181,29 +190,29 @@ public class cls_MLKZ_Login {
 
     //6.保存用户名、密码、cookie
     private void SaveLoginInformation(String username, String password, String cookie) {
-        SharedPreferences sp = Global.activity.getSharedPreferences(Global.sp_Config, Context.MODE_PRIVATE);
+        SharedPreferences sp = context.getSharedPreferences(this.MLKZ_LOGIN_INFORMATION, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         //保存用户名
-        editor.putString(Global.sp_Username, username);
+        editor.putString(this.USERNAME, username);
         //保存密码
-        editor.putString(Global.sp_Password, password);
+        editor.putString(this.PASSWORD, password);
         //保存cookie
-        editor.putString(Global.sp_Cookie, cookie);
+        editor.putString(this.COOKIE, cookie);
         editor.apply();
-        logUtil.i(this, "[登录成功，信息已保存]\r\n" + username + " " + password + " " + cookie);
+//        logUtil.i(this, "[登录成功，信息已保存]\r\n" + username + " " + password + " " + cookie);
     }
 
     //登陆返回接口
     public interface OnLoginStatusReturn {
-        void OnLoginStatusReturn(String username,String password,boolean succeed,String rtnMessage,String cookie);
+        void OnLoginStatusReturn(String username, String password, String rtnMessage, String cookie);
     }
 
     //登陆任务（子线程）
     private class loginTask extends AsyncTask<String, Void, Void> {
         //登陆地址
         private final String login_url = "http://bbs.ecust.edu.cn/member.php?mod=logging&action=login&mobile=yes";
-        private String returnMessage;       //返回的消息
-
+        private final int minShowTime = 2000;
+        private String returnMessage = "";       //返回的消息
 
         @Override
         protected Void doInBackground(String... params) {
@@ -211,16 +220,25 @@ public class cls_MLKZ_Login {
             final String username = params[0];        //用户名
             final String password = params[1];        //密码
 
+            final long startTime = System.currentTimeMillis();
+
             //进行第一次登陆访问，获取formhash及表单提交地址
             String HtmlResult = new clsBaseAccessInThread().HttpGetString(login_url, null, 0, 0);
-            final String formhash = getFormHash(HtmlResult);      //获取表单hash
-            final String postURL = getPostURL(HtmlResult);     //获取Post地址
-
-            //提交表单信息尝试登陆
-            HtmlResult = LoginByUsername(postURL, username, password, formhash);
-            this.returnMessage = LoginStatusMessage(HtmlResult);
-
-            logUtil.i(this, this.returnMessage);
+            //获取成功
+            if (HtmlResult != null && HtmlResult.length() > 0) {
+                final String formhash = getFormHash(HtmlResult);      //获取表单hash
+                final String postURL = getPostURL(HtmlResult);     //获取Post地址
+                //提交表单信息尝试登陆
+                HtmlResult = LoginByUsername(postURL, username, password, formhash);
+                this.returnMessage = LoginStatusMessage(HtmlResult);
+            }
+            try {
+                while (System.currentTimeMillis() - startTime < minShowTime) {
+                    Thread.sleep(40);
+                }
+            } catch (Exception e) {
+                logUtil.e(this, e.toString());
+            }
 
             return null;
         }
@@ -228,12 +246,14 @@ public class cls_MLKZ_Login {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            logUtil.toast(this.returnMessage);
 
             //登陆成功，保存登陆信息
             if (this.returnMessage.contains("欢迎您回来")) {
                 SaveLoginInformation(username, password, cookieReturn);
             }
+
+            //接口返回
+            onLoginStatusReturn.OnLoginStatusReturn(username, password, returnMessage, cookieReturn);
         }
     }
 }

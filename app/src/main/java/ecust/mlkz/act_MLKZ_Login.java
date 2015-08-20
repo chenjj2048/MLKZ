@@ -21,6 +21,7 @@
 
 package ecust.mlkz;
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -29,6 +30,7 @@ import android.widget.Button;
 
 import ecust.main.R;
 import lib.BaseActivity.MyBaseActivity;
+import lib.LoadingDialog;
 import lib.clsGlobal.logUtil;
 
 //梅陇客栈登陆页面
@@ -67,6 +69,11 @@ public class act_MLKZ_Login extends MyBaseActivity implements TextWatcher, View.
             return;
         }
 
+        if (password.getText().length() < 6) {
+            logUtil.toast("密码过短，请重新输入！");
+            return;
+        }
+
         //进行登陆
         loginAndGetCookie(username.getText().toString(), password.getText().toString());
         password.setText("");
@@ -74,16 +81,31 @@ public class act_MLKZ_Login extends MyBaseActivity implements TextWatcher, View.
 
     //登陆获取cookie
     public void loginAndGetCookie(String strUsername, String strPassword) {
-        cls_MLKZ_Login mLogin = new cls_MLKZ_Login().setUsername(strUsername).setPassword(strPassword);
+        //显示加载对话框
+        final Dialog loadingDialog = LoadingDialog.createLoadingDialog(this);
+        loadingDialog.show();
+
+        //进行登陆
+        cls_MLKZ_Login mLogin = new cls_MLKZ_Login(this).setUsername(strUsername).setPassword(strPassword);
         mLogin.setOnLoginStatusReturn(new cls_MLKZ_Login.OnLoginStatusReturn() {
             @Override
-            public void OnLoginStatusReturn() {
-                //登陆消息返回
+            public void OnLoginStatusReturn(String username, String password, String rtnMessage, String cookie) {
+                loadingDialog.dismiss();
+                if (rtnMessage == null || rtnMessage.length() <= 0) {
+                    logUtil.toast("登陆失败");
+                    return;
+                }
+                if (rtnMessage.contains("欢迎您回来")) {
+                    logUtil.toast("登陆成功");
+                    return;
+                }
 
-
+                logUtil.toast(username + " " + password + "\r\n" + rtnMessage );
             }
         });
         mLogin.login();     //开始登陆
+
+
     }
 
     @Override

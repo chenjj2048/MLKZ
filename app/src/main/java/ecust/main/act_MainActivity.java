@@ -1,5 +1,8 @@
 package ecust.main;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -10,6 +13,7 @@ import ecust.lecture.act_Lecture_Catalog;
 import ecust.mlkz.act_MLKZ_Home;
 import ecust.news.act_News_Catalog;
 import lib.BaseActivity.MyBaseActivity;
+import lib.LoadingDialog;
 
 /**
  * =============================================================================
@@ -81,8 +85,17 @@ public class act_MainActivity extends MyBaseActivity implements View.OnClickList
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        //通通杀死，清理内存
-        System.exit(0);
+        //询问是否返回
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setMessage("确定退出应用？");
+        dialog.setNegativeButton("是", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                System.exit(0);        //进程通通杀死，清理内存
+            }
+        });
+        dialog.setCancelable(false);
+        dialog.setPositiveButton("否", null);
+        dialog.show();
     }
 }
