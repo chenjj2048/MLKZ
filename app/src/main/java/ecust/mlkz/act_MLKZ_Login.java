@@ -25,6 +25,7 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 
@@ -32,12 +33,14 @@ import ecust.main.R;
 import lib.BaseActivity.MyBaseActivity;
 import lib.LoadingDialog;
 import lib.clsGlobal.logUtil;
+import lib.clsSoftKeyBoard;
 
 //梅陇客栈登陆页面
-public class act_MLKZ_Login extends MyBaseActivity implements TextWatcher, View.OnClickListener {
-    private myEditText username;
-    private myEditText password;
-    private Button login;
+public class act_MLKZ_Login extends MyBaseActivity implements TextWatcher, View.OnClickListener,
+        View.OnTouchListener {
+    private myEditText edittext_Username;
+    private myEditText edittext_password;
+    private Button btn_login;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,35 +51,51 @@ public class act_MLKZ_Login extends MyBaseActivity implements TextWatcher, View.
     }
 
     public void initCompents() {
-        username = (myEditText) findViewById(R.id.mlkz_login_username);
-        password = (myEditText) findViewById(R.id.mlkz_login_password);
-        login = (Button) findViewById(R.id.mlkz_login_button);
+        edittext_Username = (myEditText) findViewById(R.id.mlkz_login_username);
+        edittext_password = (myEditText) findViewById(R.id.mlkz_login_password);
+        btn_login = (Button) findViewById(R.id.mlkz_login_button);
 
-        username.addTextChangedListener(this);
-        password.addTextChangedListener(this);
-        login.setOnClickListener(this);
+        edittext_Username.addTextChangedListener(this);
+        edittext_password.addTextChangedListener(this);
+        btn_login.setOnClickListener(this);
+        btn_login.setOnTouchListener(this);
+
+        //获取成功登陆过的用户名
+        String strRecentUsername = new cls_MLKZ_Login(this).new getLoginPreference().getUsername();
+        edittext_Username.setText(strRecentUsername);
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                //btn按下后，隐藏软键盘
+                new clsSoftKeyBoard().hideIME(this, v);
+                break;
+        }
+        return false;
     }
 
     @Override
     public void onClick(View v) {
-        if (username.getText().length() <= 0) {
+        if (edittext_Username.getText().length() <= 0) {
             logUtil.toast("请输入用户名！");
             return;
         }
 
-        if (password.getText().length() <= 0) {
+        if (edittext_password.getText().length() <= 0) {
             logUtil.toast("请输入密码！");
             return;
         }
 
-        if (password.getText().length() < 6) {
+        if (edittext_password.getText().length() < 6) {
             logUtil.toast("密码过短，请重新输入！");
             return;
         }
 
         //进行登陆
-        loginAndGetCookie(username.getText().toString(), password.getText().toString());
-        password.setText("");
+        loginAndGetCookie(edittext_Username.getText().toString(), edittext_password.getText().toString());
+        edittext_password.setText("");
     }
 
     //登陆获取cookie
@@ -97,15 +116,14 @@ public class act_MLKZ_Login extends MyBaseActivity implements TextWatcher, View.
                 }
                 if (rtnMessage.contains("欢迎您回来")) {
                     logUtil.toast("登陆成功");
+
                     return;
                 }
 
-                logUtil.toast(username + " " + password + "\r\n" + rtnMessage );
+                logUtil.toast(rtnMessage);
             }
         });
         mLogin.login();     //开始登陆
-
-
     }
 
     @Override
@@ -118,12 +136,12 @@ public class act_MLKZ_Login extends MyBaseActivity implements TextWatcher, View.
 
     @Override
     public void afterTextChanged(Editable s) {
-        if (username.getText().length() > 0 && password.getText().length() > 0) {
+        if (edittext_Username.getText().length() > 0 && edittext_password.getText().length() > 0) {
             //能被点击
-            login.setBackgroundResource(R.drawable.shape_mlkz_login_button_can_press);
+            btn_login.setBackgroundResource(R.drawable.shape_mlkz_login_button_can_press);
         } else {
             //不能点击
-            login.setBackgroundResource(R.drawable.shape_mlkz_login_button_cannot_press);
+            btn_login.setBackgroundResource(R.drawable.shape_mlkz_login_button_cannot_press);
         }
     }
 }

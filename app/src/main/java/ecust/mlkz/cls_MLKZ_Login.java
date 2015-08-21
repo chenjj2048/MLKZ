@@ -43,10 +43,6 @@ import lib.clsGlobal.logUtil;
 //用于读取保存cookie
 //很早写的，类写的有点烂，囧
 public class cls_MLKZ_Login {
-    private final String MLKZ_LOGIN_INFORMATION = "mlkz_login_information";   //Preference
-    private final String USERNAME = "username";
-    private final String PASSWORD = "password";
-    private final String COOKIE = "cookie";
     private String username;
     private String password;
     private OnLoginStatusReturn onLoginStatusReturn;        //回调接口
@@ -67,12 +63,6 @@ public class cls_MLKZ_Login {
     public cls_MLKZ_Login setPassword(String password) {
         this.password = password;
         return this;
-    }
-
-    //获取Cookie
-    public String getCookie() {
-        SharedPreferences sp = context.getSharedPreferences(this.MLKZ_LOGIN_INFORMATION, Context.MODE_PRIVATE);
-        return sp.getString(this.COOKIE, "");       //读取cookie
     }
 
     //进行登陆
@@ -188,20 +178,6 @@ public class cls_MLKZ_Login {
         return strHtml;
     }
 
-    //6.保存用户名、密码、cookie
-    private void SaveLoginInformation(String username, String password, String cookie) {
-        SharedPreferences sp = context.getSharedPreferences(this.MLKZ_LOGIN_INFORMATION, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sp.edit();
-        //保存用户名
-        editor.putString(this.USERNAME, username);
-        //保存密码
-        editor.putString(this.PASSWORD, password);
-        //保存cookie
-        editor.putString(this.COOKIE, cookie);
-        editor.apply();
-//        logUtil.i(this, "[登录成功，信息已保存]\r\n" + username + " " + password + " " + cookie);
-    }
-
     //登陆返回接口
     public interface OnLoginStatusReturn {
         void OnLoginStatusReturn(String username, String password, String rtnMessage, String cookie);
@@ -249,11 +225,44 @@ public class cls_MLKZ_Login {
 
             //登陆成功，保存登陆信息
             if (this.returnMessage.contains("欢迎您回来")) {
-                SaveLoginInformation(username, password, cookieReturn);
+           new getLoginPreference().SaveLoginInformation(username, password, cookieReturn);
             }
 
             //接口返回
             onLoginStatusReturn.OnLoginStatusReturn(username, password, returnMessage, cookieReturn);
+        }
+    }
+
+    public  class getLoginPreference {
+        private final String MLKZ_LOGIN_INFORMATION = "mlkz_login_information";   //Preference
+        private final String USERNAME = "username";
+        private final String PASSWORD = "password";
+        private final String COOKIE = "cookie";
+
+        //6.保存用户名、密码、cookie
+        public  void SaveLoginInformation(String username, String password, String cookie) {
+            SharedPreferences sp = context.getSharedPreferences(this.MLKZ_LOGIN_INFORMATION, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sp.edit();
+            //保存用户名
+            editor.putString(this.USERNAME, username);
+            //保存密码
+            editor.putString(this.PASSWORD, password);
+            //保存cookie
+            editor.putString(this.COOKIE, cookie);
+            editor.apply();
+//        logUtil.i(this, "[登录成功，信息已保存]\r\n" + username + " " + password + " " + cookie);
+        }
+
+        //获取Cookie
+        public String getCookie() {
+            SharedPreferences sp = context.getSharedPreferences(this.MLKZ_LOGIN_INFORMATION, Context.MODE_PRIVATE);
+            return sp.getString(this.COOKIE, "");       //读取cookie
+        }
+
+        //获取用户名
+        public String getUsername(){
+            SharedPreferences sp = context.getSharedPreferences(this.MLKZ_LOGIN_INFORMATION, Context.MODE_PRIVATE);
+            return sp.getString(this.USERNAME, "");       //读取用户名
         }
     }
 }
