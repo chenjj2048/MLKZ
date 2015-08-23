@@ -30,6 +30,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import ecust.main.R;
+import lib.clsGlobal.logUtil;
 
 //左侧侧滑菜单
 public class fragment_MLKZ_LeftMenu extends Fragment implements View.OnClickListener {
@@ -49,7 +50,6 @@ public class fragment_MLKZ_LeftMenu extends Fragment implements View.OnClickList
         return view;
     }
 
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -63,7 +63,6 @@ public class fragment_MLKZ_LeftMenu extends Fragment implements View.OnClickList
                 activity.slidingMenu.switchToBody();        //滑回主体部分
 
                 break;
-
         }
     }
 }

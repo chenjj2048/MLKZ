@@ -41,12 +41,12 @@ import lib.clsGlobal.logUtil;
 
 //梅陇客栈登陆
 //用于读取保存cookie
-//很早写的，类写的有点烂，囧
+//很早写的，类写的有点烂，囧，有时间再改吧，暂时先将就用一下
 public class cls_MLKZ_Login {
     private String username;
     private String password;
     private OnLoginStatusReturn onLoginStatusReturn;        //回调接口
-    private String cookieReturn;        //获得的cookie
+    private String cookieReturn = "";        //获得的cookie
     private Context context;
 
     public cls_MLKZ_Login(Context context) {
@@ -187,7 +187,7 @@ public class cls_MLKZ_Login {
     private class loginTask extends AsyncTask<String, Void, Void> {
         //登陆地址
         private final String login_url = "http://bbs.ecust.edu.cn/member.php?mod=logging&action=login&mobile=yes";
-        private final int minShowTime = 2000;
+        private final int minShowTime = 1500;
         private String returnMessage = "";       //返回的消息
 
         @Override
@@ -198,17 +198,19 @@ public class cls_MLKZ_Login {
 
             final long startTime = System.currentTimeMillis();
 
-            //进行第一次登陆访问，获取formhash及表单提交地址
-            String HtmlResult = new clsBaseAccessInThread().HttpGetString(login_url, null, 0, 0);
-            //获取成功
-            if (HtmlResult != null && HtmlResult.length() > 0) {
-                final String formhash = getFormHash(HtmlResult);      //获取表单hash
-                final String postURL = getPostURL(HtmlResult);     //获取Post地址
-                //提交表单信息尝试登陆
-                HtmlResult = LoginByUsername(postURL, username, password, formhash);
-                this.returnMessage = LoginStatusMessage(HtmlResult);
-            }
             try {
+                //进行第一次登陆访问，获取formhash及表单提交地址
+                String HtmlResult = new clsBaseAccessInThread().HttpGetString(login_url, null, 0, 0);
+                //获取成功
+                if (HtmlResult != null && HtmlResult.length() > 0) {
+                    final String formhash = getFormHash(HtmlResult);      //获取表单hash
+                    final String postURL = getPostURL(HtmlResult);     //获取Post地址
+                    //提交表单信息尝试登陆
+                    HtmlResult = LoginByUsername(postURL, username, password, formhash);
+                    this.returnMessage = LoginStatusMessage(HtmlResult);
+                }
+
+                //至少加载状态显示一段时间
                 while (System.currentTimeMillis() - startTime < minShowTime) {
                     Thread.sleep(40);
                 }
@@ -225,7 +227,9 @@ public class cls_MLKZ_Login {
 
             //登陆成功，保存登陆信息
             if (this.returnMessage.contains("欢迎您回来")) {
-           new getLoginPreference().SaveLoginInformation(username, password, cookieReturn);
+                new getLoginPreference().SaveLoginInformation(username, password, cookieReturn);
+
+                logUtil.i(this, returnMessage);
             }
 
             //接口返回
@@ -233,14 +237,14 @@ public class cls_MLKZ_Login {
         }
     }
 
-    public  class getLoginPreference {
+    public class getLoginPreference {
         private final String MLKZ_LOGIN_INFORMATION = "mlkz_login_information";   //Preference
         private final String USERNAME = "username";
         private final String PASSWORD = "password";
         private final String COOKIE = "cookie";
 
         //6.保存用户名、密码、cookie
-        public  void SaveLoginInformation(String username, String password, String cookie) {
+        public void SaveLoginInformation(String username, String password, String cookie) {
             SharedPreferences sp = context.getSharedPreferences(this.MLKZ_LOGIN_INFORMATION, Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sp.edit();
             //保存用户名
@@ -250,7 +254,6 @@ public class cls_MLKZ_Login {
             //保存cookie
             editor.putString(this.COOKIE, cookie);
             editor.apply();
-//        logUtil.i(this, "[登录成功，信息已保存]\r\n" + username + " " + password + " " + cookie);
         }
 
         //获取Cookie
@@ -260,7 +263,7 @@ public class cls_MLKZ_Login {
         }
 
         //获取用户名
-        public String getUsername(){
+        public String getUsername() {
             SharedPreferences sp = context.getSharedPreferences(this.MLKZ_LOGIN_INFORMATION, Context.MODE_PRIVATE);
             return sp.getString(this.USERNAME, "");       //读取用户名
         }

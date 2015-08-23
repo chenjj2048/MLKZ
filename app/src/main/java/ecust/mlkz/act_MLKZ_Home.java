@@ -30,9 +30,12 @@ import ecust.main.R;
 import ecust.main.act_MainActivity;
 import lib.BaseActivity.MyBaseFragmentActivity;
 import lib.clsGlobal.Global;
+import lib.clsGlobal.logUtil;
 
 public class act_MLKZ_Home extends MyBaseFragmentActivity {
     public SlidingMenu slidingMenu;        //滑动控件
+    private fragment_MLKZ_LeftMenu leftMenu_Fragment;
+    private fragment_MLKZ_HomePage body_Fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,14 +44,15 @@ public class act_MLKZ_Home extends MyBaseFragmentActivity {
 
         //Fragment管理
         FragmentManager mFragmentManager = getSupportFragmentManager();
-
         FragmentTransaction trans = mFragmentManager.beginTransaction();
 
         //1.设置左侧侧滑菜单Fragment
-        trans.replace(R.id.mlkz_home_slidingmenu_left, new fragment_MLKZ_LeftMenu(), null);
+        leftMenu_Fragment = new fragment_MLKZ_LeftMenu();
+        trans.replace(R.id.mlkz_home_slidingmenu_left, leftMenu_Fragment, null);
 
         //2.设置主体部分Fragment
-        trans.replace(R.id.mlkz_home_slidingmenu_body, new fragment_MLKZ_HomePage(), null);
+        body_Fragment = new fragment_MLKZ_HomePage();
+        trans.replace(R.id.mlkz_home_slidingmenu_body, body_Fragment, null);
 
         trans.commit();
 
@@ -65,5 +69,18 @@ public class act_MLKZ_Home extends MyBaseFragmentActivity {
         //回首页
         Intent homePage = new Intent(this, act_MainActivity.class);
         startActivity(homePage);
+    }
+
+    //页面返回了登陆的cookie，主页面尝试用cookie登陆，会出现新版块
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (data == null) return;
+
+        //拿到cookie
+        String cookie = data.getStringExtra("cookie");
+
+        //凭cookie登陆，出现新版块
+        body_Fragment.loginMLKZ(cookie);
     }
 }

@@ -2,6 +2,7 @@ package ecust.mlkz;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -16,6 +17,15 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -46,7 +56,7 @@ import lib.clsHttpAccess_CallBack;
  * .
  */
 public class fragment_MLKZ_HomePage extends Fragment implements clsHttpAccess_CallBack.OnHttpVisitListener {
-
+    private final String file_data =  Environment.getExternalStorageDirectory().getPath() + "/" + Const.packageName + "/aaaaaa";      //数据的保存地址，文件名
     private List<struct_MLKZ_Home_Section> mContent = new ArrayList<>();     //存储所有数据内容
     private bbsCatalogAdapter mAdapter;     //适配器
     private ListView listView;          //ListView
@@ -57,9 +67,6 @@ public class fragment_MLKZ_HomePage extends Fragment implements clsHttpAccess_Ca
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-//        SharedPreferences sp = getActivity().getSharedPreferences(Global.sp_Config, 0);
-//        String cookieReturn = sp.getString(Global.sp_Cookie, "");
-
         View view = inflater.inflate(R.layout.mlkz_home_page_fragment, container, false);
         //适配器
         mAdapter = new bbsCatalogAdapter(getActivity(), mContent);
@@ -67,12 +74,21 @@ public class fragment_MLKZ_HomePage extends Fragment implements clsHttpAccess_Ca
         listView = (ListView) view.findViewById(R.id.mlkz_home_page_listview);
         listView.setAdapter(mAdapter);
 
-        //加载网页
-        String url = "http://bbs.ecust.edu.cn/forum.php?mobile=yes";
-        String cookie = "";
-        clsHttpAccess_CallBack.getSingleton().getHttp(url, cookie, this);
+        //取得本地数据
+        List<struct_MLKZ_Home_Section> data = getObjectData();
+        if (data == null) {
+            loginMLKZ("");    //加载网页
+        } else {
+            printAllDataLog(data);
+        }
 
         return view;    //返回布局
+    }
+
+    //凭cookie登陆梅陇客栈
+    public void loginMLKZ(String cookie) {
+        String url = "http://bbs.ecust.edu.cn/forum.php?mobile=yes";
+        clsHttpAccess_CallBack.getSingleton().getHttp(url, cookie, this);
     }
 
     @Override
@@ -93,6 +109,9 @@ public class fragment_MLKZ_HomePage extends Fragment implements clsHttpAccess_Ca
 
         //输出日志
         printAllDataLog(mContent);
+
+        //偷个懒，序列化保存结构，供离线使用
+        saveObjectData(mContent);
     }
 
     @Override
@@ -101,6 +120,40 @@ public class fragment_MLKZ_HomePage extends Fragment implements clsHttpAccess_Ca
 
     @Override
     public void onPictureBackgroundThreadLoadCompleted(String url, String cookie, boolean bSucceed, byte[] rtnPicBytes) {
+    }
+
+    //保存对象
+    public void saveObjectData(List<struct_MLKZ_Home_Section> parameter) {
+        try {
+            OutputStream outputStream = new FileOutputStream(file_data);
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+            objectOutputStream.writeObject(parameter);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    //读取对象
+    public List<struct_MLKZ_Home_Section> getObjectData() {
+        List<struct_MLKZ_Home_Section> result = null;
+        try {
+            InputStream inputStream = new FileInputStream(file_data);
+            ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+            result = (List<struct_MLKZ_Home_Section>) objectInputStream.readObject();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
     //输出所有数据
@@ -124,8 +177,8 @@ public class fragment_MLKZ_HomePage extends Fragment implements clsHttpAccess_Ca
             //创建存储的数据集
             struct_MLKZ_Home_Section mContent = new struct_MLKZ_Home_Section();
             //取得标题（华理信息、励志书院、谈天说地、娱乐休闲、特色板块、站务管理）
-            mContent.parseCatalog(fl.toString());
-            mContent.parseStruct(fl.toString());   //取得子集
+            mContent.parseCatalogName(fl.toString());
+            mContent.parseDetailStruct(fl.toString());   //取得子集
             mData.add(mContent);
         }
         return mData;
@@ -133,7 +186,7 @@ public class fragment_MLKZ_HomePage extends Fragment implements clsHttpAccess_Ca
 }
 
 //大板块（一级）
-class struct_MLKZ_Home_Section {
+class struct_MLKZ_Home_Section implements Serializable{
     private String section;     //版块名称
     private List<struct_MLKZ_Home_SubSection> contentList = new ArrayList<>();   //版块内容
 
@@ -146,13 +199,13 @@ class struct_MLKZ_Home_Section {
     }
 
     //解析版块名称（如特色板块）
-    public void parseCatalog(String html) {
+    public void parseCatalogName(String html) {
         Document document = Jsoup.parse(html);
         this.section = document.getElementsByClass("bm_h").first().text();
     }
 
     //解析单一版块
-    public void parseStruct(String html) {
+    public void parseDetailStruct(String html) {
 
         html = html.replace("bm_c even", "bm_c add");         //替换蓝白间隔的背景样式
         html = html.replace("bm_c add", "bm_c_add");          //去除div中空格,否则Jsoup无法正确解析
@@ -162,7 +215,7 @@ class struct_MLKZ_Home_Section {
         for (Element element : elements) {
             //创建数据集
             struct_MLKZ_Home_SubSection mContent = new struct_MLKZ_Home_SubSection();
-            mContent.parseStruct(element.toString());
+            mContent.parseStruct(element.toString());       //取得名称、URL、新消息数量
             this.contentList.add(mContent);
         }
     }
@@ -187,6 +240,7 @@ class struct_MLKZ_Home_SubSection {
     }
 
     //解析结构
+    //取得名称、URL、新消息数量
     public void parseStruct(String html) {
         Document document = Jsoup.parse(html);
 
@@ -194,9 +248,13 @@ class struct_MLKZ_Home_SubSection {
         this.title = document.text().trim();
         if (this.title.contains("("))
             this.title = this.title.substring(0, this.title.indexOf("("));
-        //新生报到！！！标题一定要长！！！（这版块名字这么长做甚！！！）
+
+        //新生报到！！！标题一定要长！！！（这版块名字这么长做甚！！！），去掉后面后缀，只显示新生报到
         if (this.title.contains("！"))
             this.title = this.title.substring(0, this.title.indexOf("！"));
+
+        //处理收藏版块的后缀（如 梅陇水库 [x] → 梅陇水库）
+        this.title = this.title.replace("[x]", "").trim();
 
         //Url地址
         this.url = Const.bbs + "/" + document.getElementsByTag("a").first().attr("href");
@@ -330,7 +388,7 @@ class bbsCatalogAdapter extends BaseAdapter implements View.OnClickListener, Vie
         return this.mView.get(position);
     }
 
-    //创建版块视图
+    //创建版块视图（版块合集的名称）
     public View createSectionView(struct_MLKZ_Home_Section para) {
         //版块名称
         LayoutInflater layoutInflater = LayoutInflater.from(this.context);
@@ -343,7 +401,7 @@ class bbsCatalogAdapter extends BaseAdapter implements View.OnClickListener, Vie
         return view;
     }
 
-    //创建子版块视图
+    //创建具体的子版块视图
     public View createSubSectionView(struct_MLKZ_Home_SubSection left,
                                      struct_MLKZ_Home_SubSection right) {
         //版块名称
