@@ -1,4 +1,4 @@
-package lib.clsGlobal;
+package lib;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo.State;
 import android.widget.Toast;
+
+import lib.clsUtils.logUtil;
 
 /**
  * =============================================================================

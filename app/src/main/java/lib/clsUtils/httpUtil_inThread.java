@@ -1,4 +1,4 @@
-package lib;
+package lib.clsUtils;
 
 /**
  * =============================================================================
@@ -34,18 +34,16 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import lib.clsGlobal.logUtil;
-
 /**
  * 用于网络访问
  * 获取文本及图片(字节流)
  * 必须在子线程中执行
  */
-public class clsBaseAccessInThread {
-    private final int timeout_text_connection = 3000;         //文本连接超时
-    private final int timeout_text_read = 5000;               //文本读取超时
-    private final int timeout_pic_connection = 5000;          //图片连接超时
-    private final int timeout_pic_read = 15000;               //图片读取超时
+public class httpUtil_inThread {
+    private static final int timeout_text_connection = 3000;         //文本连接超时
+    private static final int timeout_text_read = 5000;               //文本读取超时
+    private static final int timeout_pic_connection = 5000;          //图片连接超时
+    private static final int timeout_pic_read = 15000;               //图片读取超时
 
     /**
      * 获取纯本文

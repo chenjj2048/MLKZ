@@ -22,23 +22,26 @@
 package ecust.mlkz;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 
 import ecust.main.R;
 import lib.BaseActivity.MyBaseActivity;
-import lib.LoadingDialog;
-import lib.clsGlobal.logUtil;
-import lib.clsSoftKeyBoard;
+import lib.clsUtils.clsSoftKeyBoard;
+import lib.clsUtils.logUtil;
 
 //梅陇客栈登陆页面
 public class act_MLKZ_Login extends MyBaseActivity implements TextWatcher, View.OnClickListener,
         View.OnTouchListener, cls_MLKZ_Login.OnLoginStatusReturn {
+    public static final String COOKIE = "cookie";
+    public static final String USERNAME = "username";
     private Dialog loadingDialog;      //加载中Dialog
     private myEditText edittext_Username;
     private myEditText edittext_password;
@@ -62,7 +65,7 @@ public class act_MLKZ_Login extends MyBaseActivity implements TextWatcher, View.
         btn_login.setOnClickListener(this);
         btn_login.setOnTouchListener(this);
 
-        loadingDialog = LoadingDialog.createLoadingDialog(this);
+        loadingDialog = getLoadingDialog(this);
 
         //获取成功登陆过的用户名
         String strRecentUsername = new cls_MLKZ_Login(this).new getLoginPreference().getUsername();
@@ -113,7 +116,8 @@ public class act_MLKZ_Login extends MyBaseActivity implements TextWatcher, View.
         if (rtnMessage.contains("欢迎您回来")) {
             //设置返回消息
             Intent intent = new Intent();
-            intent.putExtra("cookie", cookie);
+            intent.putExtra(COOKIE, cookie);
+            intent.putExtra(USERNAME, edittext_Username.getText().toString());
             setResult(0, intent);
             finish();
             logUtil.toast("登陆成功");
@@ -151,5 +155,20 @@ public class act_MLKZ_Login extends MyBaseActivity implements TextWatcher, View.
             //不能点击
             btn_login.setBackgroundResource(R.drawable.shape_mlkz_login_button_cannot_press);
         }
+    }
+
+    //获取加载对话框
+    public Dialog getLoadingDialog(Context context) {
+        //设置View
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View v = inflater.inflate(R.layout.loading_dialog, null);// 得到加载view
+
+        // 创建自定义样式dialog
+        Dialog loadingDialog = new Dialog(context, R.style.loading_dialog);
+
+        loadingDialog.setCancelable(false);// 不可以用“返回键”取消
+        loadingDialog.setContentView(v);
+
+        return loadingDialog;
     }
 }

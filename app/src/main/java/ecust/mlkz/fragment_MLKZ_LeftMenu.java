@@ -27,10 +27,9 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.TextView;
 
 import ecust.main.R;
-import lib.clsGlobal.logUtil;
 
 //左侧侧滑菜单
 public class fragment_MLKZ_LeftMenu extends Fragment implements View.OnClickListener {
@@ -44,8 +43,8 @@ public class fragment_MLKZ_LeftMenu extends Fragment implements View.OnClickList
         View view = inflater.inflate(R.layout.mlkz_home_page_fragment_leftmenu, container, false);
 
         //寻找头像图片，点击后登录
-        ImageView imageView = (ImageView) view.findViewById(R.id.mlkz_home_menu_login_image);
-        imageView.setOnClickListener(this);
+        ViewGroup viewGroup = (ViewGroup) view.findViewById(R.id.mlkz_home_menu_login_group);
+        viewGroup.setOnClickListener(this);
 
         return view;
     }
@@ -53,16 +52,29 @@ public class fragment_MLKZ_LeftMenu extends Fragment implements View.OnClickList
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.mlkz_home_menu_login_image:
+            case R.id.mlkz_home_menu_login_group:
                 //点击头像登录，或显示详细数据
                 Intent intent = new Intent(getActivity(), act_MLKZ_Login.class);
                 startActivityForResult(intent, 0);
 
-                //寻找主Activity
-                act_MLKZ_Home activity = (act_MLKZ_Home) getActivity();
-                activity.slidingMenu.switchToBody();        //滑回主体部分
-
                 break;
         }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (data == null) return;
+
+        //设置登陆成功的用户名
+        String username = data.getStringExtra(act_MLKZ_Login.USERNAME);
+        TextView tvUserName = (TextView) getActivity().findViewById(R.id.mlkz_home_menu_login_username);
+        tvUserName.setText(username);
+
+        //寻找主Activity
+        act_MLKZ_Home activity = (act_MLKZ_Home) getActivity();
+        activity.slidingMenu.measureSize();
+        activity.slidingMenu.switchToBody();        //滑回主体部分
     }
 }

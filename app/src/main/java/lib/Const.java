@@ -1,4 +1,4 @@
-package lib.clsGlobal;
+package lib;
 
 import android.os.Environment;
 

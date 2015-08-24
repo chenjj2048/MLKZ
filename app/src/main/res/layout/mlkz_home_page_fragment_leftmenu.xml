@@ -7,19 +7,33 @@
     android:orientation="vertical"
     tools:context="ecust.mlkz.fragment_MLKZ_LeftMenu">
 
-    <!--头像-->
-    <ImageView
-        android:id="@+id/mlkz_home_menu_login_image"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_margin="20dp"
-        android:src="@drawable/mlkz_default_head_image" />
-
-    <TextView
+    <RelativeLayout
+        android:id="@+id/mlkz_home_menu_login_group"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="@style/MLKZ_LeftMenu_TextView"
-        android:text="登陆我的账号,享有更多特权"/>
+        android:background="@android:color/holo_blue_dark"
+        android:padding="20dp">
+
+        <!--头像-->
+        <ImageView
+            android:id="@+id/mlkz_home_menu_login_image"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/mlkz_default_head_image" />
+
+        <TextView
+            android:id="@+id/mlkz_home_menu_login_username"
+            style="@style/MLKZ_LeftMenu_TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/mlkz_home_menu_login_image"
+            android:layout_marginLeft="16dp"
+            android:layout_toRightOf="@id/mlkz_home_menu_login_image"
+            android:padding="0dp"
+            android:singleLine="true"
+            android:text="登陆账号"
+            android:textSize="18dp" />
+    </RelativeLayout>
 
     <TextView
         style="@style/MLKZ_LeftMenu_TextView"

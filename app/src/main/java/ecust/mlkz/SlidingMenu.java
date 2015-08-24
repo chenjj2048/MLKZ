@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 
-import lib.ScreenUtil;
+import lib.clsUtils.ScreenUtil;
 
 /**
  * =============================================================================
@@ -33,7 +33,6 @@ import lib.ScreenUtil;
 
 public class SlidingMenu extends HorizontalScrollView {
     private int mScreenWidth;       //屏幕宽度
-    private boolean firstRun = true;
     private int mMenuWidth;         //侧滑菜单宽度
     private boolean canShow;        //允许侧滑菜单显示
 
@@ -44,26 +43,29 @@ public class SlidingMenu extends HorizontalScrollView {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        //第一次时，设置宽度
-        if (firstRun) {
-            LinearLayout wrapper = (LinearLayout) getChildAt(0);
-
-            ViewGroup menu = (ViewGroup) wrapper.getChildAt(0);     //左侧菜单
-            ViewGroup content = (ViewGroup) wrapper.getChildAt(1);  //主体部分
-
-            //测量menu宽度
-            int w = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
-            int h = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
-            menu.measure(w, h);
-
-            //设置宽度
-            mMenuWidth = menu.getMeasuredWidth();
-
-            menu.getLayoutParams().width = mMenuWidth;
-            content.getLayoutParams().width = mScreenWidth;
-        }
+//判断第一次运行？？？？？？
+        measureSize();
 
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    }
+
+    //测量尺寸
+    public void measureSize() {
+        LinearLayout wrapper = (LinearLayout) getChildAt(0);
+
+        ViewGroup menu = (ViewGroup) wrapper.getChildAt(0);     //左侧菜单
+        ViewGroup content = (ViewGroup) wrapper.getChildAt(1);  //主体部分
+
+        //测量menu宽度
+        int w = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+        int h = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+        menu.measure(w, h);
+
+        //设置宽度
+        mMenuWidth = menu.getMeasuredWidth();
+
+        menu.getLayoutParams().width = mMenuWidth;
+        content.getLayoutParams().width = mScreenWidth;
     }
 
     @Override
@@ -71,7 +73,6 @@ public class SlidingMenu extends HorizontalScrollView {
         super.onLayout(changed, l, t, r, b);
         if (changed) {
             this.scrollTo(mMenuWidth, 0);     //菜单隐藏，滚动至主体部分
-            firstRun = false;
         }
     }
 
@@ -81,10 +82,7 @@ public class SlidingMenu extends HorizontalScrollView {
 
         switch (action) {
             case MotionEvent.ACTION_DOWN:
-
-
                 break;
-
             case MotionEvent.ACTION_MOVE:
                 break;
             case MotionEvent.ACTION_UP:

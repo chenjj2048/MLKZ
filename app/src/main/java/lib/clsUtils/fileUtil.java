@@ -1,9 +1,14 @@
-package lib.clsGlobal;
+package lib.clsUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
+import lib.Const;
 
 /**
  * =============================================================================
@@ -121,7 +126,7 @@ public class fileUtil {
         }
 
 
-        logUtil.e("fileUtil.java","=============缓存文件需要及时删除========");
+        logUtil.e("fileUtil.java", "=============缓存文件需要及时删除========");
         return result;
     }
 
@@ -145,4 +150,54 @@ public class fileUtil {
     }
 
 
+    //保存对象
+    public static void saveObjectData(String filePath, Object data) {
+        ObjectOutputStream objectOutputStream = null;
+        try {
+            objectOutputStream = new ObjectOutputStream(new FileOutputStream(filePath));
+            objectOutputStream.writeObject(data);
+        } catch (FileNotFoundException e) {
+            logUtil.e("fileUtil", e.toString());
+        } catch (IOException e) {
+            logUtil.e("fileUtil", e.toString());
+        } catch (Exception e) {
+            logUtil.e("fileUtil", e.toString());
+        } finally {
+            if (objectOutputStream != null) {
+                try {
+                    objectOutputStream.flush();
+                    objectOutputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    //读取对象
+    public static Object getObjectData(String filePath) {
+        Object result = null;
+        ObjectInputStream objectInputStream = null;
+        try {
+            objectInputStream = new ObjectInputStream(new FileInputStream(filePath));
+            result = objectInputStream.readObject();
+        } catch (FileNotFoundException e) {
+            logUtil.e("fileUtil", e.toString());
+        } catch (IOException e) {
+            logUtil.e("fileUtil", e.toString());
+        } catch (ClassNotFoundException e) {
+            logUtil.e("fileUtil", e.toString());
+        } catch (Exception e) {
+            logUtil.e("fileUtil", e.toString());
+        } finally {
+            if (objectInputStream != null) {
+                try {
+                    objectInputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return result;
+    }
 }

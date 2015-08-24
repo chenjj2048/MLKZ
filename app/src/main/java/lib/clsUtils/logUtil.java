@@ -1,9 +1,11 @@
-package lib.clsGlobal;
+package lib.clsUtils;
 
 import android.util.Log;
 import android.widget.Toast;
 
 import java.util.Date;
+
+import lib.clsApplication;
 
 /**
  * =============================================================================

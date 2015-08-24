@@ -10,7 +10,7 @@ import android.view.View;
 import android.widget.EditText;
 
 import ecust.main.R;
-import lib.clsGlobal.Global;
+import lib.Global;
 
 /**
  * =============================================================================

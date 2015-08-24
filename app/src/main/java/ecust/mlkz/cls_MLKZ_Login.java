@@ -15,8 +15,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import lib.clsBaseAccessInThread;
-import lib.clsGlobal.logUtil;
+import lib.clsUtils.httpUtil_inThread;
+import lib.clsUtils.logUtil;
 
 /**
  * =============================================================================
@@ -200,7 +200,7 @@ public class cls_MLKZ_Login {
 
             try {
                 //进行第一次登陆访问，获取formhash及表单提交地址
-                String HtmlResult = new clsBaseAccessInThread().HttpGetString(login_url, null, 0, 0);
+                String HtmlResult = new httpUtil_inThread().HttpGetString(login_url, null, 0, 0);
                 //获取成功
                 if (HtmlResult != null && HtmlResult.length() > 0) {
                     final String formhash = getFormHash(HtmlResult);      //获取表单hash

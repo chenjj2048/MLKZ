@@ -8,9 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ecust.main.R;
-import lib.clsGlobal.Const;
-import lib.clsGlobal.clsApplication;
-import lib.clsGlobal.logUtil;
+import lib.Const;
+import lib.clsApplication;
+import lib.clsUtils.logUtil;
 
 /**
  * =============================================================================

@@ -1,4 +1,4 @@
-package lib.clsGlobal;
+package lib;
 
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -6,9 +6,7 @@ import android.content.Context;
 import android.util.Log;
 import android.view.Window;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.util.Date;
 import java.util.List;
 
 import ecust.main.R;

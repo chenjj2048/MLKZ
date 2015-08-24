@@ -15,7 +15,7 @@
 
 
     <application
-        android:name="lib.clsGlobal.clsApplication"
+        android:name="lib.clsApplication"
         android:allowBackup="true"
         android:icon="@mipmap/logo"
         android:label="@string/app_name"

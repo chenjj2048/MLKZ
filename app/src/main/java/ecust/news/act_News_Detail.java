@@ -30,15 +30,15 @@ import java.util.zip.CRC32;
 
 import ecust.main.R;
 import lib.BaseActivity.MyBaseActivity;
-import lib.InputStreamUtils;
+import lib.clsUtils.InputStreamUtils;
 import lib.clsFailureBar;
-import lib.clsGlobal.Const;
-import lib.clsGlobal.Global;
-import lib.clsGlobal.clsApplication;
-import lib.clsGlobal.fileUtil;
-import lib.clsGlobal.logUtil;
-import lib.clsGlobal.timeUtil;
-import lib.clsHttpAccess_CallBack;
+import lib.Const;
+import lib.Global;
+import lib.clsApplication;
+import lib.clsUtils.fileUtil;
+import lib.clsUtils.logUtil;
+import lib.clsUtils.timeUtil;
+import lib.clsUtils.httpUtil;
 
 /**
  * =============================================================================
@@ -59,7 +59,7 @@ import lib.clsHttpAccess_CallBack;
  * Copyright (C) 2015 彩笔怪盗基德
  */
 public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnWebRetryListener,
-        clsHttpAccess_CallBack.OnHttpVisitListener, View.OnClickListener,
+        httpUtil.OnHttpVisitListener, View.OnClickListener,
         AbsListView.OnScrollListener {
     static int listview_scroll_items_per_second;   //ListView滚动速度
     final int MAX_THREAD_PIC_DOWNLOAD = 3;      //最大的下载线程数
@@ -242,7 +242,7 @@ public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnW
 
             picHolder.isLoading = true;     //正在加载
 
-            clsHttpAccess_CallBack.getSingleton().getBitmapBytes(url, this);        //下载
+            httpUtil.getSingleton().getBitmapBytes(url, this);        //下载
             logUtil.i(this, "[图片开始下载-线程数量" + current_Thread_Pic_Download + "]" + url);
         }
     }
@@ -400,7 +400,7 @@ public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnW
         //获取新闻文本内容
         logUtil.i(this, "[重试刷新中]" + news_URL);
         wFailureBar.setStateLoading();
-        clsHttpAccess_CallBack.getSingleton().getHttp(news_URL, this);
+        httpUtil.getSingleton().getHttp(news_URL, this);
     }
 
     @Override
@@ -417,7 +417,7 @@ public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnW
         initCompents();     //初始化组件引用
 
         //获取新闻文本内容
-        clsHttpAccess_CallBack.getSingleton().getHttp(news_URL, this);
+        httpUtil.getSingleton().getHttp(news_URL, this);
     }
 
     private void initCompents() {

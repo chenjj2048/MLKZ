@@ -14,7 +14,7 @@ import java.util.List;
 import ecust.main.R;
 import ecust.main.act_MainActivity;
 import lib.BaseActivity.MyBaseFragmentActivity;
-import lib.clsGlobal.Global;
+import lib.Global;
 
 /**
  * =============================================================================

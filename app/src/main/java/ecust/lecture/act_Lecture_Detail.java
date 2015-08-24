@@ -14,9 +14,9 @@ import org.jsoup.select.Elements;
 import ecust.main.R;
 import lib.BaseActivity.MyBaseActivity;
 import lib.clsFailureBar;
-import lib.clsGlobal.Global;
-import lib.clsGlobal.logUtil;
-import lib.clsHttpAccess_CallBack;
+import lib.Global;
+import lib.clsUtils.logUtil;
+import lib.clsUtils.httpUtil;
 
 /**
  * =============================================================================
@@ -37,7 +37,7 @@ import lib.clsHttpAccess_CallBack;
  * Copyright (C) 2015 彩笔怪盗基德
  */
 public class act_Lecture_Detail extends MyBaseActivity implements clsFailureBar.OnWebRetryListener,
-        clsHttpAccess_CallBack.OnHttpVisitListener {
+        httpUtil.OnHttpVisitListener {
     private clsLectureDetail mLectureDetail;            //学术讲座版块解析类
     private clsFailureBar wFailureBar;            //失败，加载条
 
@@ -84,7 +84,7 @@ public class act_Lecture_Detail extends MyBaseActivity implements clsFailureBar.
     public void onWebRetryCompleted() {
         logUtil.i(this, "[重试刷新中]" + mLectureDetail.mData.url);
         wFailureBar.setStateLoading();
-        clsHttpAccess_CallBack.getSingleton().getHttp(mLectureDetail.mData.url, this);
+        httpUtil.getSingleton().getHttp(mLectureDetail.mData.url, this);
     }
 
     @Override
@@ -112,7 +112,7 @@ public class act_Lecture_Detail extends MyBaseActivity implements clsFailureBar.
             mLectureDetail.Show();
         } else {
             logUtil.i(this, "[讲座详细]网页加载" + lecture_URL);
-            clsHttpAccess_CallBack.getSingleton().getHttp(lecture_URL, this); //获取讲座文本内容
+            httpUtil.getSingleton().getHttp(lecture_URL, this); //获取讲座文本内容
         }
     }
 

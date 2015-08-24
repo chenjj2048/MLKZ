@@ -1,7 +1,6 @@
 package ecust.main;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,7 +12,6 @@ import ecust.lecture.act_Lecture_Catalog;
 import ecust.mlkz.act_MLKZ_Home;
 import ecust.news.act_News_Catalog;
 import lib.BaseActivity.MyBaseActivity;
-import lib.LoadingDialog;
 
 /**
  * =============================================================================

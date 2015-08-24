@@ -3,7 +3,7 @@ package lib.BaseActivity;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
-import lib.clsGlobal.Global;
+import lib.Global;
 
 /**
  * =============================================================================

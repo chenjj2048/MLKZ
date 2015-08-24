@@ -1,4 +1,4 @@
-package lib;
+package lib.clsUtils;
 
 /**
  * Created by 1 on 2015/7/2.

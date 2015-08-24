@@ -1,4 +1,4 @@
-package lib;
+package lib.clsUtils;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -26,18 +26,18 @@ import java.util.HashMap;
  */
 
 // 网络访问类
-public class clsHttpAccess_CallBack {
+public class httpUtil {
     static int uniqueID = 0;
-    private static clsHttpAccess_CallBack mSingleton;
+    private static httpUtil mSingleton;
     public HashMap<String, requestCollection> mDataCollection = new HashMap<>();     //保存所有的请求
     private Handler mHandler = new MyHandler();
 
     /**
      * 单例模式,这里没什么用,主要是不想每次都new
      */
-    public static synchronized clsHttpAccess_CallBack getSingleton() {
+    public static synchronized httpUtil getSingleton() {
         if (mSingleton == null)
-            mSingleton = new clsHttpAccess_CallBack();
+            mSingleton = new httpUtil();
         return mSingleton;
     }
 
@@ -122,7 +122,7 @@ public class clsHttpAccess_CallBack {
         public void handleMessage(Message msg) {
             //获取操作号
             int id = msg.getData().getInt("id");
-            HashMap<String, requestCollection> mData = clsHttpAccess_CallBack.getSingleton().mDataCollection;
+            HashMap<String, requestCollection> mData = httpUtil.getSingleton().mDataCollection;
 
             //取出请求信息及返回结果
             requestCollection item = mData.get(String.valueOf(id));
@@ -156,7 +156,7 @@ public class clsHttpAccess_CallBack {
 
             if (item.requestIsPic) {
                 //下载图片
-                byte[] result = new clsBaseAccessInThread().HttpGetBitmap(item.url, item.cookie, 0, 0);
+                byte[] result = new httpUtil_inThread().HttpGetBitmap(item.url, item.cookie, 0, 0);
                 item.pic = result;                    //设置返回消息
                 item.succeed = (result != null);     //设置是否成功
                 //子线程送一遍消息（图片）
@@ -164,7 +164,7 @@ public class clsHttpAccess_CallBack {
                     item.listener.onPictureBackgroundThreadLoadCompleted(item.url, item.cookie, item.succeed, item.pic);
             } else {
                 //下载文本
-                String result = new clsBaseAccessInThread().HttpGetString(item.url, item.cookie, 0, 0);
+                String result = new httpUtil_inThread().HttpGetString(item.url, item.cookie, 0, 0);
                 item.html = result;                      //设置返回消息
                 item.succeed = result.length() > 0;     //设置是否成功
                 //子线程送一遍消息（文本）

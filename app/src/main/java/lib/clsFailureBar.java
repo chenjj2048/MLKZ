@@ -6,9 +6,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import ecust.main.R;
-import lib.clsGlobal.clsApplication;
-import lib.clsGlobal.clsNetworkChangeReceiver;
-import lib.clsGlobal.logUtil;
+import lib.clsUtils.logUtil;
 
 /**
  * =============================================================================

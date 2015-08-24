@@ -26,12 +26,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import ecust.main.R;
-import lib.clsGlobal.Const;
-import lib.clsGlobal.clsApplication;
-import lib.clsGlobal.clsExpiredTimeMangment;
-import lib.clsGlobal.logUtil;
-import lib.clsGlobal.timeUtil;
-import lib.clsHttpAccess_CallBack;
+import lib.Const;
+import lib.clsApplication;
+import lib.clsUtils.clsExpiredTimeMangment;
+import lib.clsUtils.logUtil;
+import lib.clsUtils.timeUtil;
+import lib.clsUtils.httpUtil;
 
 /**
  * =============================================================================
@@ -56,7 +56,7 @@ import lib.clsHttpAccess_CallBack;
 public class fragment_News_Catalog extends Fragment implements
         PullToRefreshBase.OnLastItemVisibleListener,
         PullToRefreshBase.OnRefreshListener2, AdapterView.OnItemClickListener,
-        clsHttpAccess_CallBack.OnHttpVisitListener {
+        httpUtil.OnHttpVisitListener {
     private final clsNewsCatalog mNewsCatalog = new clsNewsCatalog();
 
 
@@ -86,7 +86,7 @@ public class fragment_News_Catalog extends Fragment implements
             if (mAdapter.getCount() <= 0) {
                 isLoading = true;
                 logUtil.i(this, "initializeNewsData");
-                clsHttpAccess_CallBack.getSingleton().getHttp(catalogUrl, this);
+                httpUtil.getSingleton().getHttp(catalogUrl, this);
             }
         }
     }
@@ -136,7 +136,7 @@ public class fragment_News_Catalog extends Fragment implements
                         String.valueOf(catalogName.equals("通知公告") ? "?page=" : "&page=") +
                         mNewsCatalog.nextPage;
                 logUtil.i(this, "[加载下一页数据]" + website);
-                clsHttpAccess_CallBack.getSingleton().getHttp(website, this);
+                httpUtil.getSingleton().getHttp(website, this);
             }
         }
     }

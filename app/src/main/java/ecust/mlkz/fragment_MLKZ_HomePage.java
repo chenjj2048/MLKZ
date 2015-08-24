@@ -2,7 +2,6 @@ package ecust.mlkz;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -17,23 +16,16 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import ecust.main.R;
-import lib.clsGlobal.Const;
-import lib.clsGlobal.logUtil;
-import lib.clsHttpAccess_CallBack;
+import lib.Const;
+import lib.clsUtils.fileUtil;
+import lib.clsUtils.logUtil;
+import lib.clsUtils.httpUtil;
 
 /**
  * =============================================================================
@@ -55,8 +47,8 @@ import lib.clsHttpAccess_CallBack;
  * 托管地址：https://github.com/chenjj2048
  * .
  */
-public class fragment_MLKZ_HomePage extends Fragment implements clsHttpAccess_CallBack.OnHttpVisitListener {
-    private final String file_data =  Environment.getExternalStorageDirectory().getPath() + "/" + Const.packageName + "/aaaaaa";      //数据的保存地址，文件名
+public class fragment_MLKZ_HomePage extends Fragment implements httpUtil.OnHttpVisitListener {
+    private final String object_save_path = Const.getSDCardSavedPath() + "/mlkz_home.obj";      //数据的保存地址，文件名
     private List<struct_MLKZ_Home_Section> mContent = new ArrayList<>();     //存储所有数据内容
     private bbsCatalogAdapter mAdapter;     //适配器
     private ListView listView;          //ListView
@@ -75,12 +67,16 @@ public class fragment_MLKZ_HomePage extends Fragment implements clsHttpAccess_Ca
         listView.setAdapter(mAdapter);
 
         //取得本地数据
-        List<struct_MLKZ_Home_Section> data = getObjectData();
-        if (data == null) {
-            loginMLKZ("");    //加载网页
-        } else {
+        Object object = fileUtil.getObjectData(object_save_path);
+        List<struct_MLKZ_Home_Section> data = (List<struct_MLKZ_Home_Section>) object;
+        if (data != null) {
+            //先使用本地缓存
+            this.mContent = data;
             printAllDataLog(data);
+            updateListViewContent();
         }
+
+        loginMLKZ("");    //再加载刷新网页
 
         return view;    //返回布局
     }
@@ -88,13 +84,18 @@ public class fragment_MLKZ_HomePage extends Fragment implements clsHttpAccess_Ca
     //凭cookie登陆梅陇客栈
     public void loginMLKZ(String cookie) {
         String url = "http://bbs.ecust.edu.cn/forum.php?mobile=yes";
-        clsHttpAccess_CallBack.getSingleton().getHttp(url, cookie, this);
+        httpUtil.getSingleton().getHttp(url, cookie, this);
     }
 
     @Override
     public void onHttpLoadCompleted(String url, String cookie, boolean bSucceed, String rtnHtmlMessage) {
         if (!bSucceed) return;
 
+        //刷新ListView
+        updateListViewContent();
+    }
+
+    public void updateListViewContent() {
         //设置数据，通知更新
         mAdapter.setList(mContent);
         mAdapter.notifyDataSetChanged();
@@ -111,7 +112,7 @@ public class fragment_MLKZ_HomePage extends Fragment implements clsHttpAccess_Ca
         printAllDataLog(mContent);
 
         //偷个懒，序列化保存结构，供离线使用
-        saveObjectData(mContent);
+        fileUtil.saveObjectData(object_save_path, mContent);
     }
 
     @Override
@@ -122,41 +123,9 @@ public class fragment_MLKZ_HomePage extends Fragment implements clsHttpAccess_Ca
     public void onPictureBackgroundThreadLoadCompleted(String url, String cookie, boolean bSucceed, byte[] rtnPicBytes) {
     }
 
-    //保存对象
-    public void saveObjectData(List<struct_MLKZ_Home_Section> parameter) {
-        try {
-            OutputStream outputStream = new FileOutputStream(file_data);
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
-            objectOutputStream.writeObject(parameter);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    //读取对象
-    public List<struct_MLKZ_Home_Section> getObjectData() {
-        List<struct_MLKZ_Home_Section> result = null;
-        try {
-            InputStream inputStream = new FileInputStream(file_data);
-            ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
-            result = (List<struct_MLKZ_Home_Section>) objectInputStream.readObject();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return result;
-    }
 
     //输出所有数据
+
     public void printAllDataLog(List<struct_MLKZ_Home_Section> mData) {
         for (struct_MLKZ_Home_Section s0 : mData) {
             logUtil.i(this, "====" + s0.getSectionName() + "====");
@@ -186,7 +155,7 @@ public class fragment_MLKZ_HomePage extends Fragment implements clsHttpAccess_Ca
 }
 
 //大板块（一级）
-class struct_MLKZ_Home_Section implements Serializable{
+class struct_MLKZ_Home_Section implements Serializable {
     private String section;     //版块名称
     private List<struct_MLKZ_Home_SubSection> contentList = new ArrayList<>();   //版块内容
 
@@ -222,7 +191,7 @@ class struct_MLKZ_Home_Section implements Serializable{
 }
 
 //大板块下的小分类（二级）
-class struct_MLKZ_Home_SubSection {
+class struct_MLKZ_Home_SubSection implements Serializable {
     private String title;   //子标题
     private String url;     //链接地址
     private String new_message_count;   //新消息数量

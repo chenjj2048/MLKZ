@@ -28,13 +28,13 @@ import java.util.List;
 import ecust.main.R;
 import ecust.main.act_MainActivity;
 import lib.BaseActivity.MyBaseActivity;
-import lib.clsGlobal.Const;
-import lib.clsGlobal.Global;
-import lib.clsGlobal.clsApplication;
-import lib.clsGlobal.clsExpiredTimeMangment;
-import lib.clsGlobal.logUtil;
-import lib.clsGlobal.timeUtil;
-import lib.clsHttpAccess_CallBack;
+import lib.Const;
+import lib.Global;
+import lib.clsApplication;
+import lib.clsUtils.clsExpiredTimeMangment;
+import lib.clsUtils.logUtil;
+import lib.clsUtils.timeUtil;
+import lib.clsUtils.httpUtil;
 
 /**
  * =============================================================================
@@ -59,7 +59,7 @@ import lib.clsHttpAccess_CallBack;
 public class act_Lecture_Catalog extends MyBaseActivity implements
         PullToRefreshBase.OnLastItemVisibleListener,
         PullToRefreshBase.OnRefreshListener2, AdapterView.OnItemClickListener,
-        clsHttpAccess_CallBack.OnHttpVisitListener {
+        httpUtil.OnHttpVisitListener {
 
     private final int itemIsLastOne = Integer.MAX_VALUE;       // 已加载至最后一页标记
     private List<struct_LectureCatalogItem> mList = new ArrayList<>();      //数据集
@@ -218,7 +218,7 @@ public class act_Lecture_Catalog extends MyBaseActivity implements
                     //获取“下一页”url
                     String website = Const.lecture_url + "?page=" + nextPage;
                     logUtil.i(this, "[正在加载下一页]" + website);
-                    clsHttpAccess_CallBack.getSingleton().getHttp(website, this);
+                    httpUtil.getSingleton().getHttp(website, this);
                 } else
                     logUtil.toast("网络不可用");
             } else
@@ -274,7 +274,7 @@ public class act_Lecture_Catalog extends MyBaseActivity implements
         //获取地址访问
         if (mAdapter.getCount() <= 0) {
             flag_isLoading = true;
-            clsHttpAccess_CallBack.getSingleton().getHttp(Const.lecture_url, this);
+            httpUtil.getSingleton().getHttp(Const.lecture_url, this);
         }
     }
 

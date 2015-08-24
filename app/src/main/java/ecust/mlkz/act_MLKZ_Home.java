@@ -29,8 +29,7 @@ import android.support.v4.app.FragmentTransaction;
 import ecust.main.R;
 import ecust.main.act_MainActivity;
 import lib.BaseActivity.MyBaseFragmentActivity;
-import lib.clsGlobal.Global;
-import lib.clsGlobal.logUtil;
+import lib.Global;
 
 public class act_MLKZ_Home extends MyBaseFragmentActivity {
     public SlidingMenu slidingMenu;        //滑动控件
@@ -78,7 +77,7 @@ public class act_MLKZ_Home extends MyBaseFragmentActivity {
         if (data == null) return;
 
         //拿到cookie
-        String cookie = data.getStringExtra("cookie");
+        String cookie = data.getStringExtra(act_MLKZ_Login.COOKIE);
 
         //凭cookie登陆，出现新版块
         body_Fragment.loginMLKZ(cookie);

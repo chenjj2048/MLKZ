@@ -1,8 +1,10 @@
-package lib.clsGlobal;
+package lib.clsUtils;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+
+import lib.clsApplication;
 
 /**
  * =============================================================================

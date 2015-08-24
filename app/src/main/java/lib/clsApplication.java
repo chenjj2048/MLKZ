@@ -1,9 +1,11 @@
-package lib.clsGlobal;
+package lib;
 
 import android.app.Application;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+
+import lib.clsUtils.logUtil;
 
 /**
  * =============================================================================

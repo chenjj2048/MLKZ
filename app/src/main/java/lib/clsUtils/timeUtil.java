@@ -1,4 +1,4 @@
-package lib.clsGlobal;
+package lib.clsUtils;
 
 import android.text.format.Time;
 

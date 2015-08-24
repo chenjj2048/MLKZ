@@ -7,9 +7,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-import lib.clsGlobal.Const;
-import lib.clsGlobal.clsApplication;
-import lib.clsGlobal.logUtil;
+import lib.Const;
+import lib.clsApplication;
+import lib.clsUtils.logUtil;
 
 /**
  * =============================================================================

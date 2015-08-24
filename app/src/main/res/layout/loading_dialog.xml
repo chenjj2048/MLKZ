@@ -6,7 +6,7 @@
     android:background="@drawable/shape_loading_background"
     android:gravity="center"
     android:orientation="horizontal"
-    tools:context="lib.LoadingDialog">
+    tools:context="ecust.mlkz.act_MLKZ_Login">
 
     <!--进度圈-->
     <ProgressBar

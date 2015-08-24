@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-import lib.clsGlobal.logUtil;
-
 /**
  * =============================================================================
  * This program is free software: you can redistribute it and/or modify
