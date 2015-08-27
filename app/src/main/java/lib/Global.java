@@ -30,11 +30,6 @@ import ecust.main.R;
  * Copyright (C) 2015 彩笔怪盗基德
  */
 public class Global {
-    //SharedPreferences配置信息
-    public static final String sp_Config = "config";
-    public static final String sp_Username = "username";
-    public static final String sp_Password = "password";
-    public static final String sp_Cookie = "cookie";
 
     private static final boolean isDebug = true;                                                           //Debug、Releas标签
     //公共的Activity

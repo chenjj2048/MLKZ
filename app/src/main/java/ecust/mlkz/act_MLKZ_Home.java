@@ -81,5 +81,9 @@ public class act_MLKZ_Home extends MyBaseFragmentActivity {
 
         //凭cookie登陆，出现新版块
         body_Fragment.loginMLKZ(cookie);
+
+        //滑到主界面
+        SlidingMenu slidingMenu = (SlidingMenu) findViewById(R.id.mlkz_home_slidingmenu);
+        slidingMenu.setNeedSwitchToBody(true);
     }
 }

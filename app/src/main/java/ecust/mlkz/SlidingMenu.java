@@ -34,23 +34,44 @@ import lib.clsUtils.ScreenUtil;
 public class SlidingMenu extends HorizontalScrollView {
     private int mScreenWidth;       //屏幕宽度
     private int mMenuWidth;         //侧滑菜单宽度
-    private boolean canShow;        //允许侧滑菜单显示
+    private boolean canShow;        //允许侧滑菜单显示(靠边才能拉出)
+    private boolean needSwitchToBody = false;
 
     public SlidingMenu(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.mScreenWidth = ScreenUtil.getScreenWidth(context);        //获取屏幕宽度
     }
 
+    public void setNeedSwitchToBody(boolean needSwitchToBody) {
+        this.needSwitchToBody = needSwitchToBody;
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-//判断第一次运行？？？？？？
         measureSize();
 
+        //延迟一段时间执行,否则滑动距离总有问题
+        if (needSwitchToBody) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        for (int i = 0; i < 50; i++) {
+                            Thread.sleep(10);
+                            switchToBody();
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+            needSwitchToBody = false;
+        }
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
     //测量尺寸
-    public void measureSize() {
+    private void measureSize() {
         LinearLayout wrapper = (LinearLayout) getChildAt(0);
 
         ViewGroup menu = (ViewGroup) wrapper.getChildAt(0);     //左侧菜单

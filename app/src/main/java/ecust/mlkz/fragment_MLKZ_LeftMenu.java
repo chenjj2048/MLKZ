@@ -30,6 +30,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import ecust.main.R;
+import lib.clsUtils.logUtil;
 
 //左侧侧滑菜单
 public class fragment_MLKZ_LeftMenu extends Fragment implements View.OnClickListener {
@@ -45,6 +46,7 @@ public class fragment_MLKZ_LeftMenu extends Fragment implements View.OnClickList
         //寻找头像图片，点击后登录
         ViewGroup viewGroup = (ViewGroup) view.findViewById(R.id.mlkz_home_menu_login_group);
         viewGroup.setOnClickListener(this);
+
 
         return view;
     }
@@ -71,10 +73,5 @@ public class fragment_MLKZ_LeftMenu extends Fragment implements View.OnClickList
         String username = data.getStringExtra(act_MLKZ_Login.USERNAME);
         TextView tvUserName = (TextView) getActivity().findViewById(R.id.mlkz_home_menu_login_username);
         tvUserName.setText(username);
-
-        //寻找主Activity
-        act_MLKZ_Home activity = (act_MLKZ_Home) getActivity();
-        activity.slidingMenu.measureSize();
-        activity.slidingMenu.switchToBody();        //滑回主体部分
     }
 }
