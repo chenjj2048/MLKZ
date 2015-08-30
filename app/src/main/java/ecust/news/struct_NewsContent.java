@@ -3,6 +3,7 @@ package ecust.news;
 import android.graphics.Bitmap;
 import android.widget.ImageView;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Observable;
@@ -30,8 +31,8 @@ import java.util.Observer;
 
 //新闻详细内容
 //观察者模式，监视位图内存占用
-public class struct_NewsContent implements Observer {
-    int sum_bytes_of_bitmap = 0;       //位图占的内存总大小
+public class struct_NewsContent implements Observer, Serializable {
+    transient int sum_bytes_of_bitmap = 0;       //位图占的内存总大小
     String title = "";           //新闻标题
     String release_time = "";    //发表日期
     String news_Source = "";      //稿件来源、来稿单位
@@ -39,10 +40,10 @@ public class struct_NewsContent implements Observer {
     String photo_author = "";        //摄影
     String editor = "";              //编辑
     String count_of_visit = "";      //访问量
-    String body = "";               //新闻文字部分（这个是临时的，解析完后就可以回收）
+    transient String body = "";               //新闻文字部分（这个是临时的，解析完后就可以回收）
     List<String> pic_url;       //图片地址
     List<String> content;          //文字-图片URL交替部分（一行文字、一行图片交替）（重要数据在这里）
-    HashMap<String, PicHolder> bitmapHashMap = new HashMap<>();       //在内存中暂存Bitmap（内存不够就及时回收）
+    transient HashMap<String, PicHolder> bitmapHashMap= new HashMap<>();       //在内存中暂存Bitmap（内存不够就及时回收）
 
     //位图占用空间变化
     @Override

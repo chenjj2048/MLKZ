@@ -28,6 +28,7 @@
             android:id="@+id/listview_news_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="@color/grey90"
             android:textSize="20sp" />
 
         <!--新闻时间-->

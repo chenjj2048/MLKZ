@@ -24,9 +24,9 @@ import java.util.List;
 import ecust.main.R;
 import lib.Const;
 import lib.clsUtils.fileUtil;
-import lib.clsUtils.logUtil;
 import lib.clsUtils.httpUtil;
-
+import lib.clsUtils.logUtil;
+import lib.Const.PathFactory.PathType;
 /**
  * =============================================================================
  * This program is free software: you can redistribute it and/or modify
@@ -48,10 +48,14 @@ import lib.clsUtils.httpUtil;
  * .
  */
 public class fragment_MLKZ_HomePage extends Fragment implements httpUtil.OnHttpVisitListener {
-    private final String object_save_path = Const.getSDCardSavedPath() + "/mlkz_home.obj";      //数据的保存地址，文件名
-    private List<struct_MLKZ_Home_Section> mContent = new ArrayList<>();     //存储所有数据内容
-    private bbsCatalogAdapter mAdapter;     //适配器
-    private ListView listView;          //ListView
+    //数据的保存地址，文件名
+    private final String object_save_path = Const.PathFactory.getFileSavedPath(PathType.MLKZ_HOMEPAGE_SERIAL_OBJECT);
+    //存储所有数据内容
+    private List<struct_MLKZ_Home_Section> mContent = new ArrayList<>();
+    //适配器
+    private bbsCatalogAdapter mAdapter;
+    //ListView
+    private ListView listView;
 
     public fragment_MLKZ_HomePage() {
     }

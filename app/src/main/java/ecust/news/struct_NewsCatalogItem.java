@@ -20,7 +20,7 @@ package ecust.news;
  */
 
 // 新闻大标题结构
-public class struct_NewsCatalogItem {
+public class struct_NewsCatalogItem implements Comparable<struct_NewsCatalogItem> {
     public String title;  //新闻标题
     public String time;   //新闻时间
     public String url;   //新闻链接
@@ -32,11 +32,18 @@ public class struct_NewsCatalogItem {
 
         struct_NewsCatalogItem that = (struct_NewsCatalogItem) o;
 
+        if (title != null ? !title.equals(that.title) : that.title != null) return false;
+        if (time != null ? !time.equals(that.time) : that.time != null) return false;
         return !(url != null ? !url.equals(that.url) : that.url != null);
     }
 
     @Override
     public int hashCode() {
         return url != null ? url.hashCode() : 0;
+    }
+
+    @Override
+    public int compareTo(struct_NewsCatalogItem another) {
+        return another.time.compareTo(this.time);
     }
 }

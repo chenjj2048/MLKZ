@@ -48,6 +48,9 @@
             android:name="ecust.lecture.act_Lecture_Detail"
             android:label="讲座详情" />
         <activity
+            android:name="ecust.school_calendar.act_School_Calendar"
+            android:label="校历" />
+        <activity
             android:name="ecust.demotest.testDemoActivity"
             android:label="@string/title_activity_test_demo" />
     </application>

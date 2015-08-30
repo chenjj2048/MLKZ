@@ -21,6 +21,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -29,9 +30,9 @@ import ecust.main.R;
 import lib.Const;
 import lib.clsApplication;
 import lib.clsUtils.clsExpiredTimeMangment;
+import lib.clsUtils.httpUtil;
 import lib.clsUtils.logUtil;
 import lib.clsUtils.timeUtil;
-import lib.clsUtils.httpUtil;
 
 /**
  * =============================================================================
@@ -85,7 +86,7 @@ public class fragment_News_Catalog extends Fragment implements
             //获取地址访问
             if (mAdapter.getCount() <= 0) {
                 isLoading = true;
-                logUtil.i(this, "initializeNewsData");
+                logUtil.i(this, "加载初始数据");
                 httpUtil.getSingleton().getHttp(catalogUrl, this);
             }
         }
@@ -265,7 +266,7 @@ public class fragment_News_Catalog extends Fragment implements
         while (iterator.hasNext()) {
             mNewsCatalog.mList.add(iterator.next());
         }
-//        Collections.sort(mNewsCatalog.mList);
+        Collections.sort(mNewsCatalog.mList);
 
         //更新ListView中数据
         if (result.size() > 0) {

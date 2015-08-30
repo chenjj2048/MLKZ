@@ -11,7 +11,7 @@ import ecust.main.R;
 import lib.Const;
 import lib.clsApplication;
 import lib.clsUtils.logUtil;
-
+import lib.Const.PathFactory.PathType;
 /**
  * =============================================================================
  * This program is free software: you can redistribute it and/or modify
@@ -35,7 +35,7 @@ import lib.clsUtils.logUtil;
 // 包含新闻目录，以及详细信息两部分，图片另外算
 public class DataBase_News extends SQLiteOpenHelper {
     private static final int currentVersion = 1;                    //当前版本
-    private static final String dataBaseName = Const.getSQLDataBaseStoragePath() + "news.db";        //数据库名称
+    private static final String dataBaseName = Const.PathFactory.getFileSavedPath(PathType.NEWS_DATABASE);        //数据库名称
     public clsCatalog catalog = new clsCatalog();       //主目录
     private String currentCatalogTableName;     //版块名称
 

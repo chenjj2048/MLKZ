@@ -11,6 +11,7 @@ import ecust.demotest.testDemoActivity;
 import ecust.lecture.act_Lecture_Catalog;
 import ecust.mlkz.act_MLKZ_Home;
 import ecust.news.act_News_Catalog;
+import ecust.school_calendar.act_School_Calendar;
 import lib.BaseActivity.MyBaseActivity;
 
 /**
@@ -47,12 +48,13 @@ public class act_MainActivity extends MyBaseActivity implements View.OnClickList
         Button news = (Button) findViewById(R.id.mainActivity_News);
         Button lecture = (Button) findViewById(R.id.mainActivity_Lecture);
         Button test = (Button) findViewById(R.id.mainActivity_Test);
-
+        Button calendar = (Button) findViewById(R.id.mainActivity_SchoolCalendar);
 
         mlkz.setOnClickListener(this);
         news.setOnClickListener(this);
         lecture.setOnClickListener(this);
         test.setOnClickListener(this);
+        calendar.setOnClickListener(this);
     }
 
     @Override
@@ -71,6 +73,11 @@ public class act_MainActivity extends MyBaseActivity implements View.OnClickList
             //讲座信息
             case R.id.mainActivity_Lecture:
                 startActivity(new Intent(this, act_Lecture_Catalog.class));
+                finish();
+                break;
+            //校历
+            case R.id.mainActivity_SchoolCalendar:
+                startActivity(new Intent(this, act_School_Calendar.class));
                 finish();
                 break;
             //测试

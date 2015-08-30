@@ -8,6 +8,7 @@ import android.view.Window;
 import android.widget.TextView;
 
 import java.util.List;
+import java.util.zip.CRC32;
 
 import ecust.main.R;
 
@@ -35,6 +36,18 @@ public class Global {
     //公共的Activity
     public static Activity activity;
 
+
+    //根据url获得唯一的hash值（碰到一样的几乎不可能）
+    public static String getStringHash(String url) {
+        //计算CRC32值
+        CRC32 crc32 = new CRC32();
+        crc32.update(url.getBytes());
+
+        String result = url.hashCode() + "" + crc32.getValue();
+        result = result.replace("-", "");
+
+        return result;
+    }
 
     public static void log(String msg) {
         String tag = "";

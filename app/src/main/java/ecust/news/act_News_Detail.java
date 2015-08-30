@@ -23,22 +23,23 @@ import org.jsoup.select.Elements;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.zip.CRC32;
 
 import ecust.main.R;
 import lib.BaseActivity.MyBaseActivity;
-import lib.clsUtils.InputStreamUtils;
-import lib.clsFailureBar;
 import lib.Const;
+import lib.Const.PathFactory.PathType;
 import lib.Global;
 import lib.clsApplication;
+import lib.clsFailureBar;
+import lib.clsUtils.InputStreamUtils;
 import lib.clsUtils.fileUtil;
+import lib.clsUtils.httpUtil;
 import lib.clsUtils.logUtil;
 import lib.clsUtils.timeUtil;
-import lib.clsUtils.httpUtil;
 
 /**
  * =============================================================================
@@ -67,27 +68,27 @@ public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnW
     final float LISTVIEW_SCROLL_STATISTICS_TIME = 3000;     //ListView滚动速度统计时间
     boolean activity_destoryed = false;         //页面销毁，标记，用来停止其他正在进行的线程
     int current_Thread_Pic_Download = 0;        //当前下载线程数
-    String news_URL;            //新闻URL地址
-    String catalogName;         //版块名称
-    clsFailureBar wFailureBar;            //失败，加载条
-    struct_NewsContent mNewsContent;        //存放全部新闻数据内容
-    NewsAdapter mAdapter = new NewsAdapter(this);           //BaseAdapter
-    ListView wListView;         //ListView控件
-    boolean nearToTop = true;      //标记更靠近头还是更靠近尾
-    int lastVisibleItem;    //上次ListView最顶的位置
     Queue<struct_Time_Data> queue = new LinkedList<>();   //时间-数据 队列
+    private String news_URL;            //新闻URL地址
+    private String catalogName;         //版块名称
+    private clsFailureBar wFailureBar;            //失败，加载条
+    private struct_NewsContent mNewsContent;        //存放全部新闻数据内容
+    private NewsAdapter mAdapter = new NewsAdapter(this);           //BaseAdapter
+    private ListView wListView;         //ListView控件
+    private boolean nearToTop = true;      //标记更靠近头还是更靠近尾
+    private int lastVisibleItem;    //上次ListView最顶的位置
 
     //根据url获得唯一的hash值（碰到一样的几乎不可能）
-    public static String getURLHash(String url) {
-        //计算CRC32值
-        CRC32 crc32 = new CRC32();
-        crc32.update(url.getBytes());
-
-        String result = url.hashCode() + "" + crc32.getValue();
-        result = result.replace("-", "");
+    public static String getPicHash(String url) {
+        String result = Global.getStringHash(url);
 
         //设置后缀为.jpg
         return result + ".jpg";
+    }
+
+    //根据url获得唯一的hash值（碰到一样的几乎不可能）
+    public static String getHtmlHash(String url) {
+        return Global.getStringHash(url);
     }
 
     @Override
@@ -159,11 +160,17 @@ public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnW
         //解析数据
         mNewsContent = clsNewsParse.parseAllData(rtnHtmlMessage, catalogName);
 
-        initPicHolders();       //初始化图片集合
+        //保存对象
+        String filepath = Const.PathFactory.getFileSavedPath(PathType.NEWS_DETAIL_MESSAGE);
+        filepath += getHtmlHash(url);
+        fileUtil.saveObjectData(filepath, mNewsContent);
+        logUtil.i(this, mNewsContent.toString());
     }
 
     //初始化图片集合
     public void initPicHolders() {
+        mNewsContent.bitmapHashMap=new HashMap<>();
+
         //填充图片的引用，等会来这个数据集中找
         for (String url : mNewsContent.pic_url) {
             PicHolder picHolder = new PicHolder();
@@ -210,6 +217,9 @@ public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnW
             return;
         }
 
+        //初始化图片集合
+        initPicHolders();
+
         //传入数据进行更新
         mAdapter.setCatalogName(this.catalogName);
         mAdapter.setNewsContent(mNewsContent);
@@ -252,7 +262,7 @@ public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnW
         if (!bSucceed) return;
 
         //保存文件
-        fileUtil.saveCacheFile("News", getURLHash(url), rtnPicBytes);
+        fileUtil.saveCacheFile("News", getPicHash(url), rtnPicBytes);
 
         //设置图片
         PicHolder picHolder = mNewsContent.bitmapHashMap.get(url);
@@ -391,7 +401,7 @@ public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnW
         if (url.contains("http://172.") && picHolder.getBitmap() == null) {
             logUtil.toast("当前非校园网，无法加载内网图片!");
         } else {
-            logUtil.toast(url);
+//            logUtil.toast(url);
         }
     }
 
@@ -416,8 +426,24 @@ public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnW
         Global.setTitle(this, "新闻详情");
         initCompents();     //初始化组件引用
 
-        //获取新闻文本内容
-        httpUtil.getSingleton().getHttp(news_URL, this);
+        //获取缓存
+        Object object = readObject(news_URL);
+        if (object != null) {
+            //获取成功，加载本地数据
+            mNewsContent = (struct_NewsContent) object;
+            onHttpLoadCompleted(news_URL, null, true, null);
+        } else {
+            //获取新闻文本内容
+            httpUtil.getSingleton().getHttp(news_URL, this);
+        }
+    }
+
+    //读取存储对象
+    public Object readObject(String url) {
+        //保存对象
+        String filepath = Const.PathFactory.getFileSavedPath(PathType.NEWS_DETAIL_MESSAGE);
+        filepath += getHtmlHash(url);
+        return fileUtil.getObjectData(filepath);
     }
 
     private void initCompents() {
@@ -780,7 +806,7 @@ class NewsAdapter extends BaseAdapter {
         //没有图片
         if (picHolder.getBitmap() == null) {
             //1.先查找是否有本地缓存
-            boolean found = fileUtil.existCacheFile("News", act_News_Detail.getURLHash(url));
+            boolean found = fileUtil.existCacheFile("News", act_News_Detail.getPicHash(url));
 
             if (found) {
                 picHolder.found = true;
@@ -851,7 +877,7 @@ class pictureShowAsyncTask extends AsyncTask<PicHolder, Float, Void> {
 
         //如果bitmap为空，但缓存文件中有，就读取之
         if (picHolder.getBitmap() == null) {
-            byte[] bytes = fileUtil.getCacheFile("News", act_News_Detail.getURLHash(picHolder.url));
+            byte[] bytes = fileUtil.getCacheFile("News", act_News_Detail.getPicHash(picHolder.url));
 
             if (bytes == null) throw new NullPointerException();
 

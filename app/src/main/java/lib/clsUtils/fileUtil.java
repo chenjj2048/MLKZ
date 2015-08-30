@@ -9,6 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import lib.Const;
+import lib.Const.PathFactory.PathType;
 
 /**
  * =============================================================================
@@ -57,7 +58,7 @@ public class fileUtil {
         try {
             //保存位置
             String path = cacheDirectory + cacheCatalog;         //放到缓存里
-            File file = new File(Const.getSDCardSavedPath() + path, fileName);     //设置文件地址
+            File file = new File(Const.PathFactory.getFileSavedPath(PathType.PACKAGE_PATH) + path, fileName);     //设置文件地址
             if (!file.getParentFile().exists())
                 file.getParentFile().mkdirs();          //先创建多层文件夹
 
@@ -95,7 +96,7 @@ public class fileUtil {
 
         //保存位置
         String path = cacheDirectory + cacheCatalog;         //缓存地址
-        File file = new File(Const.getSDCardSavedPath() + path, fileName);     //设置文件地址
+        File file = new File(Const.PathFactory.getFileSavedPath(PathType.PACKAGE_PATH)+ path, fileName);     //设置文件地址
 
         if (!file.exists()) return null;    //没文件就返回空
 
@@ -131,7 +132,7 @@ public class fileUtil {
     }
 
     //返回形如123,456
-    public static String getIntegearFormat(int i) {
+    private static String getIntegearFormat(int i) {
         return String.format("%,d", i);
     }
 
@@ -143,7 +144,7 @@ public class fileUtil {
      */
     public static boolean existCacheFile(String cacheCatalog, String fileName) {
         String path = cacheDirectory + cacheCatalog;         //缓存地址
-        File file = new File(Const.getSDCardSavedPath() + path, fileName);     //设置文件地址
+        File file = new File(Const.PathFactory.getFileSavedPath(PathType.PACKAGE_PATH)+ path, fileName);     //设置文件地址
 
         logUtil.i("文件存在", fileName + " 是否存在：" + file.exists());
         return file.exists();
