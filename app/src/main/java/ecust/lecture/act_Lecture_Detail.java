@@ -52,7 +52,7 @@ public class act_Lecture_Detail extends MyBaseActivity implements clsFailureBar.
 
             //存储到sql
             logUtil.i(this, "讲座信息数据存储");
-            DataBase_Lecture.getSingleton().detail.SaveData(mLectureDetail.mData);
+           new  DataBase_Lecture(this).detail.SaveData(mLectureDetail.mData);
         }
     }
 
@@ -103,7 +103,7 @@ public class act_Lecture_Detail extends MyBaseActivity implements clsFailureBar.
         wFailureBar.setOnWebRetryListener(this);
 
         //获取数据库缓存数据
-        struct_LectureDetail cacheData = DataBase_Lecture.getSingleton().detail.GetData(lecture_URL);
+        struct_LectureDetail cacheData = new DataBase_Lecture(this).detail.GetData(lecture_URL);
 
         if (!cacheData.url.equals("")) {
             logUtil.i(this, "[讲座详细]缓存数据加载成功" + lecture_URL);

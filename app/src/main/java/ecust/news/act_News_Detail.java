@@ -20,6 +20,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,7 +32,6 @@ import java.util.Queue;
 import ecust.main.R;
 import lib.BaseActivity.MyBaseActivity;
 import lib.Const;
-import lib.Const.PathFactory.PathType;
 import lib.Global;
 import lib.clsApplication;
 import lib.clsFailureBar;
@@ -39,6 +39,8 @@ import lib.clsUtils.InputStreamUtils;
 import lib.clsUtils.fileUtil;
 import lib.clsUtils.httpUtil;
 import lib.clsUtils.logUtil;
+import lib.clsUtils.pathFactory;
+import lib.clsUtils.pathFactory.PathType;
 import lib.clsUtils.timeUtil;
 
 /**
@@ -88,6 +90,7 @@ public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnW
 
     //根据url获得唯一的hash值（碰到一样的几乎不可能）
     public static String getHtmlHash(String url) {
+        //设置后缀
         return Global.getStringHash(url);
     }
 
@@ -161,15 +164,14 @@ public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnW
         mNewsContent = clsNewsParse.parseAllData(rtnHtmlMessage, catalogName);
 
         //保存对象
-        String filepath = Const.PathFactory.getFileSavedPath(PathType.NEWS_DETAIL_MESSAGE);
+        String filepath = pathFactory.getFileSavedPath(PathType.NEWS_DETAIL_CONTENT_CACHE);
         filepath += getHtmlHash(url);
         fileUtil.saveObjectData(filepath, mNewsContent);
-        logUtil.i(this, mNewsContent.toString());
     }
 
     //初始化图片集合
     public void initPicHolders() {
-        mNewsContent.bitmapHashMap=new HashMap<>();
+        mNewsContent.bitmapHashMap = new HashMap<>();
 
         //填充图片的引用，等会来这个数据集中找
         for (String url : mNewsContent.pic_url) {
@@ -262,7 +264,9 @@ public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnW
         if (!bSucceed) return;
 
         //保存文件
-        fileUtil.saveCacheFile("News", getPicHash(url), rtnPicBytes);
+        String path = pathFactory.getFileSavedPath(PathType.NEWS_DETAIL_PICTURE_CACHE);
+        path += getPicHash(url);
+        fileUtil.saveBytesToFile(new File(path), rtnPicBytes);
 
         //设置图片
         PicHolder picHolder = mNewsContent.bitmapHashMap.get(url);
@@ -280,7 +284,7 @@ public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnW
 
             //处于可见位置区域
             if (wListView.indexOfChild(picHolder.imageView) >= 0) {
-                new pictureShowAsyncTask().execute(picHolder);   //图片下载完成，逐渐显示图片
+                new pictureShowAsyncTask().setActivity_Class(this).execute(picHolder);   //图片下载完成，逐渐显示图片
             }
         }
         picHolder.isLoading = false;
@@ -400,8 +404,6 @@ public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnW
 
         if (url.contains("http://172.") && picHolder.getBitmap() == null) {
             logUtil.toast("当前非校园网，无法加载内网图片!");
-        } else {
-//            logUtil.toast(url);
         }
     }
 
@@ -441,7 +443,7 @@ public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnW
     //读取存储对象
     public Object readObject(String url) {
         //保存对象
-        String filepath = Const.PathFactory.getFileSavedPath(PathType.NEWS_DETAIL_MESSAGE);
+        String filepath = pathFactory.getFileSavedPath(PathType.NEWS_DETAIL_CONTENT_CACHE);
         filepath += getHtmlHash(url);
         return fileUtil.getObjectData(filepath);
     }
@@ -776,10 +778,11 @@ class NewsAdapter extends BaseAdapter {
     public View getBodyView(struct_NewsContent mData, int pos) {
         String str = mData.content.get(pos);
         //判断是文本还是图片
-        if (str.startsWith("http://"))
-            return createNewImageView(str);          //返回图片
-        else
+        if (str.startsWith("http://")) {
+            return createNewImageView(str);         //返回图片
+        } else {
             return createNewTextView(str);          //返回文本
+        }
     }
 
 
@@ -806,13 +809,16 @@ class NewsAdapter extends BaseAdapter {
         //没有图片
         if (picHolder.getBitmap() == null) {
             //1.先查找是否有本地缓存
-            boolean found = fileUtil.existCacheFile("News", act_News_Detail.getPicHash(url));
+            String path = pathFactory.getFileSavedPath(PathType.NEWS_DETAIL_PICTURE_CACHE);
+            path += act_News_Detail.getPicHash(url);
+
+            boolean found = new File(path).exists();
 
             if (found) {
                 picHolder.found = true;
 
                 //异步任务根据URL读取文件加载，避免主线程卡顿
-                new pictureShowAsyncTask().execute(picHolder);   //getView，显示图片
+                new pictureShowAsyncTask().setActivity_Class(mActivity).execute(picHolder);   //getView，显示图片
             }
 
             //2.加载网络图片
@@ -822,7 +828,7 @@ class NewsAdapter extends BaseAdapter {
         } else {
             //图片已在内存，但没显示
             if (!picHolder.show) {
-                new pictureShowAsyncTask().execute(picHolder);   //getView，显示图片
+                new pictureShowAsyncTask().setActivity_Class(mActivity).execute(picHolder);   //getView，显示图片
             }
         }
         return picHolder.imageView;
@@ -854,15 +860,25 @@ class NewsAdapter extends BaseAdapter {
 
 //图片透明度变化，逐渐显示
 class pictureShowAsyncTask extends AsyncTask<PicHolder, Float, Void> {
-    final int length_Of_IntervalTime = 40;    //刷新时间(ms)
-    int length_Of_ShowTime = 200;    //总的显示时长(ms)
-    boolean firstLoad = true;
+    private final int length_Of_IntervalTime = 40;    //刷新时间(ms)
+    private int length_Of_ShowTime = 200;    //总的显示时长(ms)
+    private boolean firstLoad = true;
+    private PicHolder picHolder;        //获取图片及ImageView
 
-    PicHolder picHolder;        //获取图片及ImageView
+    private act_News_Detail activity_class;
+
+    //为了提供recyclePictureForMoreMemory()用
+    public pictureShowAsyncTask setActivity_Class(act_News_Detail activity_class) {
+        this.activity_class = activity_class;
+        return this;
+    }
 
     //透明度渐变
     @Override
     protected Void doInBackground(PicHolder... params) {
+        //回收图片
+        activity_class.recyclePictureForMoreMemory();
+
         //滚动过快的话，就缩短时间
         if (act_News_Detail.listview_scroll_items_per_second > 5)
             length_Of_ShowTime /= 10;
@@ -877,7 +893,12 @@ class pictureShowAsyncTask extends AsyncTask<PicHolder, Float, Void> {
 
         //如果bitmap为空，但缓存文件中有，就读取之
         if (picHolder.getBitmap() == null) {
-            byte[] bytes = fileUtil.getCacheFile("News", act_News_Detail.getPicHash(picHolder.url));
+            //获取图片路径
+            String path = pathFactory.getFileSavedPath(PathType.NEWS_DETAIL_PICTURE_CACHE);
+            path += act_News_Detail.getPicHash(picHolder.url);
+
+            //读取字节流
+            byte[] bytes = fileUtil.getBytesFromFile(new File(path));
 
             if (bytes == null) throw new NullPointerException();
 

@@ -169,7 +169,7 @@ public class fragment_News_Catalog extends Fragment implements
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.news_catalog_fragment, container, false);
         //设置Adapter
-        wListView = (PullToRefreshListView) view.findViewById(R.id.news_listview_pulltorefresh);
+        wListView = (PullToRefreshListView) view.findViewById(R.id.news_catalog_pulltorefresh);
         // 只允许下拉刷新
         wListView.setMode(PullToRefreshBase.Mode.PULL_FROM_START);
 
@@ -181,6 +181,10 @@ public class fragment_News_Catalog extends Fragment implements
         wListView.setOnLastItemVisibleListener(this);
         //新闻点击事件
         wListView.setOnItemClickListener(this);
+
+        //设置空白页
+        View emptyView = view.findViewById(R.id.news_catalog_pulltorefresh_emptyview);
+        wListView.setEmptyView(emptyView);
 
         mNewsCatalog.nextPage = new clsExpiredTimeMangment(catalogName).getInt("nextPage", 1);
 
@@ -326,6 +330,14 @@ public class fragment_News_Catalog extends Fragment implements
                     item.title = li.select("span").last().text();
                     item.time = li.getElementsByClass("time").first().text();
                     item.url = Const.news_url + li.select("a").attr("href");
+
+                    //http://news.ecust.edu.cn/news/35445?important=&category_id=7
+                    //转为http://news.ecust.edu.cn/news/35445
+                    //有时候两个版块都会有相同的新闻，但地址不同
+                    int i = item.url.indexOf("?");
+                    if (i >= 0)
+                        item.url = item.url.substring(0, i);
+
                     rtnList.add(item);
 
                     //日志

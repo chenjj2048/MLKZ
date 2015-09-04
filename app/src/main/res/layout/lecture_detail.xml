@@ -39,6 +39,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="报告题目"
+                    android:textColor="@color/grey90"
                     android:textSize="@dimen/DefaultTextSize" />
             </LinearLayout>
 
@@ -46,7 +47,8 @@
             <TextView
                 android:id="@+id/news_detail_report_title"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -63,6 +65,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="开始时间"
+                    android:textColor="@color/grey90"
                     android:textSize="@dimen/DefaultTextSize" />
             </LinearLayout>
 
@@ -70,7 +73,8 @@
             <TextView
                 android:id="@+id/news_detail_report_starttime"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -87,6 +91,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="报告地点"
+                    android:textColor="@color/grey90"
                     android:textSize="@dimen/DefaultTextSize" />
             </LinearLayout>
 
@@ -94,7 +99,8 @@
             <TextView
                 android:id="@+id/news_detail_report_address"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -111,6 +117,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="报告人"
+                    android:textColor="@color/grey90"
                     android:textSize="@dimen/DefaultTextSize" />
             </LinearLayout>
 
@@ -118,7 +125,8 @@
             <TextView
                 android:id="@+id/news_detail_report_reporter"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -135,6 +143,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="主办单位"
+                    android:textColor="@color/grey90"
                     android:textSize="@dimen/DefaultTextSize" />
             </LinearLayout>
 
@@ -142,7 +151,8 @@
             <TextView
                 android:id="@+id/news_detail_report_organization"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp" />
 
             <LinearLayout
                 android:id="@+id/news_detail_report_remark_title"
@@ -160,6 +170,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="备注"
+                    android:textColor="@color/grey90"
                     android:textSize="@dimen/DefaultTextSize" />
             </LinearLayout>
 
@@ -167,18 +178,19 @@
             <TextView
                 android:id="@+id/news_detail_report_remark"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp" />
         </LinearLayout>
     </ScrollView>
 
     <!--添加讲座提醒-->
     <!--<Button-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:gravity="center"-->
-        <!--android:padding="16dp"-->
-        <!--android:text="添加讲座提醒"-->
-        <!--android:textSize="20sp"-->
-        <!--android:textColor="@android:color/white"-->
-        <!--android:background="#ff0f9d58"/>-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:gravity="center"-->
+    <!--android:padding="16dp"-->
+    <!--android:text="添加讲座提醒"-->
+    <!--android:textSize="20sp"-->
+    <!--android:textColor="@android:color/white"-->
+    <!--android:background="#ff0f9d58"/>-->
 </LinearLayout>

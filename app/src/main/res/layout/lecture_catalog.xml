@@ -22,4 +22,13 @@
         android:headerDividersEnabled="false"
         android:scrollbars="vertical"
         android:smoothScrollbar="true" />
+
+    <TextView
+        android:id="@+id/lecture_pulltorefresh_emptyview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="正在加载.."
+        android:textColor="@color/black26"
+        android:textSize="18dp" />
 </LinearLayout>

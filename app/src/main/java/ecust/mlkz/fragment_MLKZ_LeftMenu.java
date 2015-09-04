@@ -30,7 +30,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import ecust.main.R;
-import lib.clsUtils.logUtil;
 
 //左侧侧滑菜单
 public class fragment_MLKZ_LeftMenu extends Fragment implements View.OnClickListener {
@@ -46,7 +45,6 @@ public class fragment_MLKZ_LeftMenu extends Fragment implements View.OnClickList
         //寻找头像图片，点击后登录
         ViewGroup viewGroup = (ViewGroup) view.findViewById(R.id.mlkz_home_menu_login_group);
         viewGroup.setOnClickListener(this);
-
 
         return view;
     }

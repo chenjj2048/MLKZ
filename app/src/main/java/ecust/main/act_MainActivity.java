@@ -3,9 +3,12 @@ package ecust.main;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+
+import java.io.File;
 
 import ecust.demotest.testDemoActivity;
 import ecust.lecture.act_Lecture_Catalog;
@@ -13,6 +16,8 @@ import ecust.mlkz.act_MLKZ_Home;
 import ecust.news.act_News_Catalog;
 import ecust.school_calendar.act_School_Calendar;
 import lib.BaseActivity.MyBaseActivity;
+import lib.clsUtils.logUtil;
+import lib.clsUtils.pathFactory;
 
 /**
  * =============================================================================
@@ -41,6 +46,7 @@ public class act_MainActivity extends MyBaseActivity implements View.OnClickList
 
         //初始化组件
         initComponents();
+
     }
 
     private void initComponents() {
@@ -102,5 +108,8 @@ public class act_MainActivity extends MyBaseActivity implements View.OnClickList
         dialog.setCancelable(false);
         dialog.setPositiveButton("否", null);
         dialog.show();
+
+        //删除部分缓存
+        pathFactory.cleanCacheFiles();
     }
 }

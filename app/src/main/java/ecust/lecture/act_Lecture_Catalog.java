@@ -32,9 +32,9 @@ import lib.Const;
 import lib.Global;
 import lib.clsApplication;
 import lib.clsUtils.clsExpiredTimeMangment;
+import lib.clsUtils.httpUtil;
 import lib.clsUtils.logUtil;
 import lib.clsUtils.timeUtil;
-import lib.clsUtils.httpUtil;
 
 /**
  * =============================================================================
@@ -70,7 +70,7 @@ public class act_Lecture_Catalog extends MyBaseActivity implements
     private LectureAdapter mAdapter;
     private boolean flag_isLoading = false;      //是否正在访问的标记
 
-    private DataBase_Lecture dataBase_lecture = DataBase_Lecture.getSingleton();    //获取数据库
+    private DataBase_Lecture dataBase_lecture =new  DataBase_Lecture(this);    //获取数据库
     private HashMap<String, List<struct_LectureCatalogItem>> cacheData = new HashMap<>();  //临时存放解析出来的数据
 
     public act_Lecture_Catalog() {
@@ -121,7 +121,7 @@ public class act_Lecture_Catalog extends MyBaseActivity implements
             if (result != null && result.size() > 0) {
                 // 添加数据，重复数据已被过滤
                 Iterator<struct_LectureCatalogItem> iterator = result.iterator();
-                while(iterator.hasNext()) {
+                while (iterator.hasNext()) {
                     mList.add(iterator.next());
                 }
                 Collections.sort(mList);
@@ -161,6 +161,8 @@ public class act_Lecture_Catalog extends MyBaseActivity implements
         wListView.setOnLastItemVisibleListener(this);   //监听滚动到底部
         wListView.setOnItemClickListener(this);         //新闻点击
 
+        //设置空白页
+        wListView.setEmptyView(findViewById(R.id.lecture_pulltorefresh_emptyview));
 
         nextPage = new clsExpiredTimeMangment(this).getInt("nextPage", 1);
 
@@ -305,6 +307,7 @@ public class act_Lecture_Catalog extends MyBaseActivity implements
                 item.time = li.getElementsByClass("time").first().text();
                 item.time = item.time.replace("开讲时间：", "").trim();
                 item.url = Const.news_url + li.select("a").attr("href");
+
                 rtnList.add(item);
 
 //                logUtil.i(this, item.title + " " + item.url + " " + item.time);     //日志

@@ -1,5 +1,6 @@
 package ecust.lecture;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -7,10 +8,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-import lib.Const;
-import lib.clsApplication;
 import lib.clsUtils.logUtil;
-import lib.Const.PathFactory.PathType;
+import lib.clsUtils.pathFactory;
+import lib.clsUtils.pathFactory.PathType;
+
 /**
  * =============================================================================
  * This program is free software: you can redistribute it and/or modify
@@ -33,28 +34,17 @@ import lib.Const.PathFactory.PathType;
 //讲座版块数据库
 public class DataBase_Lecture extends SQLiteOpenHelper {
     private static final int currentVersion = 1;                    //当前版本
-    private static final String dataBaseName = Const.PathFactory.getFileSavedPath(PathType.LECTURE_DATABASE);        //数据库名称
+    private static final String dataBaseName = pathFactory.getFileSavedPath(PathType.LECTURE_DATABASE);        //数据库名称
 
-    private static DataBase_Lecture db_singleton;       //单例模式
     public clsCatalog catalog;        //catalog对象（讲座目录）
     public clsDetail detail;        //detail对象（讲座详情）
 
     //构造函数
-    public DataBase_Lecture() {
-        //DataBase_Lecture(Context context, String name, SQLiteDatabase.CursorFactory factory, int version)
-        super(clsApplication.getContext(), dataBaseName, null, currentVersion);
+    public DataBase_Lecture(Context context) {
+        super(context, dataBaseName, null, currentVersion);
         logUtil.i(this, "[数据库地址]" + dataBaseName);
         this.catalog = new clsCatalog();
         this.detail = new clsDetail();
-    }
-
-    /**
-     * 获取单例
-     */
-    public static DataBase_Lecture getSingleton() {
-        if (db_singleton == null)
-            db_singleton = new DataBase_Lecture();
-        return db_singleton;
     }
 
     @Override
@@ -125,7 +115,7 @@ public class DataBase_Lecture extends SQLiteOpenHelper {
             Cursor cursor = null;       //游标
             List<struct_LectureCatalogItem> result = new ArrayList<>();    //返回数据集
             try {
-                db = db_singleton.getReadableDatabase();
+                db = getReadableDatabase();
                 //从catalog表中读取数据
                 cursor = db.rawQuery("SELECT * FROM catalog ORDER BY time DESC,url DESC", null);
                 while (cursor.moveToNext()) {
@@ -173,7 +163,7 @@ public class DataBase_Lecture extends SQLiteOpenHelper {
                     "remark,url) values(?,?,?,?,?,?,?)";
             SQLiteDatabase db = null;
             try {
-                db = db_singleton.getWritableDatabase();
+                db = getWritableDatabase();
                 db.execSQL(insertSQL, new Object[]{mData.title, mData.startTime, mData.address,
                         mData.reporter, mData.organization, mData.remark, mData.url});
             } catch (Exception e) {
@@ -195,7 +185,7 @@ public class DataBase_Lecture extends SQLiteOpenHelper {
             Cursor cursor = null;
             struct_LectureDetail result = new struct_LectureDetail();
             try {
-                db = db_singleton.getReadableDatabase();
+                db = getReadableDatabase();
                 cursor = db.rawQuery(selectSQL, new String[]{url});
 
                 if (cursor.moveToNext()) {

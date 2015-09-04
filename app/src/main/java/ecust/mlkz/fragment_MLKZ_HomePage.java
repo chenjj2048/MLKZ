@@ -23,10 +23,12 @@ import java.util.List;
 
 import ecust.main.R;
 import lib.Const;
+import lib.clsUtils.pathFactory;
+import lib.clsUtils.pathFactory.PathType;
 import lib.clsUtils.fileUtil;
 import lib.clsUtils.httpUtil;
 import lib.clsUtils.logUtil;
-import lib.Const.PathFactory.PathType;
+
 /**
  * =============================================================================
  * This program is free software: you can redistribute it and/or modify
@@ -49,13 +51,15 @@ import lib.Const.PathFactory.PathType;
  */
 public class fragment_MLKZ_HomePage extends Fragment implements httpUtil.OnHttpVisitListener {
     //数据的保存地址，文件名
-    private final String object_save_path = Const.PathFactory.getFileSavedPath(PathType.MLKZ_HOMEPAGE_SERIAL_OBJECT);
+    private final String object_save_path = pathFactory.getFileSavedPath(PathType.MLKZ_HOMEPAGE_SERIAL_OBJECT);
     //存储所有数据内容
     private List<struct_MLKZ_Home_Section> mContent = new ArrayList<>();
     //适配器
     private bbsCatalogAdapter mAdapter;
     //ListView
     private ListView listView;
+    //空页面
+    private TextView emptyView;
 
     public fragment_MLKZ_HomePage() {
     }
@@ -66,9 +70,14 @@ public class fragment_MLKZ_HomePage extends Fragment implements httpUtil.OnHttpV
         View view = inflater.inflate(R.layout.mlkz_home_page_fragment, container, false);
         //适配器
         mAdapter = new bbsCatalogAdapter(getActivity(), mContent);
+
+        //空页面
+        emptyView = (TextView) view.findViewById(R.id.mlkz_home_page_emptyview);
+
         //ListView
         listView = (ListView) view.findViewById(R.id.mlkz_home_page_listview);
         listView.setAdapter(mAdapter);
+        listView.setEmptyView(emptyView);
 
         //取得本地数据
         Object object = fileUtil.getObjectData(object_save_path);

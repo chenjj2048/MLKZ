@@ -26,15 +26,12 @@ import lib.clsUtils.ScreenUtil;
  * =============================================================================
  * .
  * Created on 2015/8/12
- * 参考自http://blog.csdn.net/lmj623565791/article/details/39257409
- * <p/>
  * 侧滑菜单+主体部分
  */
 
 public class SlidingMenu extends HorizontalScrollView {
     private int mScreenWidth;       //屏幕宽度
     private int mMenuWidth;         //侧滑菜单宽度
-    private boolean canShow;        //允许侧滑菜单显示(靠边才能拉出)
     private boolean needSwitchToBody = false;
 
     public SlidingMenu(Context context, AttributeSet attrs) {
@@ -99,19 +96,17 @@ public class SlidingMenu extends HorizontalScrollView {
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
-        int action = ev.getAction();
-
-        switch (action) {
+        switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                //过滤掉事件，不触发ACTION_UP，手指在最左边才能滑出菜单
+                if (this.getScrollX() != 0 && ev.getX() >= mMenuWidth / 8)
+                    return false;
                 break;
             case MotionEvent.ACTION_MOVE:
                 break;
             case MotionEvent.ACTION_UP:
-
-
                 //进行判断，如果显示区域大于菜单宽度一半则完全显示，否则隐藏
-                int scrollX = getScrollX();
-                if (scrollX > mMenuWidth / 2)
+                if (this.getScrollX() > mMenuWidth / 2)
                     switchToBody();
                 else
                     switchToLeftMenu();
