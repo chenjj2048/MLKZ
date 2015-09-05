@@ -2,13 +2,14 @@ package ecust.news;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
@@ -56,14 +57,21 @@ import lib.clsUtils.timeUtil;
 // 华理新闻Fragment
 public class fragment_News_Catalog extends Fragment implements
         PullToRefreshBase.OnLastItemVisibleListener,
-        PullToRefreshBase.OnRefreshListener2, AdapterView.OnItemClickListener,
-        httpUtil.OnHttpVisitListener {
+        PullToRefreshBase.OnRefreshListener2, httpUtil.OnHttpVisitListener {
     private final clsNewsCatalog mNewsCatalog = new clsNewsCatalog();
 
 
     HashMap<String, List<struct_NewsCatalogItem>> cacheData = new HashMap<>();
-    boolean currentIsVisible = false;     //当前Fragment是否可见
-    private String catalogName;   //版块名称，如校园要闻、综合新闻、图说华理等
+    //当前Fragment是否可见
+    boolean currentIsVisible = false;
+
+    // view.setBackgroundResource(R.color.xxx)出错，经常只有部分项目变色，害我调试半天，摔！
+    //一直以为OnTouch事件没拦截到
+    private int listview_Item_Focused_Color;
+
+    //版块名称，如校园要闻、综合新闻、图说华理等
+    private String catalogName;
+
     private String catalogUrl;
     private PullToRefreshListView wListView;
     private NewsAdapter mAdapter = new NewsAdapter();
@@ -142,28 +150,6 @@ public class fragment_News_Catalog extends Fragment implements
         }
     }
 
-    /**
-     * 点击到具体新闻，准备开始展开
-     *
-     * @param parent   parent
-     * @param view     view
-     * @param position 序号
-     * @param id       id
-     */
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        position--;
-        struct_NewsCatalogItem item = mNewsCatalog.mList.get(position);
-
-        //打开新的窗体,显示具体新闻内容
-        Intent new_activity = new Intent();
-        new_activity.setClass(getActivity(), act_News_Detail.class);
-        //传进去URL和新闻目录分类
-        new_activity.putExtra("URL", item.url);              //发送要打开的URL
-        new_activity.putExtra("catalogName", catalogName);       //发送所在分类
-        startActivity(new_activity);
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -179,8 +165,6 @@ public class fragment_News_Catalog extends Fragment implements
 
         //监听滚动到底部
         wListView.setOnLastItemVisibleListener(this);
-        //新闻点击事件
-        wListView.setOnItemClickListener(this);
 
         //设置空白页
         View emptyView = view.findViewById(R.id.news_catalog_pulltorefresh_emptyview);
@@ -188,6 +172,7 @@ public class fragment_News_Catalog extends Fragment implements
 
         mNewsCatalog.nextPage = new clsExpiredTimeMangment(catalogName).getInt("nextPage", 1);
 
+        listview_Item_Focused_Color = getResources().getColor(R.color.grey240);
         return view;
     }
 
@@ -301,7 +286,6 @@ public class fragment_News_Catalog extends Fragment implements
         initializeNewsData();
     }
 
-
     private class clsNewsCatalog {
         private final int itemIsLastOne = Integer.MAX_VALUE; //已加载至最后一页，标记
         public List<struct_NewsCatalogItem> mList = new ArrayList<>();          // 数据集
@@ -352,7 +336,41 @@ public class fragment_News_Catalog extends Fragment implements
     }
 
     //华理新闻主页面Adapter
-    private class NewsAdapter extends BaseAdapter {
+    private class NewsAdapter extends BaseAdapter implements View.OnTouchListener {
+
+        @Override
+        public boolean onTouch(View view, MotionEvent event) {
+            ViewHolder viewHolder = (ViewHolder) view.getTag();
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    //变化背景色
+                    view.setBackgroundColor(listview_Item_Focused_Color);
+                    break;
+                case MotionEvent.ACTION_UP:
+                    //恢复原来颜色
+                    view.setBackgroundColor(Color.WHITE);
+                    //开启activity
+                    startNewsDetailActivity(viewHolder.url);
+                    break;
+                case MotionEvent.ACTION_CANCEL:
+                    //恢复原来颜色
+                    view.setBackgroundColor(Color.WHITE);
+                    break;
+            }
+            return true;
+        }
+
+        //开启新应用
+        public void startNewsDetailActivity(String url) {
+            //打开新的窗体,显示具体新闻内容
+            Intent new_activity = new Intent();
+            new_activity.setClass(getActivity(), act_News_Detail.class);
+            //传进去URL和新闻目录分类
+            new_activity.putExtra("URL", url);              //发送要打开的URL
+            new_activity.putExtra("catalogName", catalogName);       //发送所在分类
+            startActivity(new_activity);
+        }
+
         @Override
         public int getCount() {
             return mNewsCatalog.mList.size();
@@ -376,6 +394,8 @@ public class fragment_News_Catalog extends Fragment implements
                 LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 convertView = inflater.inflate(R.layout.news_catalog_fragment_item, null);
 
+                convertView.setOnTouchListener(this);
+
                 viewHolder = new ViewHolder();
                 viewHolder.title = (TextView) convertView.findViewById(R.id.listview_news_title);
                 viewHolder.time = (TextView) convertView.findViewById(R.id.listview_news_updatetime);
@@ -390,7 +410,7 @@ public class fragment_News_Catalog extends Fragment implements
             String timeMessage = item.time + "  " + timeUtil.getDeltaDate(item.time);
             viewHolder.time.setText(timeMessage);
             viewHolder.title.setText(item.title);
-
+            viewHolder.url = item.url;
 
             //预加载网络数据
             final int preLoadCount = 100;       //预加载的数据数量,每页为20条数据
@@ -405,6 +425,7 @@ public class fragment_News_Catalog extends Fragment implements
         private class ViewHolder {
             public TextView title;  //标题
             public TextView time;   //发表时间，含几天前
+            String url;
         }
     }
 

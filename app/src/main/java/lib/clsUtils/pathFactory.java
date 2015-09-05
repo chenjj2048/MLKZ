@@ -1,12 +1,14 @@
 package lib.clsUtils;
 
-import android.os.Environment;
+import android.content.Context;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import lib.clsApplication;
 
 /**
  * =============================================================================
@@ -31,38 +33,34 @@ import java.util.List;
 
 //工厂模式
 public class pathFactory {
-    //包名
-    private final static String packageName = "cjj.ecust.helper";
-    //默认路径名称
-    private final static String packagePath = Environment.getExternalStorageDirectory().getPath() +
-            "/" + packageName;
+    private final static Context context = clsApplication.getContext();
+
+    //Cache路径
+    //storage/sdcard0/Android/data/cjj.ecust.helper/cache
+    private final static String packageCachePath = context.getExternalCacheDir().getPath();
 
     //获取文件的保存路径
     public static String getFileSavedPath(PathType name) {
         String result = "";
         switch (name) {
-            case PACKAGE_PATH:
-                //包名路径
-                result = packagePath;
-                break;
             case LECTURE_DATABASE:
                 //讲座版块数据库
-                result = pathFactory.getSQLDataBaseStoragePath() + "Lecture/DataBase/lecture.db";
+                result = getSQLDataBaseStoragePath() + "lecture.db";
                 break;
             case NEWS_DATABASE:
                 //新闻版块数据库
-                result = pathFactory.getSQLDataBaseStoragePath() + "News/DataBase/news.db";
+                result = getSQLDataBaseStoragePath() + "news.db";
                 break;
             case NEWS_DETAIL_CONTENT_CACHE:
                 //新闻详细内容缓存
-                result = packagePath + "/NEWS/Cache_Content/";
+                result = packageCachePath + "/NEWS_Content_Cache/";
                 break;
             case NEWS_DETAIL_PICTURE_CACHE:
                 //新闻图片缓存
-                result = packagePath + "/NEWS/Cache_Picture/";
+                result = packageCachePath + "/NEWS_Picture_Cache/";
                 break;
             case MLKZ_HOMEPAGE_SERIAL_OBJECT:
-                result = packagePath + "/MLKZ/mlkz_home.obj";
+                result = context.getExternalFilesDir("MLKZ") + "/mlkz_home.cfg";
                 break;
         }
 
@@ -83,7 +81,7 @@ public class pathFactory {
         String result;
         if (saved_in_SDCard) {
             //数据库存储地址(存储卡)
-            result = Environment.getExternalStorageDirectory().getPath() + "/" + packageName + "/";
+            result = context.getExternalFilesDir("Sqlite").getPath() + "/";
         } else {
             //数据库存储地址（应用内）
             result = "";
@@ -155,7 +153,6 @@ public class pathFactory {
 
     //文件存储的位置标识
     public enum PathType {
-        PACKAGE_PATH,                               //包名
         MLKZ_HOMEPAGE_SERIAL_OBJECT,                //梅陇客栈
         LECTURE_DATABASE,                            //讲座版块
         NEWS_DATABASE, NEWS_DETAIL_CONTENT_CACHE, NEWS_DETAIL_PICTURE_CACHE    //新闻版块

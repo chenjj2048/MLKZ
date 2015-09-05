@@ -6,8 +6,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 
-import com.viewpagerindicator.TabPageIndicator;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -116,17 +114,15 @@ public class act_News_Catalog extends MyBaseFragmentActivity implements ViewPage
             mFragments.add(mFragment_News);
         }
 
-        //Set the pager with an adapter
+        //设置ViewPager
         ViewPager wViewPager = (ViewPager) findViewById(R.id.news_Catalog_Viewpager);
         wViewPager.setAdapter(mFragmentAdapter);
 
-        //Bind the title indicator to the adapter
-        TabPageIndicator tabIndicator = (TabPageIndicator) findViewById(R.id.news_Catalog_TabIndicator);
-        tabIndicator.setViewPager(wViewPager);
-        tabIndicator.setOnPageChangeListener(this);
-
-        //设置要加载的Fragment位置(有可能被销毁，因此不一定每次都是第一个)
-        tabIndicator.setCurrentItem(currentFragmentPosition);
+        //自定义的控件
+        myWidgetTabPageIndicator tabPagerIndicator = (myWidgetTabPageIndicator) findViewById(R.id.news_catalog_myTabPageIndicator);
+        tabPagerIndicator.setViewPager(wViewPager);
+        tabPagerIndicator.setOnPageChangeListener(this);
+        tabPagerIndicator.setCurrentItem(currentFragmentPosition);
     }
 
     @Override
