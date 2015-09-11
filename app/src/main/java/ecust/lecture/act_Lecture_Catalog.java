@@ -1,5 +1,6 @@
 package ecust.lecture;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -27,7 +28,6 @@ import java.util.List;
 
 import ecust.main.R;
 import ecust.main.act_MainActivity;
-import lib.BaseActivity.MyBaseActivity;
 import lib.Const;
 import lib.Global;
 import lib.clsApplication;
@@ -56,7 +56,7 @@ import lib.clsUtils.timeUtil;
  */
 
 //讲座版块详细目录
-public class act_Lecture_Catalog extends MyBaseActivity implements
+public class act_Lecture_Catalog extends Activity implements
         PullToRefreshBase.OnLastItemVisibleListener,
         PullToRefreshBase.OnRefreshListener2, AdapterView.OnItemClickListener,
         httpUtil.OnHttpVisitListener {
@@ -70,7 +70,7 @@ public class act_Lecture_Catalog extends MyBaseActivity implements
     private LectureAdapter mAdapter;
     private boolean flag_isLoading = false;      //是否正在访问的标记
 
-    private DataBase_Lecture dataBase_lecture =new  DataBase_Lecture(this);    //获取数据库
+    private DataBase_Lecture dataBase_lecture = new DataBase_Lecture(this);    //获取数据库
     private HashMap<String, List<struct_LectureCatalogItem>> cacheData = new HashMap<>();  //临时存放解析出来的数据
 
     public act_Lecture_Catalog() {

@@ -21,7 +21,6 @@
         android:layout_alignParentLeft="true"
         android:layout_margin="10dp"
         android:layout_toLeftOf="@id/mlkz_home_page_viewgroup_divider"
-        android:background="@drawable/selector_mlkz_homepage_item"
         android:padding="6dp">
 
         <!--子版块名称-->
@@ -51,7 +50,6 @@
         android:layout_alignParentRight="true"
         android:layout_margin="10dp"
         android:layout_toRightOf="@id/mlkz_home_page_viewgroup_divider"
-        android:background="@drawable/selector_mlkz_homepage_item"
         android:padding="6dp">
 
         <!--子版块名称-->

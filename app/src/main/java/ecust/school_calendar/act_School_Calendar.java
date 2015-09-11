@@ -21,6 +21,7 @@
 
 package ecust.school_calendar;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
@@ -31,11 +32,10 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import ecust.main.R;
 import ecust.main.act_MainActivity;
-import lib.BaseActivity.MyBaseActivity;
 import lib.Global;
 import lib.clsUtils.httpUtil;
 
-public class act_School_Calendar extends MyBaseActivity implements httpUtil.OnHttpVisitListener {
+public class act_School_Calendar extends Activity implements httpUtil.OnHttpVisitListener {
     //校历URL地址
     private final String url = "http://jwc.ecust.edu.cn/s/75/t/134/p/12/c/4053/list.htm";
 
@@ -77,7 +77,7 @@ public class act_School_Calendar extends MyBaseActivity implements httpUtil.OnHt
     }
 
     //SAX解析器
-    public class sax extends DefaultHandler{
+    public class sax extends DefaultHandler {
         @Override
         public void startDocument() throws SAXException {
             super.startDocument();

@@ -21,6 +21,7 @@
 
 package ecust.mlkz;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -33,42 +34,43 @@ import android.view.View;
 import android.widget.Button;
 
 import ecust.main.R;
-import lib.BaseActivity.MyBaseActivity;
 import lib.clsUtils.clsSoftKeyBoard;
 import lib.clsUtils.logUtil;
+import widget.myEditText;
 
 //梅陇客栈登陆页面
-public class act_MLKZ_Login extends MyBaseActivity implements TextWatcher, View.OnClickListener,
+public class act_MLKZ_Login extends Activity implements TextWatcher, View.OnClickListener,
         View.OnTouchListener, cls_MLKZ_Login.OnLoginStatusReturn {
     public static final String COOKIE = "cookie";
     public static final String USERNAME = "username";
-    private Dialog loadingDialog;      //加载中Dialog
+    //加载中Dialog
+    private Dialog loadingDialog;
     private myEditText edittext_Username;
-    private myEditText edittext_password;
-    private Button btn_login;
+    private myEditText edittext_Password;
+    private Button button_Login;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.mlkz_login);
 
-        initCompents();
+        init();
     }
 
-    public void initCompents() {
+    public void init() {
         edittext_Username = (myEditText) findViewById(R.id.mlkz_login_username);
-        edittext_password = (myEditText) findViewById(R.id.mlkz_login_password);
-        btn_login = (Button) findViewById(R.id.mlkz_login_button);
+        edittext_Password = (myEditText) findViewById(R.id.mlkz_login_password);
+        button_Login = (Button) findViewById(R.id.mlkz_login_button);
 
         edittext_Username.addTextChangedListener(this);
-        edittext_password.addTextChangedListener(this);
-        btn_login.setOnClickListener(this);
-        btn_login.setOnTouchListener(this);
+        edittext_Password.addTextChangedListener(this);
+        button_Login.setOnClickListener(this);
+        button_Login.setOnTouchListener(this);
 
         loadingDialog = getLoadingDialog(this);
 
         //获取成功登陆过的用户名
-        String strRecentUsername = new cls_MLKZ_Login(this).new getLoginPreference().getUsername();
+        String strRecentUsername = new cls_MLKZ_Login(this).getPreference().getUsername();
         edittext_Username.setText(strRecentUsername);
     }
 
@@ -90,19 +92,19 @@ public class act_MLKZ_Login extends MyBaseActivity implements TextWatcher, View.
             return;
         }
 
-        if (edittext_password.getText().length() <= 0) {
+        if (edittext_Password.getText().length() <= 0) {
             logUtil.toast("请输入密码！");
             return;
         }
 
-        if (edittext_password.getText().length() < 6) {
+        if (edittext_Password.getText().length() < 6) {
             logUtil.toast("密码过短，请重新输入！");
             return;
         }
 
         //进行登陆
-        loginAndGetCookie(edittext_Username.getText().toString(), edittext_password.getText().toString());
-        edittext_password.setText("");
+        loginAndGetCookie(edittext_Username.getText().toString(), edittext_Password.getText().toString());
+        edittext_Password.setText("");
     }
 
     //登陆消息返回
@@ -148,12 +150,12 @@ public class act_MLKZ_Login extends MyBaseActivity implements TextWatcher, View.
 
     @Override
     public void afterTextChanged(Editable s) {
-        if (edittext_Username.getText().length() > 0 && edittext_password.getText().length() > 0) {
+        if (edittext_Username.getText().length() > 0 && edittext_Password.getText().length() > 0) {
             //能被点击
-            btn_login.setBackgroundResource(R.drawable.shape_mlkz_login_button_can_press);
+            button_Login.setBackgroundResource(R.drawable.shape_mlkz_login_button_can_press);
         } else {
             //不能点击
-            btn_login.setBackgroundResource(R.drawable.shape_mlkz_login_button_cannot_press);
+            button_Login.setBackgroundResource(R.drawable.shape_mlkz_login_button_cannot_press);
         }
     }
 

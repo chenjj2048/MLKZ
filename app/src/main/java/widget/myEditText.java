@@ -1,4 +1,4 @@
-package ecust.mlkz;
+package widget;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;

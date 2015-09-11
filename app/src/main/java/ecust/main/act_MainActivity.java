@@ -1,5 +1,6 @@
 package ecust.main;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,7 +13,6 @@ import ecust.lecture.act_Lecture_Catalog;
 import ecust.mlkz.act_MLKZ_Home;
 import ecust.news.act_News_Catalog;
 import ecust.school_calendar.act_School_Calendar;
-import lib.BaseActivity.MyBaseActivity;
 import lib.clsUtils.pathFactory;
 
 /**
@@ -33,7 +33,7 @@ import lib.clsUtils.pathFactory;
  * Created by 彩笔怪盗基德 on 2015/5/20
  * Copyright (C) 2015 彩笔怪盗基德
  */
-public class act_MainActivity extends MyBaseActivity implements View.OnClickListener {
+public class act_MainActivity extends Activity implements View.OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

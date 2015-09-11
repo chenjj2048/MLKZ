@@ -3,6 +3,7 @@ package ecust.news;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 
@@ -11,7 +12,6 @@ import java.util.List;
 
 import ecust.main.R;
 import ecust.main.act_MainActivity;
-import lib.BaseActivity.MyBaseFragmentActivity;
 import lib.Global;
 
 /**
@@ -32,7 +32,7 @@ import lib.Global;
  * Created by 彩笔怪盗基德 on 2015/6/30
  * Copyright (C) 2015 彩笔怪盗基德
  */
-public class act_News_Catalog extends MyBaseFragmentActivity implements ViewPager.OnPageChangeListener {
+public class act_News_Catalog extends FragmentActivity implements ViewPager.OnPageChangeListener {
     private int currentFragmentPosition = 0;        //当前Fragment的索引值
     private List<Fragment> mFragments = new ArrayList<>();   //数据集
     private final FragmentPagerAdapter mFragmentAdapter = new FragmentPagerAdapter(getSupportFragmentManager()) {

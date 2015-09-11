@@ -15,7 +15,7 @@
         android:padding="20dp">
 
         <!--头像-->
-        <ecust.mlkz.myCircleImageView
+        <widget.myCircleImageView
             android:id="@+id/mlkz_home_menu_login_image"
             android:layout_width="80dp"
             android:layout_height="80dp"

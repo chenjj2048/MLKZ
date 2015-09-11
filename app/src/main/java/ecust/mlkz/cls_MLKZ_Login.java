@@ -178,9 +178,52 @@ public class cls_MLKZ_Login {
         return strHtml;
     }
 
+    public LoginPreference getPreference() {
+        return new LoginPreference(this.context);
+    }
+
     //登陆返回接口
     public interface OnLoginStatusReturn {
         void OnLoginStatusReturn(String username, String password, String rtnMessage, String cookie);
+    }
+
+    public class LoginPreference {
+        //Preference文件名
+        private static final String MLKZ_LOGIN_INFORMATION = "mlkz_login_information";
+        private static final String USERNAME = "username";
+        private static final String PASSWORD = "password";
+        private static final String COOKIE = "cookie";
+
+        private Context context;
+
+        public LoginPreference(Context context) {
+            this.context = context;
+        }
+
+        //6.保存用户名、密码、cookie
+        public void saveLoginInformation(String username, String password, String cookie) {
+            SharedPreferences sp = context.getSharedPreferences(MLKZ_LOGIN_INFORMATION, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sp.edit();
+            //保存用户名
+            editor.putString(USERNAME, username);
+            //保存密码
+            editor.putString(PASSWORD, password);
+            //保存cookie
+            editor.putString(COOKIE, cookie);
+            editor.apply();
+        }
+
+        //获取Cookie
+        public String getCookie() {
+            SharedPreferences sp = context.getSharedPreferences(MLKZ_LOGIN_INFORMATION, Context.MODE_PRIVATE);
+            return sp.getString(COOKIE, "");       //读取cookie
+        }
+
+        //获取用户名
+        public String getUsername() {
+            SharedPreferences sp = context.getSharedPreferences(MLKZ_LOGIN_INFORMATION, Context.MODE_PRIVATE);
+            return sp.getString(USERNAME, "");       //读取用户名
+        }
     }
 
     //登陆任务（子线程）
@@ -227,45 +270,13 @@ public class cls_MLKZ_Login {
 
             //登陆成功，保存登陆信息
             if (this.returnMessage.contains("欢迎您回来")) {
-                new getLoginPreference().SaveLoginInformation(username, password, cookieReturn);
+                cls_MLKZ_Login.this.getPreference().saveLoginInformation(username, password, cookieReturn);
 
                 logUtil.i(this, returnMessage);
             }
 
             //接口返回
             onLoginStatusReturn.OnLoginStatusReturn(username, password, returnMessage, cookieReturn);
-        }
-    }
-
-    public class getLoginPreference {
-        private final String MLKZ_LOGIN_INFORMATION = "mlkz_login_information";   //Preference
-        private final String USERNAME = "username";
-        private final String PASSWORD = "password";
-        private final String COOKIE = "cookie";
-
-        //6.保存用户名、密码、cookie
-        public void SaveLoginInformation(String username, String password, String cookie) {
-            SharedPreferences sp = context.getSharedPreferences(this.MLKZ_LOGIN_INFORMATION, Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sp.edit();
-            //保存用户名
-            editor.putString(this.USERNAME, username);
-            //保存密码
-            editor.putString(this.PASSWORD, password);
-            //保存cookie
-            editor.putString(this.COOKIE, cookie);
-            editor.apply();
-        }
-
-        //获取Cookie
-        public String getCookie() {
-            SharedPreferences sp = context.getSharedPreferences(this.MLKZ_LOGIN_INFORMATION, Context.MODE_PRIVATE);
-            return sp.getString(this.COOKIE, "");       //读取cookie
-        }
-
-        //获取用户名
-        public String getUsername() {
-            SharedPreferences sp = context.getSharedPreferences(this.MLKZ_LOGIN_INFORMATION, Context.MODE_PRIVATE);
-            return sp.getString(this.USERNAME, "");       //读取用户名
         }
     }
 }

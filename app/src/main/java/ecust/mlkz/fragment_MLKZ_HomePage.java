@@ -1,6 +1,7 @@
 package ecust.mlkz;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -23,11 +24,11 @@ import java.util.List;
 
 import ecust.main.R;
 import lib.Const;
-import lib.clsUtils.pathFactory;
-import lib.clsUtils.pathFactory.PathType;
 import lib.clsUtils.fileUtil;
 import lib.clsUtils.httpUtil;
 import lib.clsUtils.logUtil;
+import lib.clsUtils.pathFactory;
+import lib.clsUtils.pathFactory.PathType;
 
 /**
  * =============================================================================
@@ -61,7 +62,9 @@ public class fragment_MLKZ_HomePage extends Fragment implements httpUtil.OnHttpV
     //空页面
     private TextView emptyView;
 
+
     public fragment_MLKZ_HomePage() {
+
     }
 
     @Override
@@ -89,7 +92,8 @@ public class fragment_MLKZ_HomePage extends Fragment implements httpUtil.OnHttpV
             updateListViewContent();
         }
 
-        loginMLKZ("");    //再加载刷新网页
+        String cookie = new cls_MLKZ_Login(getActivity()).getPreference().getCookie();
+        loginMLKZ(cookie);    //再加载刷新网页
 
         return view;    //返回布局
     }
@@ -251,7 +255,7 @@ class struct_MLKZ_Home_SubSection implements Serializable {
 }
 
 //ListView适配器
-class bbsCatalogAdapter extends BaseAdapter implements View.OnClickListener, View.OnTouchListener {
+class bbsCatalogAdapter extends BaseAdapter implements View.OnTouchListener {
     private final int total_columns = 2;        //双栏
     private int count_of_data = 0;              //ListView行的数量
     private Context context;
@@ -270,26 +274,32 @@ class bbsCatalogAdapter extends BaseAdapter implements View.OnClickListener, Vie
         this.mView = initViews();
     }
 
-    @Override
-    public void onClick(View v) {
-    }
-
     //onClick点击后经常无反应，滚动后才会响应点击事件，这里用onTouch替代
-    //但又来了个新问题，selector不起作用
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                v.setBackgroundResource(R.color.grey230);
+                break;
+            case MotionEvent.ACTION_MOVE:
                 break;
             case MotionEvent.ACTION_UP:
-                //取代灵异的onClick事件
                 struct_MLKZ_Home_SubSection tag = (struct_MLKZ_Home_SubSection) v.getTag();
 
-                if (tag != null)
-                    logUtil.toast(tag.getTitle() + " = " + tag.getUrl());
+                //打开新页面
+                if (tag != null) {
+                    Intent intent = new Intent(this.context, act_MLKZ_Secondary_Page.class);
+                    intent.putExtra("title", tag.getTitle())
+                            .putExtra("url", tag.getUrl());
+                    this.context.startActivity(intent);
+                }
+
+            case MotionEvent.ACTION_CANCEL:
+                //切换回原始背景
+                v.setBackgroundResource(R.color.grey240);
                 break;
         }
-        return false;
+        return true;
     }
 
     //初始化所有视图,一次设置索引，方便查找
@@ -405,7 +415,7 @@ class bbsCatalogAdapter extends BaseAdapter implements View.OnClickListener, Vie
         if (left != null) {
             leftViewGroup.setTag(left);
             leftViewGroup.setOnTouchListener(this);
-            leftViewGroup.setOnClickListener(this);                 //设置点击事件
+            leftViewGroup.setBackgroundResource(R.color.grey240);
             leftSubSectionName.setText(left.getTitle());            //设置版块名称（左侧）
             leftNewMessage.setText(left.getNew_Message_Count());    //设置新消息数量（左侧）
         } else {
@@ -416,7 +426,7 @@ class bbsCatalogAdapter extends BaseAdapter implements View.OnClickListener, Vie
         if (right != null) {
             rightViewGroup.setTag(right);
             rightViewGroup.setOnTouchListener(this);
-            rightViewGroup.setOnClickListener(this);                //设置点击事件
+            rightViewGroup.setBackgroundResource(R.color.grey240);
             rightSubSectionName.setText(right.getTitle());          //设置版块名称（左侧）
             rightNewMessage.setText(right.getNew_Message_Count());  //设置新消息数量（左侧）
         } else {

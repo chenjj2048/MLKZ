@@ -23,24 +23,29 @@ package ecust.mlkz;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
 import ecust.main.R;
 import ecust.main.act_MainActivity;
-import lib.BaseActivity.MyBaseFragmentActivity;
 import lib.Global;
 
-public class act_MLKZ_Home extends MyBaseFragmentActivity {
-    public SlidingMenu slidingMenu;        //滑动控件
+public class act_MLKZ_Home extends FragmentActivity {
     private fragment_MLKZ_LeftMenu leftMenu_Fragment;
     private fragment_MLKZ_HomePage body_Fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.mlkz_home_frame);           //加载梅陇客栈 主框架布局
+        setContentView(R.layout.mlkz_home_frame);
 
+        init();
+
+        Global.setTitle(this, "梅陇客栈");
+    }
+
+    private void init() {
         //Fragment管理
         FragmentManager mFragmentManager = getSupportFragmentManager();
         FragmentTransaction trans = mFragmentManager.beginTransaction();
@@ -54,11 +59,6 @@ public class act_MLKZ_Home extends MyBaseFragmentActivity {
         trans.replace(R.id.mlkz_home_slidingmenu_body, body_Fragment, null);
 
         trans.commit();
-
-        //寻找滑动视图
-        slidingMenu = (SlidingMenu) findViewById(R.id.mlkz_home_slidingmenu);
-
-        Global.setTitle(this, "梅陇客栈");
     }
 
     //回退到主页
@@ -81,9 +81,5 @@ public class act_MLKZ_Home extends MyBaseFragmentActivity {
 
         //凭cookie登陆，出现新版块
         body_Fragment.loginMLKZ(cookie);
-
-        //滑到主界面
-        SlidingMenu slidingMenu = (SlidingMenu) findViewById(R.id.mlkz_home_slidingmenu);
-        slidingMenu.setNeedSwitchToBody(true);
     }
 }

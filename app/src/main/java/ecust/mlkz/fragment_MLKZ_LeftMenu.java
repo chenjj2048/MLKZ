@@ -46,6 +46,13 @@ public class fragment_MLKZ_LeftMenu extends Fragment implements View.OnClickList
         ViewGroup viewGroup = (ViewGroup) view.findViewById(R.id.mlkz_home_menu_login_group);
         viewGroup.setOnClickListener(this);
 
+        //设置用户名
+        String username = new cls_MLKZ_Login(getActivity()).getPreference().getUsername();
+        if (!username.equals("")) {
+            TextView textView_UserName = (TextView) view.findViewById(R.id.mlkz_home_menu_login_username);
+            textView_UserName.setText(username);
+        }
+
         return view;
     }
 
@@ -56,7 +63,6 @@ public class fragment_MLKZ_LeftMenu extends Fragment implements View.OnClickList
                 //点击头像登录，或显示详细数据
                 Intent intent = new Intent(getActivity(), act_MLKZ_Login.class);
                 startActivityForResult(intent, 0);
-
                 break;
         }
     }

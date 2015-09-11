@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ecust.main"
     android:versionCode="1"
-    android:versionName="1.0">
+    android:versionName="1.0" >
 
     <uses-sdk
         android:minSdkVersion="15"
@@ -13,16 +13,17 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
+    <android:uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:name="lib.clsApplication"
         android:allowBackup="true"
         android:icon="@mipmap/logo"
         android:label="@string/app_name"
-        android:theme="@style/AppBaseTheme">
+        android:theme="@style/AppBaseTheme" >
         <activity
             android:name=".act_MainActivity"
-            android:label="@string/title_activity_act__main_page">
+            android:label="@string/title_activity_act__main_page" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -53,6 +54,10 @@
         <activity
             android:name="ecust.demotest.testDemoActivity"
             android:label="@string/title_activity_test_demo" />
+        <activity
+            android:name="ecust.mlkz.act_MLKZ_Secondary_Page"
+            android:label="@string/title_activity_act__mlkz__secondary__page" >
+        </activity>
     </application>
 
 </manifest>

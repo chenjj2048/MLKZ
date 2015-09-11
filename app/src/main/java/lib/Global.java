@@ -32,10 +32,6 @@ import ecust.main.R;
  */
 public class Global {
 
-    private static final boolean isDebug = true;                                                           //Debug、Releas标签
-    //公共的Activity
-    public static Activity activity;
-
 
     //根据url获得唯一的hash值（碰到一样的几乎不可能）
     public static String getStringHash(String url) {
@@ -49,40 +45,12 @@ public class Global {
         return result;
     }
 
-    public static void log(String msg) {
-        String tag = "";
-
-        if (isDebug == false) return;
-
-        if (clsActivity.currentVisibleActivity != null) {
-            tag = clsActivity.currentVisibleActivity.toString();
-        }
-
-        if (msg.contains("Exception")) {
-            Log.e(tag, msg);
-        } else {
-            Log.i(tag, msg);
-        }
-    }
-
     /**
      * 设置标题栏title
      */
     public static void setTitle(Activity v, String title) {
         TextView tv = (TextView) v.findViewById(R.id.title_bar);
         tv.setText(title);
-    }
-
-    // 字符串转换为ASCII码   
-    public static String String2Ascii(String s) {
-        StringBuilder sb = new StringBuilder();
-        char[] chars = s.toCharArray(); // 把字符中转换为字符数组   
-        for (int i = 0; i < chars.length; i++) {
-            sb.append(chars[i] + " " + (int) chars[i] + " ");
-        }
-        String result = sb.toString();
-        Global.log(result);
-        return result;
     }
 
     /**
@@ -108,63 +76,6 @@ public class Global {
         }
     }
 
-    /**
-     * 管理页面的开启关闭
-     */
-    public static class clsActivity {
-
-        public static Activity currentVisibleActivity;                                             //当前可见的Activity
-        private static int activity_exist_count = 0;                                                //存在页面数量
-
-        //页面加载
-        public static void onCreate(Activity v) {
-
-            activity_exist_count++;
-            v.requestWindowFeature(Window.FEATURE_NO_TITLE);
-//            logUtil.i("global","[onCreate][页面数量=" + activity_exist_count + "]" + v.getClass().getCanonicalName());
-            System.gc();
-        }
-
-        //页面销毁
-        public static void onDestory(Activity v) {
-            activity_exist_count--;
-//            logUtil.i("global","[onDestory][页面数量=" + activity_exist_count + "]" + v.getClass().getCanonicalName());
-            System.gc();
-        }
-
-        public static void onResume(Activity v) {
-            currentVisibleActivity = v;
-//            Global.i("[onResume][页面数量=" + activity_exist_count + "]" + v.getClass().getCanonicalName());
-        }
-
-        public static void onPause(Activity v) {
-//            Global.i("[onPause][页面数量=" + activity_exist_count + "]" + v.getClass().getCanonicalName());
-        }
-
-        /**
-         * 判断当前程序是否在前台
-         *
-         * @return true or false
-         */
-        public static boolean isVisible() {
-            Context context = clsApplication.getContext();
-            ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-            List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
-            for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
-                if (appProcess.processName.equals(context.getPackageName())) {
-                    if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_BACKGROUND) {
-                        Global.log("[程序正在后台]" + appProcess.processName);
-                        return false;
-                    } else {
-                        Global.log("[程序正在前台]" + appProcess.processName);
-                        return true;
-                    }
-                }
-            }
-            //可能程序已经结束，找不到了
-            return true;
-        }
-    }
 }
 
 

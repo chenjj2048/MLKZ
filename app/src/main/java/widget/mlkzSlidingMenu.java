@@ -1,4 +1,4 @@
-package ecust.mlkz;
+package widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -9,6 +9,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 
 import lib.clsUtils.ScreenUtil;
+import lib.clsUtils.logUtil;
 
 /**
  * =============================================================================
@@ -29,42 +30,37 @@ import lib.clsUtils.ScreenUtil;
  * 侧滑菜单+主体部分
  */
 
-public class SlidingMenu extends HorizontalScrollView {
+public class mlkzSlidingMenu extends HorizontalScrollView implements Runnable {
     private int mScreenWidth;       //屏幕宽度
     private int mMenuWidth;         //侧滑菜单宽度
-    private boolean needSwitchToBody = false;
 
-    public SlidingMenu(Context context, AttributeSet attrs) {
+    public mlkzSlidingMenu(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.mScreenWidth = ScreenUtil.getScreenWidth(context);        //获取屏幕宽度
     }
 
-    public void setNeedSwitchToBody(boolean needSwitchToBody) {
-        this.needSwitchToBody = needSwitchToBody;
+    //延迟一段时间执行,否则滑动距离总有问题
+    @Override
+    public void run() {
+        try {
+            //用new Timer().schedule()又会有明显延时，起不到作用，很难看
+            //知道这样不好，但只执行一次同样会有明显延时,加了次数以后，界面滑动延时现象消失
+            for (int i = 0; i < 10; i++) {
+                Thread.sleep(10);
+                switchToBody();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         measureSize();
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
         //延迟一段时间执行,否则滑动距离总有问题
-        if (needSwitchToBody) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        for (int i = 0; i < 50; i++) {
-                            Thread.sleep(10);
-                            switchToBody();
-                        }
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
-            needSwitchToBody = false;
-        }
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        new Thread(this).start();
     }
 
     //测量尺寸
@@ -95,11 +91,11 @@ public class SlidingMenu extends HorizontalScrollView {
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent ev) {
-        switch (ev.getAction()) {
+    public boolean onTouchEvent(MotionEvent event) {logUtil.i(this,event.getAction()+"");
+        switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 //过滤掉事件，不触发ACTION_UP，手指在最左边才能滑出菜单
-                if (this.getScrollX() != 0 && ev.getX() >= mMenuWidth / 8)
+                if (this.getScrollX() != 0 && event.getX() >= mMenuWidth / 8)
                     return false;
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -113,7 +109,7 @@ public class SlidingMenu extends HorizontalScrollView {
 
                 return true;
         }
-        return super.onTouchEvent(ev);
+        return super.onTouchEvent(event);
     }
 
     //滑动至主页

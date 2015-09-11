@@ -10,7 +10,7 @@
     <include layout="@layout/part_actionbar" />
 
     <!--侧滑菜单、主体组合部分-->
-    <ecust.mlkz.SlidingMenu
+    <widget.mlkzSlidingMenu
         android:id="@+id/mlkz_home_slidingmenu"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -37,5 +37,5 @@
                 android:orientation="horizontal" />
         </LinearLayout>
 
-    </ecust.mlkz.SlidingMenu>
+    </widget.mlkzSlidingMenu>
 </LinearLayout>

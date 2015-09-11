@@ -1,5 +1,6 @@
 package ecust.news;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -30,7 +31,6 @@ import java.util.List;
 import java.util.Queue;
 
 import ecust.main.R;
-import lib.BaseActivity.MyBaseActivity;
 import lib.Const;
 import lib.Global;
 import lib.clsApplication;
@@ -61,7 +61,7 @@ import lib.clsUtils.timeUtil;
  * Created by 彩笔怪盗基德 on 2015/6/30
  * Copyright (C) 2015 彩笔怪盗基德
  */
-public class act_News_Detail extends MyBaseActivity implements clsFailureBar.OnWebRetryListener,
+public class act_News_Detail extends Activity implements clsFailureBar.OnWebRetryListener,
         httpUtil.OnHttpVisitListener, View.OnClickListener,
         AbsListView.OnScrollListener {
     static int listview_scroll_items_per_second;   //ListView滚动速度

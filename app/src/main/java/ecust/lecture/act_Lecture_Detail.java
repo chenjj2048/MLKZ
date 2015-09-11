@@ -1,5 +1,6 @@
 package ecust.lecture;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.View;
@@ -12,11 +13,10 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import ecust.main.R;
-import lib.BaseActivity.MyBaseActivity;
-import lib.clsFailureBar;
 import lib.Global;
-import lib.clsUtils.logUtil;
+import lib.clsFailureBar;
 import lib.clsUtils.httpUtil;
+import lib.clsUtils.logUtil;
 
 /**
  * =============================================================================
@@ -36,7 +36,7 @@ import lib.clsUtils.httpUtil;
  * Created by 彩笔怪盗基德 on 2015/6/5
  * Copyright (C) 2015 彩笔怪盗基德
  */
-public class act_Lecture_Detail extends MyBaseActivity implements clsFailureBar.OnWebRetryListener,
+public class act_Lecture_Detail extends Activity implements clsFailureBar.OnWebRetryListener,
         httpUtil.OnHttpVisitListener {
     private clsLectureDetail mLectureDetail;            //学术讲座版块解析类
     private clsFailureBar wFailureBar;            //失败，加载条
@@ -52,7 +52,7 @@ public class act_Lecture_Detail extends MyBaseActivity implements clsFailureBar.
 
             //存储到sql
             logUtil.i(this, "讲座信息数据存储");
-           new  DataBase_Lecture(this).detail.SaveData(mLectureDetail.mData);
+            new DataBase_Lecture(this).detail.SaveData(mLectureDetail.mData);
         }
     }
 
