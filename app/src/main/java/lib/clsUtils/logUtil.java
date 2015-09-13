@@ -70,33 +70,53 @@ public class logUtil {
     }
 
     public static void d(Object object, String msg) {
+        if (msg == null) return;
         if (isDebug)
             Log.d(object.getClass().getCanonicalName(), msg);
     }
 
     public static void d(String tag, String msg) {
+        if (msg == null) return;
         if (isDebug)
             Log.d(tag, msg);
     }
 
     public static void i(Object object, String msg) {
+        if (msg == null) return;
         if (isDebug)
             Log.i(object.getClass().getCanonicalName(), msg);
     }
 
     public static void i(String tag, String msg) {
+        if (msg == null) return;
         if (isDebug)
             Log.i(tag, msg);
     }
 
     public static void e(Object object, String msg) {
+        if (msg == null) return;
         if (isDebug)
             Log.e(object.getClass().getCanonicalName(), msg);
     }
 
     public static void e(String tag, String msg) {
+        if (msg == null) return;
         if (isDebug)
             Log.e(tag, msg);
+    }
+
+    public static void printException(Object object, Exception e) {
+        if (isDebug) {
+            Log.e(object.getClass().getCanonicalName(), e.toString());
+            e.printStackTrace();
+        }
+    }
+
+    public static void printException(String tag, Exception e) {
+        if (isDebug) {
+            Log.e(tag, e.toString());
+            e.printStackTrace();
+        }
     }
 }
 

@@ -8,8 +8,8 @@ import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 
+import lib.Global;
 import lib.clsUtils.ScreenUtil;
-import lib.clsUtils.logUtil;
 
 /**
  * =============================================================================
@@ -31,8 +31,13 @@ import lib.clsUtils.logUtil;
  */
 
 public class mlkzSlidingMenu extends HorizontalScrollView implements Runnable {
-    private int mScreenWidth;       //屏幕宽度
-    private int mMenuWidth;         //侧滑菜单宽度
+    //屏幕宽度
+    private int mScreenWidth;
+    //侧滑菜单宽度
+    private int mMenuWidth;
+    //决定是否可以滚动
+    private boolean canScroll;
+
 
     public mlkzSlidingMenu(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -83,6 +88,21 @@ public class mlkzSlidingMenu extends HorizontalScrollView implements Runnable {
     }
 
     @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                //设置ScrollView是否能够滚动
+                if (this.getScrollX() != 0 &&
+                        event.getX() >= Math.max(mMenuWidth / 8, Global.dimenConvert.dip2px(5)))
+                    canScroll = false;
+                else
+                    canScroll = true;
+                break;
+        }
+        return super.dispatchTouchEvent(event);
+    }
+
+    @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
         if (changed) {
@@ -91,14 +111,14 @@ public class mlkzSlidingMenu extends HorizontalScrollView implements Runnable {
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event) {logUtil.i(this,event.getAction()+"");
+    public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                //过滤掉事件，不触发ACTION_UP，手指在最左边才能滑出菜单
-                if (this.getScrollX() != 0 && event.getX() >= mMenuWidth / 8)
-                    return false;
                 break;
             case MotionEvent.ACTION_MOVE:
+                //屏蔽滚动
+                if (!canScroll)
+                    return false;
                 break;
             case MotionEvent.ACTION_UP:
                 //进行判断，如果显示区域大于菜单宽度一半则完全显示，否则隐藏
@@ -106,8 +126,9 @@ public class mlkzSlidingMenu extends HorizontalScrollView implements Runnable {
                     switchToBody();
                 else
                     switchToLeftMenu();
-
                 return true;
+            case MotionEvent.ACTION_CANCEL:
+                break;
         }
         return super.onTouchEvent(event);
     }

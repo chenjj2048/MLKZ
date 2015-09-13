@@ -102,16 +102,16 @@ public class httpUtil {
      * 回调函数
      */
     public interface OnHttpVisitListener {
-        void onHttpLoadCompleted(String url, String cookie, boolean bSucceed, String rtnHtmlMessage);
+        void onHttpLoadCompleted(String url, String cookie, boolean bSucceed, String returnHtmlMessage);
 
         //子线程，用来处理数据，避免UI卡顿
-        void onHttpBackgroundThreadLoadCompleted(String url, String cookie, boolean bSucceed, String rtnHtmlMessage);
+        void onHttpBackgroundThreadLoadCompleted(String url, String cookie, boolean bSucceed, String returnHtmlMessage);
 
         //pic为图片字节流
-        void onPictureLoadCompleted(String url, String cookie, boolean bSucceed, byte[] rtnPicBytes);
+        void onPictureLoadCompleted(String url, String cookie, boolean bSucceed, byte[] returnPicBytes);
 
         //子线程中
-        void onPictureBackgroundThreadLoadCompleted(String url, String cookie, boolean bSucceed, byte[] rtnPicBytes);
+        void onPictureBackgroundThreadLoadCompleted(String url, String cookie, boolean bSucceed, byte[] returnPicBytes);
     }
 
     /**
