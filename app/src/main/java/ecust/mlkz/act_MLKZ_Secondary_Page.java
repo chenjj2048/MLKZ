@@ -73,11 +73,14 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
     public void onHttpLoadCompleted(String url, String cookie, boolean bSucceed, String returnHtmlMessage) {
         if (!bSucceed) return;
 
-        ((TextView) findViewById(R.id.mlkz_secondary_page_text)).setText(returnHtmlMessage);
-
         //数据解析
-        new htmlParser().parseHtmlData(returnHtmlMessage);
+        struct_forumDataRoot t = new htmlParser().parseHtmlData(returnHtmlMessage);
 
+        String str = "";
+        for (struct_forumPostNode i : t.forumPosts) {
+            str += i.toString() + "\r\n\r\n";
+        }
+        ((TextView) findViewById(R.id.mlkz_secondary_page_text)).setText(str);
     }
 
     @Override
@@ -145,7 +148,8 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
                         case "bm_c":
                         case "bm_c bt":
                             //解析 一条条的贴子 结构
-                            parsePostItem(event, parser);
+                            struct_forumPostNode item = parsePostItem(event, parser);
+                            result.forumPosts.add(item);
                             break;
                     }
                 }
@@ -154,7 +158,7 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
                 try {
                     event = parser.next();
                 } catch (Exception e) {
-//                    logUtil.e(this, e.toString());
+                    e.printStackTrace();
                 }
             }
 
@@ -169,9 +173,11 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
         }
 
         //解析当前的贴子结构
-        private void parsePostItem(int currentEvent, XmlPullParser parser) {
-
-            String str;
+        private struct_forumPostNode parsePostItem(int currentEvent, XmlPullParser parser) {
+            //临时字符串
+            String str = null;
+            //解析第一行内容（相对的是第二行）
+            boolean bParseFirstLine = true;
             //单个贴子信息
             struct_forumPostNode postItem = factory.new struct_forumPostNode();
 
@@ -179,57 +185,8 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
             while (event != XmlPullParser.END_DOCUMENT) {
                 switch (event) {
                     case XmlPullParser.START_TAG:
-                        //先后顺序不能乱
-                        if ("span".equals(parser.getName())) {
-
-                            //移动指针
-                            try {
-                                event = parser.next();
-                                event = parser.next();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-
-                            //根据标签选择不同处理过程
-                            if (event == XmlPullParser.START_TAG && "a".equals(parser.getName())) {
-                                //分支1：作者非匿名（多数情况）
-
-                                //4.设置作者空间URL
-                                str = parser.getAttributeValue(null, "href");
-                                postItem.setAuthorSpaceUrl(str);
-//
-//                                //5.设置作者名称
-//                                try {
-//                                    str = parser.nextText();
-//                                    postItem.setAuthor(str);
-//                                } catch (Exception e) { //
-//                                }
-//
-//                                //移动指针
-//                                try {
-//                                    parser.nextText();
-//                                } catch (Exception e) { //
-//                                }
-//                            } else {
-//                                //分支2：作者为匿名
-//
-//                                //4.设置作者空间URL
-//                                postItem.setAuthorSpaceUrl("");
-//                                //5.设置作者名称
-//                                postItem.setAuthor("匿名");
-                            }
-//
-//                            //6.设置发帖时间
-//                            // 如2014-9-7                        回26
-//                            str = parser.getText().replace("匿名 ", "").trim();
-//                            postItem.setFirstReleaseTime(str);
-//
-//                            //7.设置回复数量
-//                            postItem.setReply(str);
-
-                            return;
-                        }
-                        if ("a".equals(parser.getName())) {
+                        //解析第一行
+                        if ("a".equals(parser.getName()) && bParseFirstLine) {
                             //1.设置贴子URL
                             str = parser.getAttributeValue(null, "href");
                             postItem.setUrl(str);
@@ -251,7 +208,7 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
                                 }
                             }
 
-                            //2.设置贴子类型
+                            //2.设置贴子类别
                             if (event == XmlPullParser.START_TAG && "img".equals(parser.getName())) {
                                 str = parser.getAttributeValue(null, "src");
                                 postItem.setForumPostType(str);
@@ -267,25 +224,101 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
                             if (event == XmlPullParser.TEXT) {
                                 postItem.setTitle(parser.getText());
                             }
+
+                            //解析第二行标记
+                            bParseFirstLine = false;
+                            break;
+                        }
+
+                        //解析第二行
+                        if ("span".equals(parser.getName()) && !bParseFirstLine) {
+
+                            //移动指针
+                            try {
+                                event = parser.next();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+
+                            //根据标签选择不同处理过程
+                            if (event == XmlPullParser.TEXT && parser.getText().contains("匿名")) {
+                                //分支1：作者为匿名（少数情况）
+
+                                //4.设置作者空间URL
+                                postItem.setAuthorSpaceUrl("");
+                                //5.设置作者名称
+                                postItem.setAuthor("匿名");
+
+                                //6.设置发帖时间
+                                //传入参数类似  "2014-9-7                        回26"
+                                try {
+                                    str = parser.getText();
+                                    str = str.replace("匿名 ", "").trim();
+                                    postItem.setFirstReleaseTime(str);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+
+                                //7.设置回复数量
+                                postItem.setReply(str);
+                            } else {
+                                //分支2：作者非匿名（多数情况）
+                                try {
+                                    event = parser.next();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+
+                                if (event == XmlPullParser.START_TAG && "a".equals(parser.getName())) {
+                                    //4.设置作者空间URL
+                                    str = parser.getAttributeValue(null, "href");
+                                    postItem.setAuthorSpaceUrl(str);
+
+                                    //5.设置作者名称
+                                    try {
+                                        str = parser.nextText();
+                                        postItem.setAuthor(str);
+                                        parser.next();
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    //6.设置发帖时间
+                                    //传入参数类似  "2014-9-7                        回26"
+                                    try {
+                                        str = parser.getText();
+                                        str = str.replace("匿名 ", "").trim();
+                                        postItem.setFirstReleaseTime(str);
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    //7.设置回复数量
+                                    postItem.setReply(str);
+                                }
+                            }
+                            //正常退出的地方
+                            return postItem;
                         }
                         break;
                     case XmlPullParser.TEXT:
-
                         break;
                     case XmlPullParser.END_TAG:
-                        //解析结束退出,添加项目
+                        //解析结束退出
                         if (parser.getName().equals("div")) {
-                            result.forumPosts.add(postItem);
-                            return;
+                            return postItem;
                         }
                 }
 
                 //拿到下一条内容
                 try {
                     event = parser.next();
-                } catch (Exception e) {     //
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
+            //不是从这里退出函数的
+            return null;
         }
 
 
@@ -456,7 +489,19 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
             private int forumPostType = POST_STATUS_NORMAL;
 
             public struct_forumPostNode() {
-                logUtil.d(this, "=======新建贴子节点=========");
+                logUtil.d(this, "=======贴子 节点=========");
+            }
+
+            @Override
+            public String toString() {
+                return "title='" + title + "\r\n" +
+                        ", url='" + url + "\r\n" +
+                        ", author='" + author + "\r\n" +
+                        ", authorSpaceUrl='" + authorSpaceUrl + "\r\n" +
+                        ", firstReleaseTime='" + firstReleaseTime + "\r\n" +
+                        ", reply=" + reply + "\r\n" +
+                        ", forumPostType=" + forumPostType +
+                        '}';
             }
 
             public int getForumPostType() {
@@ -478,6 +523,8 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
                     case "template/eis_012/img/rewardsmall.gif":
                         this.forumPostType = POST_STATUS_BOUNTY;
                         break;
+                    default:
+                        logUtil.w(this, "[未能解析的贴子类型-图片]" + picURL);
                 }
                 logUtil.d(this, "[贴子类型]" + this.forumPostType);
             }
@@ -530,8 +577,9 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
              *                         "2014-9-7                        回26" 或  "2014-9-7"
              */
             public void setFirstReleaseTime(String firstReleaseTime) {
-
-                this.firstReleaseTime = firstReleaseTime;
+                final int maxLength = 10;
+                this.firstReleaseTime = firstReleaseTime.substring(0,
+                        Math.min(maxLength, firstReleaseTime.length())).trim();
                 logUtil.d(this, "[发帖时间]" + this.firstReleaseTime);
             }
 

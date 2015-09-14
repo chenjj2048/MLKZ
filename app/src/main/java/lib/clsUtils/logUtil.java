@@ -93,6 +93,18 @@ public class logUtil {
             Log.i(tag, msg);
     }
 
+    public static void w(Object object, String msg) {
+        if (msg == null) return;
+        if (isDebug)
+            Log.w(object.getClass().getCanonicalName(), msg);
+    }
+
+    public static void w(String tag, String msg) {
+        if (msg == null) return;
+        if (isDebug)
+            Log.w(tag, msg);
+    }
+
     public static void e(Object object, String msg) {
         if (msg == null) return;
         if (isDebug)
