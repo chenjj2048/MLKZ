@@ -145,9 +145,9 @@ public class fragment_MLKZ_HomePage extends Fragment implements httpUtil.OnHttpV
 
     public void printAllDataLog(List<struct_MLKZ_Home_Section> mData) {
         for (struct_MLKZ_Home_Section s0 : mData) {
-            logUtil.i(this, "====" + s0.getSectionName() + "====");
+            logUtil.d(this, "====" + s0.getSectionName() + "====");
             for (struct_MLKZ_Home_SubSection s1 : s0.getContentList()) {
-                logUtil.i(this, s1.getTitle() + "  " + s1.getUrl() + "  " + s1.getNew_Message_Count());
+                logUtil.d(this, s1.getTitle() + "  " + s1.getUrl() + "  " + s1.getNew_Message_Count());
             }
         }
     }

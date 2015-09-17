@@ -36,7 +36,9 @@ import java.util.List;
 
 import ecust.main.R;
 import ecust.mlkz.act_MLKZ_Secondary_Page.forum_Structs_Collection.struct_forumChildSectionNode;
+import ecust.mlkz.act_MLKZ_Secondary_Page.forum_Structs_Collection.struct_forumCommitPostURL;
 import ecust.mlkz.act_MLKZ_Secondary_Page.forum_Structs_Collection.struct_forumDataRoot;
+import ecust.mlkz.act_MLKZ_Secondary_Page.forum_Structs_Collection.struct_forumHeadInfo;
 import ecust.mlkz.act_MLKZ_Secondary_Page.forum_Structs_Collection.struct_forumPostNode;
 import ecust.mlkz.act_MLKZ_Secondary_Page.forum_Structs_Collection.struct_forumSubjectClassificationNode;
 import lib.clsUtils.httpUtil;
@@ -138,18 +140,42 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
                 if (event == XmlPullParser.START_TAG && parser.getName().equals("div")) {
                     switch (parser.getAttributeValue(null, "class")) {
                         case "box flif":
-                            //解析 今日新增贴子数量、版块总主题数量
-                            parseHeadPostsCount(result, parser);
+                            //解析 今日新增贴子数量、版块总主题数量、收藏版块
+                            struct_forumHeadInfo headInfo = parseHeadPostsCount(parser);
+                            result.setHeadInfo(headInfo);
+
+                            if (headInfo != null) {
+                                logUtil.d(this, "=========版块头部信息==========");
+                                logUtil.d(this, "[今日主题数量]" + headInfo.getItem_Count_Today());
+                                logUtil.d(this, "[版块总主题数量]" + headInfo.getItem_Count_Subjects());
+                                logUtil.d(this, "[收藏版块] URL=" + headInfo.getFavoriteSectionURL());
+                            }
                             break;
+
+                        case "tz pbn":
+                            //解析 发帖地址
+                            struct_forumCommitPostURL commitPostURL = parseCommitPostURL(parser);
+                            result.setCommitPostURL(commitPostURL);
+
+                            if (commitPostURL != null) {
+                                logUtil.d(this, "=========发帖地址==========");
+                                logUtil.d(this, "[发帖]" + commitPostURL.getPostURL());
+                                logUtil.d(this, "[投票]" + commitPostURL.getVoteURL());
+                                logUtil.d(this, "[悬赏]" + commitPostURL.getBountyURL());
+                            }
+
+                            break;
+
                         case "bm_c":
                         case "bm_c bt":
                             //解析 一条条的贴子 结构
-                            struct_forumPostNode item = parsePostItem(event, parser);
+                            struct_forumPostNode item = parsePostItem(parser);
                             if (item != null) {
                                 result.forumPosts.add(item);
                                 logUtil.d(this, item.toString());
                             }
                             break;
+
                         case "box ttp":
                             //解析 主题分类
 
@@ -164,6 +190,7 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
                                 logUtil.d(this, i.toString());
 
                             break;
+
                         case "fl":
                             //解析 子版块
 
@@ -171,17 +198,14 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
                                     parseChildSection(parser);
 
                             if (childSectionNodeList == null || childSectionNodeList.size() == 0) {
-                                break;
+                                logUtil.d(this, "=========子版块为空=======");
                             } else {
-                                logUtil.e(this, "list is not  null");
+                                result.childSections = childSectionNodeList;
+                                logUtil.d(this, "=========解析子版块=========");
+                                for (struct_forumChildSectionNode i : childSectionNodeList) {
+                                    logUtil.d(this, i.toString());
+                                }
                             }
-                            result.childSections = childSectionNodeList;
-
-                            logUtil.d(this, "=========解析子版块=========");
-                            for (struct_forumChildSectionNode i : childSectionNodeList) {
-                                logUtil.d(this, i.toString());
-                            }
-
                             break;
                     }
                 }
@@ -190,8 +214,7 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
                 try {
                     event = parser.next();
                 } catch (Exception e) {
-                    logUtil.w(this, "[网页源码中可能多了个Tag]Line " + parser.getLineNumber());
-//                    e.printStackTrace();
+                    logUtil.w(this, "[网页标签未成对] Line=" + parser.getLineNumber());
                 }
             }
 
@@ -205,8 +228,39 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
             return result;
         }
 
+        //解析发帖地址
+        protected struct_forumCommitPostURL parseCommitPostURL(XmlPullParser parser) {
+            int event = XmlPullParser.START_DOCUMENT;
+
+            struct_forumCommitPostURL result = factory.new struct_forumCommitPostURL();
+
+            while (event != XmlPullParser.END_DOCUMENT) {
+                try {
+                    event = parser.next();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                if (event == XmlPullParser.START_TAG && "a".equals(parser.getName())) {
+                    try {
+                        String href = parser.getAttributeValue(null, "href");
+                        String name = parser.nextText();
+
+                        logUtil.e(this, "[" + name + "]" + href);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                } else if (event == XmlPullParser.END_TAG && "div".equals(parser.getName())) {
+                    return result;
+                }
+            }
+
+            return null;
+        }
+
         //解析子版块内容
-        private List<struct_forumChildSectionNode> parseChildSection(XmlPullParser parser) {
+        protected List<struct_forumChildSectionNode> parseChildSection(XmlPullParser parser) {
             //数据集
             List<struct_forumChildSectionNode> result = new ArrayList<>(10);
             struct_forumChildSectionNode node;
@@ -217,8 +271,9 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
                 try {
                     event = parser.next();
                 } catch (Exception e) {
-                    logUtil.w(this, "网页标签未成对");
+                    logUtil.w(this, "[网页标签未成对] Line=" + parser.getLineNumber());
                 }
+
 
                 if (event == XmlPullParser.START_TAG && "a".equals(parser.getName())) {
                     //设置数据
@@ -232,14 +287,12 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
                         node.setName(name);
 
                         result.add(node);
-
-                        logUtil.e(this, node.toString());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                } else if (event == XmlPullParser.END_TAG && "div".equals(parser.getName())) {
-                    //退出
-                    logUtil.e(this, "here 2 " + result.size());
+                } else if (event == XmlPullParser.START_TAG && "div".equals(parser.getName()) &&
+                        "ft".equals(parser.getAttributeValue(null, "class"))) {
+                    //结束
                     return result;
                 }
             }
@@ -247,7 +300,8 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
         }
 
         //解析主题分类（不一定每个版块都有这一项）
-        private List<struct_forumSubjectClassificationNode> parseSubjectClassification(XmlPullParser parser) {
+        private List<struct_forumSubjectClassificationNode> parseSubjectClassification
+        (XmlPullParser parser) {
             int event = XmlPullParser.START_DOCUMENT;
             //数据集
             List<struct_forumSubjectClassificationNode> result = new ArrayList<>(20);
@@ -293,7 +347,8 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
         }
 
         //解析当前的贴子结构
-        private struct_forumPostNode parsePostItem(int currentEvent, XmlPullParser parser) {
+
+        private struct_forumPostNode parsePostItem(XmlPullParser parser) {
             //临时字符串
             String str = null;
             //解析第一行内容（相对的是第二行）
@@ -301,7 +356,8 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
             //单个贴子信息
             struct_forumPostNode postItem = factory.new struct_forumPostNode();
 
-            int event = currentEvent;
+            int event = XmlPullParser.START_DOCUMENT;
+
             while (event != XmlPullParser.END_DOCUMENT) {
                 switch (event) {
                     case XmlPullParser.START_TAG:
@@ -443,7 +499,9 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
 
 
         //设置 今日新增贴子数量、版块总主题数量
-        private void parseHeadPostsCount(struct_forumDataRoot target, XmlPullParser parser) {
+        private struct_forumHeadInfo parseHeadPostsCount(XmlPullParser parser) {
+            struct_forumHeadInfo result = factory.new struct_forumHeadInfo();
+
             int event = XmlPullParser.START_DOCUMENT;
             try {
                 event = parser.getEventType();
@@ -454,22 +512,30 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
             while (true) {
                 switch (event) {
                     case XmlPullParser.END_DOCUMENT:
-                        return;
+                        return null;
+                    case XmlPullParser.START_TAG:
+                        if ("a".equals(parser.getName())) {
+                            //收藏版块
+                            String href = parser.getAttributeValue(null, "href");
+                            result.setFavoriteSectionURL(href);
+                        }
+                        break;
                     case XmlPullParser.TEXT:
                         //设置属性
                         String str = parser.getText();
-                        target.setItem_Count_Today(str);
-                        target.setItem_Count_Subjects(str);
+                        result.setItem_Count_Today(str);
+                        result.setItem_Count_Subjects(str);
                         break;
                     case XmlPullParser.END_TAG:
                         //解析结束退出
-                        if (parser.getName().equals("div")) return;
+                        if (parser.getName().equals("div")) return result;
                 }
 
                 //拿到下一条内容
                 try {
                     event = parser.next();
-                } catch (Exception e) {     //
+                } catch (Exception e) {
+                    logUtil.w(this, "[未成对标签] Line=" + parser.getLineNumber());
                 }
             }
         }
@@ -499,16 +565,61 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
             private String sectionTitle;
             //当前版块URL
             private String sectionURL;
-            //今日发帖
-            private int item_Count_Today = 0;
-            //主题数量
-            private int item_Count_Subjects = 0;
+            //头部信息
+            private struct_forumHeadInfo headInfo = new struct_forumHeadInfo();
+            //发帖地址
+            private struct_forumCommitPostURL commitPostURL = new struct_forumCommitPostURL();
             //当前已显示的数量
             private int item_Count_Current = 0;
             //主题分类（不一定存在）
             private List<struct_forumSubjectClassificationNode> subjectClassification = new ArrayList<>();
             //子版块（不一定存在）
             private List<struct_forumChildSectionNode> childSections = new ArrayList<>(10);
+
+            public String getSectionTitle() {
+                return sectionTitle;
+            }
+
+            public void setSectionTitle(String sectionTitle) {
+                this.sectionTitle = sectionTitle;
+            }
+
+            public String getSectionURL() {
+                return sectionURL;
+            }
+
+            public void setSectionURL(String sectionURL) {
+                this.sectionURL = sectionURL;
+            }
+
+            public struct_forumHeadInfo getHeadInfo() {
+                return headInfo;
+            }
+
+            public void setHeadInfo(struct_forumHeadInfo headInfo) {
+                this.headInfo = headInfo;
+            }
+
+            public struct_forumCommitPostURL getCommitPostURL() {
+                return commitPostURL;
+            }
+
+            public void setCommitPostURL(struct_forumCommitPostURL commitPostURL) {
+                this.commitPostURL = commitPostURL;
+            }
+        }
+
+        /**
+         * 头部信息
+         */
+        protected class struct_forumHeadInfo {
+            //今日发帖
+            private int item_Count_Today = 0;
+            //主题数量
+            private int item_Count_Subjects = 0;
+            //收藏版块
+            private String favoriteSectionURL;
+
 
             public int getItem_Count_Today() {
                 return item_Count_Today;
@@ -524,7 +635,6 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
 
                 try {
                     this.item_Count_Today = Integer.parseInt(str.replace("今日", "").trim());
-                    logUtil.d(this, "[今日主题数量]" + getItem_Count_Today());
                 } catch (Exception e) {
                     logUtil.e(this, str);
                     logUtil.printException(this, e);
@@ -545,27 +655,57 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
 
                 try {
                     this.item_Count_Subjects = Integer.parseInt(str.replace("主题", "").trim());
-                    logUtil.d(this, "[版块总主题数量]" + getItem_Count_Subjects());
                 } catch (Exception e) {
                     logUtil.e(this, str);
                     logUtil.printException(this, e);
                 }
             }
 
-            public String getSectionTitle() {
-                return sectionTitle;
+            public String getFavoriteSectionURL() {
+                return favoriteSectionURL;
             }
 
-            public void setSectionTitle(String sectionTitle) {
-                this.sectionTitle = sectionTitle;
+            public void setFavoriteSectionURL(String favoriteSectionURL) {
+                //null
+                if (favoriteSectionURL == null || favoriteSectionURL.length() < 10) {
+                    this.favoriteSectionURL = "";
+                } else {
+                    this.favoriteSectionURL = favoriteSectionURL;
+                }
+            }
+        }
+
+
+        /**
+         * 发帖地址（发帖、发投票、发悬赏）
+         */
+        protected class struct_forumCommitPostURL {
+            private String postURL;
+            private String voteURL;
+            private String bountyURL;
+
+            public String getPostURL() {
+                return postURL;
             }
 
-            public String getSectionURL() {
-                return sectionURL;
+            public void setPostURL(String postURL) {
+                this.postURL = postURL;
             }
 
-            public void setSectionURL(String sectionURL) {
-                this.sectionURL = sectionURL;
+            public String getVoteURL() {
+                return voteURL;
+            }
+
+            public void setVoteURL(String voteURL) {
+                this.voteURL = voteURL;
+            }
+
+            public String getBountyURL() {
+                return bountyURL;
+            }
+
+            public void setBountyURL(String bountyURL) {
+                this.bountyURL = bountyURL;
             }
         }
 
