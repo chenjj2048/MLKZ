@@ -6,8 +6,6 @@
     <style name="AppBaseTheme" parent="Theme.AppCompat.Light">
         <!-- 自定义的风格 -->
         <item name="android:textViewStyle">@style/Base_TextView</item>
-
-
     </style>
 
 

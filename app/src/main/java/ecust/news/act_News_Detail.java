@@ -803,8 +803,8 @@ class NewsAdapter extends BaseAdapter {
         //从表中查下有木有Bitmap
         PicHolder picHolder = mNewsContent.bitmapHashMap.get(url);
 
-        if (picHolder == null)
-            throw new NullPointerException();       //放心，这个不会为空的！
+        if (picHolder==null)
+            return new ImageView(context);
 
         //没有图片
         if (picHolder.getBitmap() == null) {

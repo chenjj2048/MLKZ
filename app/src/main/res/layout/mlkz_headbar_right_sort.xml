@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    tools:context="ecust.mlkz.headbar_Secondary_Page"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/mlkz_secondary_page_headbar_sort_by_posttime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="6dp"
+        android:text="按发帖时间排序"
+        android:textSize="18dp" />
+
+    <!--分割线-->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/grey230" />
+
+    <TextView
+        android:id="@+id/mlkz_secondary_page_headbar_sort_by_replytime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="6dp"
+        android:text="按回复时间排序"
+        android:textSize="18dp" />
+</LinearLayout>

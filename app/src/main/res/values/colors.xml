@@ -2,12 +2,10 @@
 <resources>
 
     <color name="blue">#ff395da8</color>
-    <color name="white">#ffffffff</color>
     <color name="green1">#ffa2e08d</color>
     <color name="green2">#ff45c038</color>
     <color name="grey1">#ffc8c8c8</color>
     <color name="blue2">#ff009fd3</color>
-    <color name="black">#ff000000</color>
 
     <!--灰色系列-->
     <color name="grey240">#fff0f0f0</color>

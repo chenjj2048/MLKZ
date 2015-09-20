@@ -23,7 +23,6 @@ package ecust.mlkz;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Xml;
-import android.widget.TextView;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -41,6 +40,7 @@ import ecust.mlkz.act_MLKZ_Secondary_Page.forum_Structs_Collection.struct_forumD
 import ecust.mlkz.act_MLKZ_Secondary_Page.forum_Structs_Collection.struct_forumHeadInfo;
 import ecust.mlkz.act_MLKZ_Secondary_Page.forum_Structs_Collection.struct_forumPostNode;
 import ecust.mlkz.act_MLKZ_Secondary_Page.forum_Structs_Collection.struct_forumSubjectClassificationNode;
+import lib.Global;
 import lib.clsUtils.httpUtil;
 import lib.clsUtils.logUtil;
 
@@ -55,6 +55,27 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
 
     //Cookie
     private String cookie;
+
+    //头部bar
+    private headbar_Secondary_Page headbar;
+
+    //HeadBar回调接口
+    private headbar_Secondary_Page.OnHeadbarClickListener onHeadbarClickListener =
+            new headbar_Secondary_Page.OnHeadbarClickListener() {
+
+                //排序按钮点击
+                @Override
+                public void onSortButtonClick(int sortByTime) {
+                    switch (sortByTime) {
+                        case headbar_Secondary_Page.SORT_BY_POSTTIME:
+                            logUtil.toast("发帖时间");
+                            break;
+                        case headbar_Secondary_Page.SORT_BY_REPLYTIME:
+                            logUtil.toast("回复时间");
+                            break;
+                    }
+                }
+            };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +92,11 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
         //获取内容
         String url = forumData.getSectionURL();
         httpUtil.getSingleton().getHttp(url, cookie, this);
+
+        Global.setTitle(this, "梅陇客栈");
+
+        headbar = (headbar_Secondary_Page) findViewById(R.id.mlkz_secondary_page_headbar);
+        headbar.setOnHeadbarClickListener(onHeadbarClickListener);
     }
 
     @Override
@@ -78,13 +104,9 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
         if (!bSucceed) return;
 
         //数据解析
-        struct_forumDataRoot t = new htmlParser().parseHtmlData(returnHtmlMessage);
+        struct_forumDataRoot result = new htmlParser().parseHtmlData(returnHtmlMessage);
 
-        String str = "";
-        for (struct_forumPostNode i : t.forumPosts) {
-            str += i.toString() + "\r\n\r\n";
-        }
-        ((TextView) findViewById(R.id.mlkz_secondary_page_text)).setText(str);
+
     }
 
     @Override
@@ -184,6 +206,8 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
 
                             if (subjectClassificationList == null) break;
 
+                            headbar.setSubjectClassificationData(subjectClassificationList);
+
                             result.subjectClassification = subjectClassificationList;
                             logUtil.d(this, "============主题分类=============");
                             for (struct_forumSubjectClassificationNode i : subjectClassificationList)
@@ -246,7 +270,13 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
                         String href = parser.getAttributeValue(null, "href");
                         String name = parser.nextText();
 
-                        logUtil.e(this, "[" + name + "]" + href);
+                        if (name.contains("发帖"))
+                            result.setPostURL(href);
+                        else if (name.contains("投票"))
+                            result.setVoteURL(href);
+                        else if (name.contains("悬赏"))
+                            result.setBountyURL(href);
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -300,8 +330,7 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
         }
 
         //解析主题分类（不一定每个版块都有这一项）
-        private List<struct_forumSubjectClassificationNode> parseSubjectClassification
-        (XmlPullParser parser) {
+        protected List<struct_forumSubjectClassificationNode> parseSubjectClassification(XmlPullParser parser) {
             int event = XmlPullParser.START_DOCUMENT;
             //数据集
             List<struct_forumSubjectClassificationNode> result = new ArrayList<>(20);
@@ -348,7 +377,7 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
 
         //解析当前的贴子结构
 
-        private struct_forumPostNode parsePostItem(XmlPullParser parser) {
+        protected struct_forumPostNode parsePostItem(XmlPullParser parser) {
             //临时字符串
             String str = null;
             //解析第一行内容（相对的是第二行）
@@ -499,7 +528,7 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
 
 
         //设置 今日新增贴子数量、版块总主题数量
-        private struct_forumHeadInfo parseHeadPostsCount(XmlPullParser parser) {
+        protected struct_forumHeadInfo parseHeadPostsCount(XmlPullParser parser) {
             struct_forumHeadInfo result = factory.new struct_forumHeadInfo();
 
             int event = XmlPullParser.START_DOCUMENT;
