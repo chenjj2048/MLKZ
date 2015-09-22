@@ -29,7 +29,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.AdapterView;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -52,11 +52,17 @@ import lib.clsUtils.logUtil;
  * 3.新帖排序
  */
 public class headbar_Secondary_Page extends LinearLayout implements View.OnClickListener,
-        PopupWindow.OnDismissListener, AdapterView.OnItemClickListener {
+        PopupWindow.OnDismissListener, View.OnTouchListener {
     //按发帖时间排序
     protected final static int SORT_BY_POSTTIME = 0;
     //按回复时间排序
     protected final static int SORT_BY_REPLYTIME = 1;
+    //对应bar的标签
+    private final static int LEFT_CATALOG = 1;
+    private final static int MIDDLE_CLASSIFICATION = 2;
+    private final static int RIGHT_SORT = 3;
+    //ListView点击下的纵坐标位置
+    private float listViewLastYPosition;
     //点击事件回调
     private OnHeadbarClickListener onHeadbarClickListener;
     //弹出框
@@ -77,6 +83,9 @@ public class headbar_Secondary_Page extends LinearLayout implements View.OnClick
     private Context context;
     //主题分类数据数组
     private List<String> arraySubjectClassification = new ArrayList<>();
+    //字体颜色
+    private int textUnfocusedColor;
+    private int textFocusedColor;
 
     public headbar_Secondary_Page(Context context) {
         super(context);
@@ -121,6 +130,9 @@ public class headbar_Secondary_Page extends LinearLayout implements View.OnClick
         this.setBackgroundColor(0);
 
         //设置字体颜色
+        textUnfocusedColor = getResources().getColor(R.color.black26);
+        textFocusedColor = getResources().getColor(android.R.color.holo_orange_dark);
+
         setDefaultTextColor();
 
         this.arraySubjectClassification.add("全部");
@@ -128,10 +140,9 @@ public class headbar_Secondary_Page extends LinearLayout implements View.OnClick
 
     //设置默认字体颜色
     private void setDefaultTextColor() {
-        final int textColor = getResources().getColor(R.color.black26);
-        section.setTextColor(textColor);
-        classification.setTextColor(textColor);
-        sort.setTextColor(textColor);
+        section.setTextColor(textUnfocusedColor);
+        classification.setTextColor(textUnfocusedColor);
+        sort.setTextColor(textUnfocusedColor);
     }
 
     @Override
@@ -140,13 +151,65 @@ public class headbar_Secondary_Page extends LinearLayout implements View.OnClick
         popView = null;
     }
 
+    //ListView项目被点击,代替OnItemClickListener
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        TextView textView = (TextView) view;
+    public boolean onTouch(View v, MotionEvent event) {
+        ListView listView;
+        if (!(v instanceof ListView)) {
+            return false;
+        } else {
+            listView = (ListView) v;
+        }
 
-        logUtil.toast(textView.getText().toString());
-        popupWindow.dismiss();
+        //return true会屏蔽滚动事件
+        //return false照样会触发ACTION_UP事件
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                //记录点击下的位置
+                listViewLastYPosition = event.getY();
+                break;
+            case MotionEvent.ACTION_MOVE:
+                break;
+            case MotionEvent.ACTION_UP:
+                //移动距离过大，则有可能为ListView的滚动事件
+                float distance = event.getY() - listViewLastYPosition;
+                if (Math.abs(distance) >= clsDimensionConvert.dip2px(this.context, 5)) break;
+
+                //确定点击item的位置
+                final int position = listView.pointToPosition((int) event.getX(), (int) event.getY());
+                if (position < 0) break;
+
+                String str = listView.getAdapter().getItem(position).toString();
+                //传递点击事件
+                notifyClickEvent((int) popView.getTag(), str);
+
+                popupWindow.dismiss();
+                break;
+        }
+
+        return false;
     }
+
+    private void notifyClickEvent(int view_tag, String str) {
+        switch (view_tag) {
+            case LEFT_CATALOG:
+                break;
+            case MIDDLE_CLASSIFICATION:
+                logUtil.toast(str);
+                break;
+            case RIGHT_SORT:
+                if (onHeadbarClickListener != null) {
+                    if (str.equals("按发帖时间排序")) {
+                        onHeadbarClickListener.onSortButtonClick(SORT_BY_POSTTIME);
+                    } else if (str.equals("按回复时间排序")) {
+                        onHeadbarClickListener.onSortButtonClick(SORT_BY_REPLYTIME);
+                    }
+                }
+                popupWindow.dismiss();
+                break;
+        }
+    }
+
 
     @Override
     public void onClick(View v) {
@@ -158,9 +221,8 @@ public class headbar_Secondary_Page extends LinearLayout implements View.OnClick
                     popupWindow.dismiss();
                 } else {
                     showLeftSectionView();
+                    ((TextView) v).setTextColor(textFocusedColor);
                 }
-                setDefaultTextColor();
-                ((TextView) v).setTextColor(getResources().getColor(android.R.color.holo_orange_dark));
                 break;
             case R.id.mlkz_secondary_page_headbar_classification:
                 //主题分类
@@ -168,9 +230,8 @@ public class headbar_Secondary_Page extends LinearLayout implements View.OnClick
                     popupWindow.dismiss();
                 } else {
                     showMiddleClassificationView();
+                    ((TextView) v).setTextColor(textFocusedColor);
                 }
-                setDefaultTextColor();
-                ((TextView) v).setTextColor(getResources().getColor(android.R.color.holo_orange_dark));
                 break;
             case R.id.mlkz_secondary_page_headbar_sort:
                 //排序方式
@@ -178,26 +239,10 @@ public class headbar_Secondary_Page extends LinearLayout implements View.OnClick
                     popupWindow.dismiss();
                 } else {
                     showRightSortView();
+                    ((TextView) v).setTextColor(textFocusedColor);
                 }
-                setDefaultTextColor();
-                ((TextView) v).setTextColor(getResources().getColor(android.R.color.holo_orange_dark));
                 break;
 
-            //================子项-排序====================
-            case R.id.mlkz_secondary_page_headbar_sort_by_posttime:
-                //按发帖时间排序
-                if (onHeadbarClickListener != null) {
-                    onHeadbarClickListener.onSortButtonClick(SORT_BY_POSTTIME);
-                    popupWindow.dismiss();
-                }
-                break;
-            case R.id.mlkz_secondary_page_headbar_sort_by_replytime:
-                //按回复时间排序
-                if (onHeadbarClickListener != null) {
-                    onHeadbarClickListener.onSortButtonClick(SORT_BY_REPLYTIME);
-                    popupWindow.dismiss();
-                }
-                break;
             default:
                 //点击了背景空白处
                 popupWindow.dismiss();
@@ -208,41 +253,59 @@ public class headbar_Secondary_Page extends LinearLayout implements View.OnClick
      * 左侧-版块所在
      */
     private void showLeftSectionView() {
-        popView = LayoutInflater.from(this.context).inflate(R.layout.mlkz_headbar_left_section, null);
-        popupView();
+        View view = LayoutInflater.from(this.context).inflate(R.layout.mlkz_headbar_left_section, null);
+        view.setTag(LEFT_CATALOG);
+        popupView(view);
     }
 
     /**
      * 中间-主题分类
      */
     private void showMiddleClassificationView() {
-        popView = LayoutInflater.from(this.context).inflate(R.layout.mlkz_headbar_middle_classification, null);
-        ListView listView = (ListView) popView.findViewById(R.id.mlkz_secondary_page_headbar_classification_listview);
+        //添加ListView
+        ListView listView = new ListView(this.context);
+        listView.setLayoutParams(new LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        listView.setBackgroundColor(Color.WHITE);
 
+        //数据集
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this.context,
                 android.R.layout.simple_list_item_1, this.arraySubjectClassification);
 
-        listView.setOnItemClickListener(this);
+        listView.setOnTouchListener(this);
         listView.setAdapter(adapter);
-        popupView();
+
+        listView.setTag(MIDDLE_CLASSIFICATION);
+        popupView(listView);
     }
 
     /**
      * 右侧-排序方式
      */
     private void showRightSortView() {
-        popView = LayoutInflater.from(this.context).inflate(R.layout.mlkz_headbar_right_sort, null);
-        TextView sortByPostTime = (TextView) popView.findViewById(R.id.mlkz_secondary_page_headbar_sort_by_posttime);
-        TextView sortByReplyTime = (TextView) popView.findViewById(R.id.mlkz_secondary_page_headbar_sort_by_replytime);
-        sortByPostTime.setOnClickListener(this);
-        sortByReplyTime.setOnClickListener(this);
-        popupView();
+        //添加ListView
+        ListView listView = new ListView(this.context);
+        listView.setLayoutParams(new LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        listView.setBackgroundColor(Color.WHITE);
+
+        //数据集
+        String[] array = new String[]{"按发帖时间排序", "按回复时间排序"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this.context, android.R.layout.simple_list_item_1, array);
+
+        listView.setOnTouchListener(this);
+        listView.setAdapter(adapter);
+
+        listView.setTag(RIGHT_SORT);
+        popupView(listView);
     }
 
     /**
      * 显示View
      */
-    private void popupView() {
+    private void popupView(View view) {
+        popView = view;
+
         //设置半透明背景
         View backgroundView = new View(this.context);
         backgroundView.setBackgroundColor(Color.argb(0x80, 0, 0, 0));
@@ -259,6 +322,7 @@ public class headbar_Secondary_Page extends LinearLayout implements View.OnClick
         popupWindow.setOnDismissListener(this);
         popupWindow.showAsDropDown(linearLayout);
     }
+
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -297,7 +361,7 @@ public class headbar_Secondary_Page extends LinearLayout implements View.OnClick
             arraySubjectClassification.add(node.getName());
     }
 
-    public interface OnHeadbarClickListener {
+    interface OnHeadbarClickListener {
         void onSortButtonClick(int sortByTime);
     }
 }
