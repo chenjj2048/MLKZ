@@ -21,8 +21,15 @@
 package ecust.mlkz;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Xml;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -38,6 +45,7 @@ import ecust.mlkz.act_MLKZ_Secondary_Page.forum_Structs_Collection.struct_forumC
 import ecust.mlkz.act_MLKZ_Secondary_Page.forum_Structs_Collection.struct_forumCommitPostURL;
 import ecust.mlkz.act_MLKZ_Secondary_Page.forum_Structs_Collection.struct_forumDataRoot;
 import ecust.mlkz.act_MLKZ_Secondary_Page.forum_Structs_Collection.struct_forumHeadInfo;
+import ecust.mlkz.act_MLKZ_Secondary_Page.forum_Structs_Collection.struct_forumPosition;
 import ecust.mlkz.act_MLKZ_Secondary_Page.forum_Structs_Collection.struct_forumPostNode;
 import ecust.mlkz.act_MLKZ_Secondary_Page.forum_Structs_Collection.struct_forumSubjectClassificationNode;
 import lib.Global;
@@ -62,11 +70,28 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
     //HeadBar回调接口
     private headbar_Secondary_Page.OnHeadbarClickListener onHeadbarClickListener =
             new headbar_Secondary_Page.OnHeadbarClickListener() {
+                //跳转到新版块
+                @Override
+                public void jumpToNewSection(String name, String href) {
+                    logUtil.toast(name + " " + href);
+                }
+
+                //子版块被选中
+                @Override
+                public void onChildSectionSelected(String str) {
+                    logUtil.toast("子版块 " + str);
+                }
+
+                //筛选按钮
+                @Override
+                public void onClassificationSelected(String str) {
+                    logUtil.toast("筛选 = " + str);
+                }
 
                 //排序按钮点击
                 @Override
-                public void onSortButtonClick(int sortByTime) {
-                    switch (sortByTime) {
+                public void onSortSelected(int sortByTimeType) {
+                    switch (sortByTimeType) {
                         case headbar_Secondary_Page.SORT_BY_POSTTIME:
                             logUtil.toast("发帖时间");
                             break;
@@ -95,23 +120,48 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
 
         Global.setTitle(this, "梅陇客栈");
 
+        initHeadbar();
+        initRecyclerView();
+    }
+
+    /**
+     * 初始化headbar
+     */
+    private void initHeadbar() {
         headbar = (headbar_Secondary_Page) findViewById(R.id.mlkz_secondary_page_headbar);
         headbar.setOnHeadbarClickListener(onHeadbarClickListener);
+    }
+
+    /**
+     * 初始化RecyclerView
+     */
+    private void initRecyclerView() {
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.mlkz_secondary_page_recyclerview);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(new recyclerViewAdapter(this, forumData));
     }
 
     @Override
     public void onHttpLoadCompleted(String url, String cookie, boolean bSucceed, String returnHtmlMessage) {
         if (!bSucceed) return;
 
-        //数据解析
-        struct_forumDataRoot result = new htmlParser().parseHtmlData(returnHtmlMessage);
-
-
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.mlkz_secondary_page_recyclerview);
+        recyclerView.getAdapter().notifyDataSetChanged();
+        recyclerViewAdapter adapter=(recyclerViewAdapter) recyclerView.getAdapter();
+    adapter.setData(forumData);
+        logUtil.e(this,forumData.forumPosts.size()+"==");
     }
 
     @Override
     public void onHttpBackgroundThreadLoadCompleted(String url, String cookie, boolean bSucceed, String returnHtmlMessage) {
+        if (!bSucceed) return;
 
+        //数据解析
+        struct_forumDataRoot result = new htmlParser().parseHtmlData(returnHtmlMessage);
+        headbar.setData(result);
+
+        //合并结果
+        forumData = result;
     }
 
     @Override
@@ -125,6 +175,482 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
     }
 
     /**
+     * 数据集合
+     */
+    protected static class forum_Structs_Collection {
+        /**
+         * 论坛贴子类型
+         */
+        protected static final int POST_STATUS_NORMAL = 0;
+        protected static final int POST_STATUS_TOP = 1;
+        protected static final int POST_STATUS_LOCK = 2;
+        protected static final int POST_STATUS_VOTE = 3;
+        protected static final int POST_STATUS_BOUNTY = 4;
+
+        /**
+         * 论坛数据解析结果-根节点
+         */
+        protected class struct_forumDataRoot {
+            //贴子汇总
+            protected List<struct_forumPostNode> forumPosts = new ArrayList<>(100);
+            //子版块（不一定存在）
+            List<struct_forumChildSectionNode> childSections = new ArrayList<>();
+            //当前版块名称
+            private String sectionTitle;
+            //当前版块URL
+            private String sectionURL;
+            //论坛所处版块
+            private struct_forumPosition forumPosition = new struct_forumPosition();
+            //头部信息
+            private struct_forumHeadInfo headInfo = new struct_forumHeadInfo();
+            //发帖地址
+            private struct_forumCommitPostURL commitPostURL = new struct_forumCommitPostURL();
+            //主题分类（不一定存在）
+            private List<struct_forumSubjectClassificationNode> subjectClassification = new ArrayList<>();
+
+            public String getSectionTitle() {
+                return sectionTitle;
+            }
+
+            public void setSectionTitle(String sectionTitle) {
+                this.sectionTitle = sectionTitle;
+            }
+
+            public String getSectionURL() {
+                return sectionURL;
+            }
+
+            public void setSectionURL(String sectionURL) {
+                this.sectionURL = sectionURL;
+            }
+
+            public struct_forumPosition getForumPosition() {
+                return forumPosition;
+            }
+
+            public void setForumPosition(struct_forumPosition forumPosition) {
+                this.forumPosition = forumPosition;
+            }
+
+            public struct_forumHeadInfo getHeadInfo() {
+                return headInfo;
+            }
+
+            public void setHeadInfo(struct_forumHeadInfo headInfo) {
+                this.headInfo = headInfo;
+            }
+
+            public struct_forumCommitPostURL getCommitPostURL() {
+                return commitPostURL;
+            }
+
+            public void setCommitPostURL(struct_forumCommitPostURL commitPostURL) {
+                this.commitPostURL = commitPostURL;
+            }
+
+            public List<struct_forumSubjectClassificationNode> getSubjectClassification() {
+                return subjectClassification;
+            }
+
+            public void setSubjectClassification(List<struct_forumSubjectClassificationNode> subjectClassification) {
+                this.subjectClassification = subjectClassification;
+            }
+        }
+
+        /**
+         * 当前论坛版块所处位置
+         */
+        protected class struct_forumPosition {
+            private String homePageURL;
+            private String secondaryPageURL;
+            private String homePageName;
+            private String secondaryPageName;
+            private String thirdPageName;
+
+            public String getHomePageURL() {
+                return homePageURL;
+            }
+
+            public void setHomePageURL(String homePageURL) {
+                this.homePageURL = homePageURL;
+            }
+
+            public String getSecondaryPageURL() {
+                return secondaryPageURL;
+            }
+
+            public void setSecondaryPageURL(String secondaryPageURL) {
+                this.secondaryPageURL = secondaryPageURL;
+            }
+
+            public String getHomePageName() {
+                return homePageName;
+            }
+
+            public void setHomePageName(String homePageName) {
+                this.homePageName = homePageName;
+            }
+
+            public String getSecondaryPageName() {
+                return secondaryPageName;
+            }
+
+            public void setSecondaryPageName(String secondaryPageName) {
+                this.secondaryPageName = secondaryPageName;
+            }
+
+            public String getThirdPageName() {
+                return thirdPageName;
+            }
+
+            public void setThirdPageName(String thirdPageName) {
+                this.thirdPageName = thirdPageName;
+            }
+        }
+
+        /**
+         * 头部信息
+         */
+        protected class struct_forumHeadInfo {
+            //今日发帖
+            private int item_Count_Today = 0;
+            //主题数量
+            private int item_Count_Subjects = 0;
+            //收藏版块
+            private String favoriteSectionURL;
+
+
+            public int getItem_Count_Today() {
+                return item_Count_Today;
+            }
+
+            /**
+             * 设置今日新增主题数量
+             *
+             * @param str 如"今日0"
+             */
+            public void setItem_Count_Today(String str) {
+                if (str == null || !str.contains("今日")) return;
+
+                try {
+                    this.item_Count_Today = Integer.parseInt(str.replace("今日", "").trim());
+                } catch (Exception e) {
+                    logUtil.e(this, str);
+                    logUtil.printException(this, e);
+                }
+            }
+
+            public int getItem_Count_Subjects() {
+                return item_Count_Subjects;
+            }
+
+            /**
+             * 设置版块 主题数量
+             *
+             * @param str 如"主题963"
+             */
+            public void setItem_Count_Subjects(String str) {
+                if (str == null || !str.contains("主题")) return;
+
+                try {
+                    this.item_Count_Subjects = Integer.parseInt(str.replace("主题", "").trim());
+                } catch (Exception e) {
+                    logUtil.e(this, str);
+                    logUtil.printException(this, e);
+                }
+            }
+
+            public String getFavoriteSectionURL() {
+                return favoriteSectionURL;
+            }
+
+            public void setFavoriteSectionURL(String favoriteSectionURL) {
+                //null
+                if (favoriteSectionURL == null || favoriteSectionURL.length() < 10) {
+                    this.favoriteSectionURL = "";
+                } else {
+                    this.favoriteSectionURL = favoriteSectionURL;
+                }
+            }
+        }
+
+
+        /**
+         * 发帖地址（发帖、发投票、发悬赏）
+         */
+        protected class struct_forumCommitPostURL {
+            private String postURL;
+            private String voteURL;
+            private String bountyURL;
+
+            public String getPostURL() {
+                return postURL;
+            }
+
+            public void setPostURL(String postURL) {
+                this.postURL = postURL;
+            }
+
+            public String getVoteURL() {
+                return voteURL;
+            }
+
+            public void setVoteURL(String voteURL) {
+                this.voteURL = voteURL;
+            }
+
+            public String getBountyURL() {
+                return bountyURL;
+            }
+
+            public void setBountyURL(String bountyURL) {
+                this.bountyURL = bountyURL;
+            }
+        }
+
+        /**
+         * 子版块-节点
+         */
+        protected class struct_forumChildSectionNode {
+            //子版块标题
+            private String name;
+            //子版块URL
+            private String url;
+
+            public String getName() {
+                return name;
+            }
+
+            public void setName(String name) {
+                this.name = name;
+            }
+
+            public String getUrl() {
+                return url;
+            }
+
+            public void setUrl(String url) {
+                this.url = url;
+            }
+
+            @Override
+            public String toString() {
+                return "[" + name + "]" + url;
+            }
+        }
+
+        /**
+         * 论坛贴子-节点
+         */
+        protected class struct_forumPostNode {
+            //贴子题目
+            private String title;
+            //贴子URL
+            private String url;
+            //作者
+            private String authorName;
+            //作者空间URL
+            private String authorSpaceUrl;
+            //发帖时间
+            private String firstReleaseTime;
+            //回复数量
+            private int reply = 0;
+            //贴子类型
+            private int forumPostType = POST_STATUS_NORMAL;
+
+            @Override
+            public String toString() {
+                return "[标题]" + title + "\r\n" +
+                        "[URL]" + url + "\r\n" +
+                        "[作者]" + authorName + "\r\n" +
+                        "[作者空间]" + authorSpaceUrl + "\r\n" +
+                        "[发表日期]" + firstReleaseTime + "\r\n" +
+                        "[回复数量]" + reply + "\r\n" +
+                        "[贴子类型]" + forumPostType;
+            }
+
+            public int getForumPostType() {
+                return forumPostType;
+            }
+
+            public void setForumPostType(String picURL) {
+                //设置相应的贴子类型
+                switch (picURL) {
+                    case "template/eis_012/img/pin_1.gif":
+                        this.forumPostType = POST_STATUS_TOP;
+                        break;
+                    case "template/eis_012/img/folder_lock.gif":
+                        this.forumPostType = POST_STATUS_LOCK;
+                        break;
+                    case "template/eis_012/img/pollsmall.gif":
+                        this.forumPostType = POST_STATUS_VOTE;
+                        break;
+                    case "template/eis_012/img/rewardsmall.gif":
+                        this.forumPostType = POST_STATUS_BOUNTY;
+                        break;
+                    default:
+                        logUtil.w(this, "[未能解析的贴子类型-图片]" + picURL);
+                }
+            }
+
+            public String getTitle() {
+                return title;
+            }
+
+            public void setTitle(String title) {
+                title = title.replace("\r", "").replace("\n", "").trim();
+                this.title = title;
+            }
+
+            public String getUrl() {
+                return url;
+            }
+
+            public void setUrl(String url) {
+                this.url = url;
+            }
+
+            public String getAuthorName() {
+                return authorName;
+            }
+
+            public void setAuthorName(String authorName) {
+                this.authorName = authorName;
+            }
+
+            public String getAuthorSpaceUrl() {
+                return authorSpaceUrl;
+            }
+
+            public void setAuthorSpaceUrl(String authorSpaceUrl) {
+                this.authorSpaceUrl = authorSpaceUrl;
+            }
+
+            public String getFirstReleaseTime() {
+                return firstReleaseTime;
+            }
+
+            /**
+             * 设置发帖时间
+             *
+             * @param firstReleaseTime 传入参数可能为
+             *                         "2014-9-7                        回26" 或  "2014-9-7"
+             */
+            public void setFirstReleaseTime(String firstReleaseTime) {
+                final int maxLength = 10;
+                this.firstReleaseTime = firstReleaseTime.substring(0,
+                        Math.min(maxLength, firstReleaseTime.length())).trim();
+            }
+
+            public int getReply() {
+                return reply;
+            }
+
+            /**
+             * 设置会附属
+             *
+             * @param str 传入参数可能为
+             *            "2014-9-7                        回26" 或  "2014-9-7"
+             */
+            public void setReply(String str) {
+                if (str != null && str.contains("回")) {
+                    str = str.substring(str.lastIndexOf("回"));
+                    str = str.replace("回", "").trim();
+                    this.reply = Integer.parseInt(str);
+                } else {
+                    this.reply = 0;
+                }
+            }
+        }
+
+        /**
+         * 主题分类
+         */
+        protected class struct_forumSubjectClassificationNode {
+            private String name;
+            private String url;
+
+            public String getName() {
+                return name;
+            }
+
+            public void setName(String name) {
+                this.name = name;
+            }
+
+            public String getUrl() {
+                return url;
+            }
+
+            public void setUrl(String url) {
+                this.url = url;
+            }
+
+            @Override
+            public String toString() {
+                return "[" + name + "]" + url;
+            }
+        }
+    }
+
+    /**
+     * RecyclcerView适配器
+     */
+    private class recyclerViewAdapter extends RecyclerView.Adapter {
+        private Context context;
+        private struct_forumDataRoot mData;
+
+        public recyclerViewAdapter(Context context, struct_forumDataRoot mData) {
+            this.context = context;
+            this.mData = mData;
+        }
+
+        public void setData(struct_forumDataRoot data) {
+            this.mData = data;
+        }
+
+        @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+            View view = getLayoutInflater().inflate(R.layout.mlkz_seconary_page_item, null);
+            myViewHolder viewHolder = new myViewHolder(view);
+            return viewHolder;
+        }
+
+        @Override
+        public void onBindViewHolder(RecyclerView.ViewHolder recyclerViewHolder, int i) {
+            myViewHolder viewHolder = (myViewHolder) recyclerViewHolder;
+            struct_forumPostNode node=mData.forumPosts.get(i);
+logUtil.e(this, node.getTitle());
+            //设置数据
+            viewHolder.title.setText(node.getTitle());
+            viewHolder.authorName.setText(node.getAuthorName());
+            viewHolder.postTime.setText(node.getFirstReleaseTime());
+            viewHolder.replyCount.setText(node.getReply()+"");
+        }
+
+        @Override
+        public int getItemCount() {
+            return mData.forumPosts.size();
+        }
+
+        //ViewHolder
+         class myViewHolder extends RecyclerView.ViewHolder {
+            TextView title;
+            TextView authorName;
+            TextView postTime;
+            TextView replyCount;
+
+            public myViewHolder(View itemView) {
+                super(itemView);
+                this.title=(TextView) itemView.findViewById(R.id.mlkz_secondary_page_item_title);
+                this.authorName=(TextView) itemView.findViewById(R.id.mlkz_secondary_page_item_authorname);
+                this.postTime=(TextView) itemView.findViewById(R.id.mlkz_secondary_page_item_posttime);
+                this.replyCount=(TextView) itemView.findViewById(R.id.mlkz_secondary_page_item_replycount);
+            }
+        }
+    }
+
+    /**
      * 用于HTML页面的解析
      */
     protected class htmlParser {
@@ -134,7 +660,7 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
          *
          * @param html 网页数据
          */
-        protected struct_forumDataRoot parseHtmlData(String html) {
+        public struct_forumDataRoot parseHtmlData(String html) {
             //解析后的数据集
             struct_forumDataRoot result = factory.new struct_forumDataRoot();
 
@@ -161,6 +687,19 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
                 //处理内容
                 if (event == XmlPullParser.START_TAG && parser.getName().equals("div")) {
                     switch (parser.getAttributeValue(null, "class")) {
+                        case "box":
+                            //解析 版块所处位置 论坛->一级版块->二级版块
+                            struct_forumPosition forumPosition = parseCurrentSectionPosition(parser);
+                            result.setForumPosition(forumPosition);
+
+                            if (forumPosition != null) {
+                                logUtil.d(this, "========版块位置=========");
+                                logUtil.d(this, "[" + forumPosition.getHomePageName() + "]" + forumPosition.getHomePageURL());
+                                logUtil.d(this, "[" + forumPosition.getSecondaryPageName() + "]" + forumPosition.getSecondaryPageURL());
+                                logUtil.d(this, "[" + forumPosition.getThirdPageName() + "] null URL");
+                            }
+
+                            break;
                         case "box flif":
                             //解析 今日新增贴子数量、版块总主题数量、收藏版块
                             struct_forumHeadInfo headInfo = parseHeadPostsCount(parser);
@@ -206,8 +745,6 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
 
                             if (subjectClassificationList == null) break;
 
-                            headbar.setSubjectClassificationData(subjectClassificationList);
-
                             result.subjectClassification = subjectClassificationList;
                             logUtil.d(this, "============主题分类=============");
                             for (struct_forumSubjectClassificationNode i : subjectClassificationList)
@@ -250,6 +787,55 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
             }
 
             return result;
+        }
+
+        /**
+         * 解析版块名字及URL
+         * 论坛 > 学院平台 > 资源与环境工程学院
+         */
+        protected struct_forumPosition parseCurrentSectionPosition(XmlPullParser parser) {
+            int event = XmlPullParser.START_DOCUMENT;
+            int href_position = 0;
+
+            struct_forumPosition result = factory.new struct_forumPosition();
+
+            while (event != XmlPullParser.END_DOCUMENT) {
+                try {
+                    event = parser.next();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                if (event == XmlPullParser.START_TAG && "a".equals(parser.getName())) {
+                    //URL
+                    String href = parser.getAttributeValue(null, "href");
+                    if (++href_position == 1) {
+                        //第一级<a href=xxxx>
+                        try {
+                            result.setHomePageName(parser.nextText());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        result.setHomePageURL(href);
+                    } else if (href_position == 2) {
+                        //第二级<a href=xxxx>
+                        try {
+                            result.setSecondaryPageName(parser.nextText());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        result.setSecondaryPageURL(href);
+                    }
+                } else if (event == XmlPullParser.TEXT && parser.getText().trim().length() > 1 && !parser.getText().contains("&gt;")) {
+                    //第三级名称，无URL
+                    result.setThirdPageName(parser.getText().trim());
+                } else if (event == XmlPullParser.END_TAG && "div".equals(parser.getName())) {
+                    //返回结果
+                    return result;
+                }
+            }
+
+            return null;
         }
 
         //解析发帖地址
@@ -452,7 +1038,7 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
                                 //4.设置作者空间URL
                                 postItem.setAuthorSpaceUrl("");
                                 //5.设置作者名称
-                                postItem.setAuthor("匿名");
+                                postItem.setAuthorName("匿名");
 
                                 //6.设置发帖时间
                                 //传入参数类似  "2014-9-7                        回26"
@@ -482,7 +1068,7 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
                                     //5.设置作者名称
                                     try {
                                         str = parser.nextText();
-                                        postItem.setAuthor(str);
+                                        postItem.setAuthorName(str);
                                         parser.next();
                                     } catch (Exception e) {
                                         e.printStackTrace();
@@ -571,356 +1157,6 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
 
     }
 
-    /**
-     * 数据集合
-     */
-    protected class forum_Structs_Collection {
-        /**
-         * 论坛贴子类型
-         */
-        protected static final int POST_STATUS_NORMAL = 0;
-        protected static final int POST_STATUS_TOP = 1;
-        protected static final int POST_STATUS_LOCK = 2;
-        protected static final int POST_STATUS_VOTE = 3;
-        protected static final int POST_STATUS_BOUNTY = 4;
 
-        /**
-         * 论坛数据解析结果-根节点
-         */
-        protected class struct_forumDataRoot {
-            //贴子汇总
-            protected List<struct_forumPostNode> forumPosts = new ArrayList<>(100);
-            //当前版块名称
-            private String sectionTitle;
-            //当前版块URL
-            private String sectionURL;
-            //头部信息
-            private struct_forumHeadInfo headInfo = new struct_forumHeadInfo();
-            //发帖地址
-            private struct_forumCommitPostURL commitPostURL = new struct_forumCommitPostURL();
-            //当前已显示的数量
-            private int item_Count_Current = 0;
-            //主题分类（不一定存在）
-            private List<struct_forumSubjectClassificationNode> subjectClassification = new ArrayList<>();
-            //子版块（不一定存在）
-            private List<struct_forumChildSectionNode> childSections = new ArrayList<>(10);
-
-            public String getSectionTitle() {
-                return sectionTitle;
-            }
-
-            public void setSectionTitle(String sectionTitle) {
-                this.sectionTitle = sectionTitle;
-            }
-
-            public String getSectionURL() {
-                return sectionURL;
-            }
-
-            public void setSectionURL(String sectionURL) {
-                this.sectionURL = sectionURL;
-            }
-
-            public struct_forumHeadInfo getHeadInfo() {
-                return headInfo;
-            }
-
-            public void setHeadInfo(struct_forumHeadInfo headInfo) {
-                this.headInfo = headInfo;
-            }
-
-            public struct_forumCommitPostURL getCommitPostURL() {
-                return commitPostURL;
-            }
-
-            public void setCommitPostURL(struct_forumCommitPostURL commitPostURL) {
-                this.commitPostURL = commitPostURL;
-            }
-        }
-
-        /**
-         * 头部信息
-         */
-        protected class struct_forumHeadInfo {
-            //今日发帖
-            private int item_Count_Today = 0;
-            //主题数量
-            private int item_Count_Subjects = 0;
-            //收藏版块
-            private String favoriteSectionURL;
-
-
-            public int getItem_Count_Today() {
-                return item_Count_Today;
-            }
-
-            /**
-             * 设置今日新增主题数量
-             *
-             * @param str 如"今日0"
-             */
-            public void setItem_Count_Today(String str) {
-                if (str == null || !str.contains("今日")) return;
-
-                try {
-                    this.item_Count_Today = Integer.parseInt(str.replace("今日", "").trim());
-                } catch (Exception e) {
-                    logUtil.e(this, str);
-                    logUtil.printException(this, e);
-                }
-            }
-
-            public int getItem_Count_Subjects() {
-                return item_Count_Subjects;
-            }
-
-            /**
-             * 设置版块 主题数量
-             *
-             * @param str 如"主题963"
-             */
-            public void setItem_Count_Subjects(String str) {
-                if (str == null || !str.contains("主题")) return;
-
-                try {
-                    this.item_Count_Subjects = Integer.parseInt(str.replace("主题", "").trim());
-                } catch (Exception e) {
-                    logUtil.e(this, str);
-                    logUtil.printException(this, e);
-                }
-            }
-
-            public String getFavoriteSectionURL() {
-                return favoriteSectionURL;
-            }
-
-            public void setFavoriteSectionURL(String favoriteSectionURL) {
-                //null
-                if (favoriteSectionURL == null || favoriteSectionURL.length() < 10) {
-                    this.favoriteSectionURL = "";
-                } else {
-                    this.favoriteSectionURL = favoriteSectionURL;
-                }
-            }
-        }
-
-
-        /**
-         * 发帖地址（发帖、发投票、发悬赏）
-         */
-        protected class struct_forumCommitPostURL {
-            private String postURL;
-            private String voteURL;
-            private String bountyURL;
-
-            public String getPostURL() {
-                return postURL;
-            }
-
-            public void setPostURL(String postURL) {
-                this.postURL = postURL;
-            }
-
-            public String getVoteURL() {
-                return voteURL;
-            }
-
-            public void setVoteURL(String voteURL) {
-                this.voteURL = voteURL;
-            }
-
-            public String getBountyURL() {
-                return bountyURL;
-            }
-
-            public void setBountyURL(String bountyURL) {
-                this.bountyURL = bountyURL;
-            }
-        }
-
-        /**
-         * 子版块-节点
-         */
-        protected class struct_forumChildSectionNode {
-            //子版块标题
-            private String name;
-            //子版块URL
-            private String url;
-
-            public String getName() {
-                return name;
-            }
-
-            public void setName(String name) {
-                this.name = name;
-            }
-
-            public String getUrl() {
-                return url;
-            }
-
-            public void setUrl(String url) {
-                this.url = url;
-            }
-
-            @Override
-            public String toString() {
-                return "[" + name + "]" + url;
-            }
-        }
-
-        /**
-         * 论坛贴子-节点
-         */
-        protected class struct_forumPostNode {
-            //贴子题目
-            private String title;
-            //贴子URL
-            private String url;
-            //作者
-            private String author;
-            //作者空间URL
-            private String authorSpaceUrl;
-            //发帖时间
-            private String firstReleaseTime;
-            //回复数量
-            private int reply = 0;
-            //贴子类型
-            private int forumPostType = POST_STATUS_NORMAL;
-
-            @Override
-            public String toString() {
-                return "[标题]" + title + "\r\n" +
-                        "[URL]" + url + "\r\n" +
-                        "[作者]" + author + "\r\n" +
-                        "[作者空间]" + authorSpaceUrl + "\r\n" +
-                        "[发表日期]" + firstReleaseTime + "\r\n" +
-                        "[回复数量]" + reply + "\r\n" +
-                        "[贴子类型]" + forumPostType;
-            }
-
-            public int getForumPostType() {
-                return forumPostType;
-            }
-
-            public void setForumPostType(String picURL) {
-                //设置相应的贴子类型
-                switch (picURL) {
-                    case "template/eis_012/img/pin_1.gif":
-                        this.forumPostType = POST_STATUS_TOP;
-                        break;
-                    case "template/eis_012/img/folder_lock.gif":
-                        this.forumPostType = POST_STATUS_LOCK;
-                        break;
-                    case "template/eis_012/img/pollsmall.gif":
-                        this.forumPostType = POST_STATUS_VOTE;
-                        break;
-                    case "template/eis_012/img/rewardsmall.gif":
-                        this.forumPostType = POST_STATUS_BOUNTY;
-                        break;
-                    default:
-                        logUtil.w(this, "[未能解析的贴子类型-图片]" + picURL);
-                }
-            }
-
-            public String getTitle() {
-                return title;
-            }
-
-            public void setTitle(String title) {
-                title = title.replace("\r", "").replace("\n", "").trim();
-                this.title = title;
-            }
-
-            public String getUrl() {
-                return url;
-            }
-
-            public void setUrl(String url) {
-                this.url = url;
-            }
-
-            public String getAuthor() {
-                return author;
-            }
-
-            public void setAuthor(String author) {
-                this.author = author;
-            }
-
-            public String getAuthorSpaceUrl() {
-                return authorSpaceUrl;
-            }
-
-            public void setAuthorSpaceUrl(String authorSpaceUrl) {
-                this.authorSpaceUrl = authorSpaceUrl;
-            }
-
-            public String getFirstReleaseTime() {
-                return firstReleaseTime;
-            }
-
-            /**
-             * 设置发帖时间
-             *
-             * @param firstReleaseTime 传入参数可能为
-             *                         "2014-9-7                        回26" 或  "2014-9-7"
-             */
-            public void setFirstReleaseTime(String firstReleaseTime) {
-                final int maxLength = 10;
-                this.firstReleaseTime = firstReleaseTime.substring(0,
-                        Math.min(maxLength, firstReleaseTime.length())).trim();
-            }
-
-            public int getReply() {
-                return reply;
-            }
-
-            /**
-             * 设置会附属
-             *
-             * @param str 传入参数可能为
-             *            "2014-9-7                        回26" 或  "2014-9-7"
-             */
-            public void setReply(String str) {
-                if (str != null && str.contains("回")) {
-                    str = str.substring(str.lastIndexOf("回"));
-                    str = str.replace("回", "").trim();
-                    this.reply = Integer.parseInt(str);
-                } else {
-                    this.reply = 0;
-                }
-            }
-        }
-
-        /**
-         * 主题分类
-         */
-        protected class struct_forumSubjectClassificationNode {
-            private String name;
-            private String url;
-
-            public String getName() {
-                return name;
-            }
-
-            public void setName(String name) {
-                this.name = name;
-            }
-
-            public String getUrl() {
-                return url;
-            }
-
-            public void setUrl(String url) {
-                this.url = url;
-            }
-
-            @Override
-            public String toString() {
-                return "[" + name + "]" + url;
-            }
-        }
-    }
 }
 

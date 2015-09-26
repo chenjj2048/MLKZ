@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:context="ecust.mlkz.act_MLKZ_Secondary_Page">
+
+    <TextView
+        android:id="@+id/mlkz_secondary_page_item_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/mlkz_secondary_page_item_authorname"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/mlkz_secondary_page_item_posttime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/mlkz_secondary_page_item_replycount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>

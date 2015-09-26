@@ -40,8 +40,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ecust.main.R;
+import ecust.mlkz.act_MLKZ_Secondary_Page.forum_Structs_Collection;
+import ecust.mlkz.act_MLKZ_Secondary_Page.forum_Structs_Collection.struct_forumChildSectionNode;
+import ecust.mlkz.act_MLKZ_Secondary_Page.forum_Structs_Collection.struct_forumDataRoot;
+import ecust.mlkz.act_MLKZ_Secondary_Page.forum_Structs_Collection.struct_forumPosition;
 import ecust.mlkz.act_MLKZ_Secondary_Page.forum_Structs_Collection.struct_forumSubjectClassificationNode;
 import lib.clsDimensionConvert;
+import lib.clsUtils.ScreenUtil;
 import lib.clsUtils.logUtil;
 
 /**
@@ -61,8 +66,8 @@ public class headbar_Secondary_Page extends LinearLayout implements View.OnClick
     private final static int LEFT_CATALOG = 1;
     private final static int MIDDLE_CLASSIFICATION = 2;
     private final static int RIGHT_SORT = 3;
-    //ListView点击下的纵坐标位置
-    private float listViewLastYPosition;
+    //记录ListView点击下的item及listView中第一个可见项，用于ListView在onScroll后是否需要显示
+    private int listViewLastItemHashcode;
     //点击事件回调
     private OnHeadbarClickListener onHeadbarClickListener;
     //弹出框
@@ -81,8 +86,8 @@ public class headbar_Secondary_Page extends LinearLayout implements View.OnClick
     private Paint paint;
     //上下文
     private Context context;
-    //主题分类数据数组
-    private List<String> arraySubjectClassification = new ArrayList<>();
+    //数据集
+    private struct_forumDataRoot mData = new forum_Structs_Collection().new struct_forumDataRoot();
     //字体颜色
     private int textUnfocusedColor;
     private int textFocusedColor;
@@ -134,8 +139,6 @@ public class headbar_Secondary_Page extends LinearLayout implements View.OnClick
         textFocusedColor = getResources().getColor(android.R.color.holo_orange_dark);
 
         setDefaultTextColor();
-
-        this.arraySubjectClassification.add("全部");
     }
 
     //设置默认字体颜色
@@ -161,25 +164,21 @@ public class headbar_Secondary_Page extends LinearLayout implements View.OnClick
             listView = (ListView) v;
         }
 
-        //return true会屏蔽滚动事件
-        //return false照样会触发ACTION_UP事件
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                //记录点击下的位置
-                listViewLastYPosition = event.getY();
+                //记录点击下的位置是否没变
+                listViewLastItemHashcode = listView.pointToPosition((int) event.getX(), (int) event.getY());
+                listViewLastItemHashcode = listViewLastItemHashcode ^ listView.getFirstVisiblePosition();
                 break;
             case MotionEvent.ACTION_MOVE:
                 break;
             case MotionEvent.ACTION_UP:
-                //移动距离过大，则有可能为ListView的滚动事件
-                float distance = event.getY() - listViewLastYPosition;
-                if (Math.abs(distance) >= clsDimensionConvert.dip2px(this.context, 5)) break;
+                //确定点击item的位置(点击项与listView第一项均没变，才算UP事件)
+                final int pos = listView.pointToPosition((int) event.getX(), (int) event.getY());
+                if (pos < 0 || listViewLastItemHashcode != (pos ^ listView.getFirstVisiblePosition()))
+                    break;
 
-                //确定点击item的位置
-                final int position = listView.pointToPosition((int) event.getX(), (int) event.getY());
-                if (position < 0) break;
-
-                String str = listView.getAdapter().getItem(position).toString();
+                String str = listView.getAdapter().getItem(pos).toString();
                 //传递点击事件
                 notifyClickEvent((int) popView.getTag(), str);
 
@@ -190,26 +189,32 @@ public class headbar_Secondary_Page extends LinearLayout implements View.OnClick
         return false;
     }
 
+    /**
+     * 接收到点击事件
+     *
+     * @param view_tag 标示是哪块View被点击了，LEFT_CATALOG，MIDDLE_CLASSIFICATION，RIGHT_SORT
+     * @param str      点击到的文字提示
+     */
     private void notifyClickEvent(int view_tag, String str) {
+        if (onHeadbarClickListener == null) return;
+
         switch (view_tag) {
             case LEFT_CATALOG:
+                onHeadbarClickListener.onChildSectionSelected(str);
                 break;
             case MIDDLE_CLASSIFICATION:
-                logUtil.toast(str);
+                onHeadbarClickListener.onClassificationSelected(str);
                 break;
             case RIGHT_SORT:
-                if (onHeadbarClickListener != null) {
-                    if (str.equals("按发帖时间排序")) {
-                        onHeadbarClickListener.onSortButtonClick(SORT_BY_POSTTIME);
-                    } else if (str.equals("按回复时间排序")) {
-                        onHeadbarClickListener.onSortButtonClick(SORT_BY_REPLYTIME);
-                    }
+                if (str.equals("按发帖时间排序")) {
+                    onHeadbarClickListener.onSortSelected(SORT_BY_POSTTIME);
+                } else if (str.equals("按回复时间排序")) {
+                    onHeadbarClickListener.onSortSelected(SORT_BY_REPLYTIME);
                 }
-                popupWindow.dismiss();
                 break;
         }
+        popupWindow.dismiss();
     }
-
 
     @Override
     public void onClick(View v) {
@@ -242,7 +247,6 @@ public class headbar_Secondary_Page extends LinearLayout implements View.OnClick
                     ((TextView) v).setTextColor(textFocusedColor);
                 }
                 break;
-
             default:
                 //点击了背景空白处
                 popupWindow.dismiss();
@@ -255,6 +259,51 @@ public class headbar_Secondary_Page extends LinearLayout implements View.OnClick
     private void showLeftSectionView() {
         View view = LayoutInflater.from(this.context).inflate(R.layout.mlkz_headbar_left_section, null);
         view.setTag(LEFT_CATALOG);
+
+        //1.设置三级版块标题
+        TextView title1 = (TextView) view.findViewById(R.id.mlkz_secondary_page_headbar_section_1st_title);
+        TextView title2 = (TextView) view.findViewById(R.id.mlkz_secondary_page_headbar_section_2rd_title);
+        TextView title3 = (TextView) view.findViewById(R.id.mlkz_secondary_page_headbar_section_3rd_title);
+
+        //设置数据
+        struct_forumPosition forumPosition = mData.getForumPosition();
+        title1.setText(forumPosition.getHomePageName());
+        title2.setText(forumPosition.getSecondaryPageName());
+        title3.setText(forumPosition.getThirdPageName());
+
+        title1.setTag(forumPosition.getHomePageURL());
+        title2.setTag(forumPosition.getSecondaryPageURL());
+
+        //点击事件
+        OnClickListener leftViewListener = new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!(v instanceof TextView)) return;
+
+                TextView textView = (TextView) v;
+                String href = (String) v.getTag();
+                if (onHeadbarClickListener != null)
+                    onHeadbarClickListener.jumpToNewSection(textView.getText().toString(), href);
+                popupWindow.dismiss();
+            }
+        };
+
+        title1.setOnClickListener(leftViewListener);
+        title2.setOnClickListener(leftViewListener);
+
+        //2.设置子版块
+        ListView listView = (ListView) view.findViewById(R.id.mlkz_secondary_page_headbar_section_listview);
+        List<String> childSectionsName = new ArrayList<>();
+        for (struct_forumChildSectionNode i : mData.childSections) {
+            //子版块名称
+            childSectionsName.add(i.getName());
+        }
+        if (childSectionsName.size() == 0)
+            childSectionsName.add("无");
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this.context, android.R.layout.simple_list_item_1, childSectionsName);
+        listView.setAdapter(adapter);
+        listView.setOnTouchListener(this);
+
         popupView(view);
     }
 
@@ -264,18 +313,27 @@ public class headbar_Secondary_Page extends LinearLayout implements View.OnClick
     private void showMiddleClassificationView() {
         //添加ListView
         ListView listView = new ListView(this.context);
+        listView.setTag(MIDDLE_CLASSIFICATION);
         listView.setLayoutParams(new LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         listView.setBackgroundColor(Color.WHITE);
 
-        //数据集
+        //读取数据
+        List<struct_forumSubjectClassificationNode> data = mData.getSubjectClassification();
+        //生成名字集合
+        List<String> classificationName = new ArrayList<>();
+        for (struct_forumSubjectClassificationNode i : data)
+            classificationName.add(i.getName());
+        if (!classificationName.contains("全部"))
+            classificationName.add(0, "全部");
+
+        //适配器
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this.context,
-                android.R.layout.simple_list_item_1, this.arraySubjectClassification);
+                android.R.layout.simple_list_item_1, classificationName);
 
         listView.setOnTouchListener(this);
         listView.setAdapter(adapter);
 
-        listView.setTag(MIDDLE_CLASSIFICATION);
         popupView(listView);
     }
 
@@ -285,8 +343,9 @@ public class headbar_Secondary_Page extends LinearLayout implements View.OnClick
     private void showRightSortView() {
         //添加ListView
         ListView listView = new ListView(this.context);
+        listView.setTag(RIGHT_SORT);
         listView.setLayoutParams(new LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         listView.setBackgroundColor(Color.WHITE);
 
         //数据集
@@ -296,26 +355,32 @@ public class headbar_Secondary_Page extends LinearLayout implements View.OnClick
         listView.setOnTouchListener(this);
         listView.setAdapter(adapter);
 
-        listView.setTag(RIGHT_SORT);
         popupView(listView);
     }
 
     /**
-     * 显示View
+     * 显示View（会添加一个半透明黑色背景）
      */
     private void popupView(View view) {
         popView = view;
 
+        //View最大只显示7成
+        final int screenHeight = ScreenUtil.getScreenHeight(this.context);
+        final float maxHeight = screenHeight * 0.7f;
+        view.measure(0, MeasureSpec.makeMeasureSpec((int) maxHeight, MeasureSpec.AT_MOST));
+        view.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, view.getMeasuredHeight()));
+
         //设置半透明背景
         View backgroundView = new View(this.context);
         backgroundView.setBackgroundColor(Color.argb(0x80, 0, 0, 0));
-        backgroundView.setOnClickListener(this);
 
         //容器内添加要显示的View和半透明背景
         LinearLayout viewGroup = new LinearLayout(this.context);
         viewGroup.setOrientation(VERTICAL);
         viewGroup.addView(popView);
         viewGroup.addView(backgroundView);
+        viewGroup.setOnClickListener(this);
 
         //显示
         popupWindow = new PopupWindow(viewGroup, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
@@ -337,6 +402,7 @@ public class headbar_Secondary_Page extends LinearLayout implements View.OnClick
             canvas.drawLine(width / 3, 0, width / 3, height, paint);
             canvas.drawLine(width / 3 * 2, 0, width / 3 * 2, height, paint);
         } else {
+            //这块暂时不用，以后有需要再改
             //共二块部分
             canvas.drawLine(width / 2, 0, width / 2, height, paint);
         }
@@ -351,17 +417,26 @@ public class headbar_Secondary_Page extends LinearLayout implements View.OnClick
     }
 
     /**
-     * 设置主题分类数据
-     *
-     * @param subjectClassificationList 分类数据
+     * 设置数据集
      */
-    public void setSubjectClassificationData(List<struct_forumSubjectClassificationNode> subjectClassificationList) {
-        arraySubjectClassification = new ArrayList<>(20);
-        for (struct_forumSubjectClassificationNode node : subjectClassificationList)
-            arraySubjectClassification.add(node.getName());
+    public void setData(struct_forumDataRoot result) {
+        this.mData = result;
     }
 
+    /**
+     * 点击接口
+     */
     interface OnHeadbarClickListener {
-        void onSortButtonClick(int sortByTime);
+        //跳转至新版块
+        void jumpToNewSection(String name, String href);
+
+        //子版块
+        void onChildSectionSelected(String str);
+
+        //筛选
+        void onClassificationSelected(String str);
+
+        //排序
+        void onSortSelected(int sortByTimeType);
     }
 }

@@ -2,21 +2,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@android:color/white"
+    android:orientation="vertical"
     tools:context="ecust.mlkz.act_MLKZ_Secondary_Page">
 
-    <include layout="@layout/part_actionbar"/>
+    <include layout="@layout/part_actionbar" />
 
     <!--跳转、分类、排序的bar-->
     <ecust.mlkz.headbar_Secondary_Page
         android:id="@+id/mlkz_secondary_page_headbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
 
-    <TextView
+    <!--贴子内容-->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/mlkz_secondary_page_recyclerview"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="=1234567"
-        android:textSize="50sp"/>
+        android:layout_height="match_parent" />
 </LinearLayout>

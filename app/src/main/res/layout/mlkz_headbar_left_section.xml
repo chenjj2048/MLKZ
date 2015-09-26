@@ -4,12 +4,56 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    tools:context="ecust.mlkz.headbar_Secondary_Page"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context="ecust.mlkz.headbar_Secondary_Page">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="left"
-        android:textSize="18dp" />
+        android:background="#ffa0a0a0"
+        android:gravity="center_horizontal"
+        android:text="当前版块"
+        android:textColor="@android:color/white" />
+
+    <!--版块位置-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/mlkz_secondary_page_headbar_section_1st_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:textSize="16dp" />
+
+        <TextView
+            android:id="@+id/mlkz_secondary_page_headbar_section_2rd_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:textSize="16dp" />
+
+        <TextView
+            android:id="@+id/mlkz_secondary_page_headbar_section_3rd_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:textSize="16dp" />
+    </LinearLayout>
+
+    <!--子版块-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#ffa0a0a0"
+        android:gravity="center_horizontal"
+        android:text="子版块"
+        android:textColor="@android:color/white" />
+
+    <ListView
+        android:id="@+id/mlkz_secondary_page_headbar_section_listview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </LinearLayout>

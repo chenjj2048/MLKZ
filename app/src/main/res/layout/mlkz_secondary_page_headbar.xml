@@ -29,7 +29,7 @@
         android:paddingBottom="8dp"
         android:paddingTop="8dp"
         android:singleLine="true"
-        android:text="主题分类"
+        android:text="筛选"
         android:textSize="18dp" />
 
     <TextView
