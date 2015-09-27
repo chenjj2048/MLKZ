@@ -19,7 +19,7 @@
  * .
  */
 
-package ecust.mlkz;
+package ecust.mlkz.homePage;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -30,6 +30,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import ecust.main.R;
+import ecust.mlkz.act_MLKZ_Login;
+import ecust.mlkz.cls_MLKZ_Login;
 
 //左侧侧滑菜单
 public class fragment_MLKZ_LeftMenu extends Fragment implements View.OnClickListener {

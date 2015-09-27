@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    tools:context="ecust.mlkz.headbar_Secondary_Page">
+    tools:context="ecust.mlkz.secondaryPage_needBeRefractored.widget_HeadBar">
 
     <TextView
         android:id="@+id/mlkz_secondary_page_headbar_section"

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="ecust.mlkz.fragment_MLKZ_HomePage">
+    tools:context="ecust.mlkz.homePage.fragment_MLKZ_HomePage">
 
     <!--梅陇客栈 目录-->
     <ListView

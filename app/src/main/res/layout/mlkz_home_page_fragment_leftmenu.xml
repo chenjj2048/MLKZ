@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@color/black26"
     android:orientation="vertical"
-    tools:context="ecust.mlkz.fragment_MLKZ_LeftMenu">
+    tools:context="ecust.mlkz.homePage.fragment_MLKZ_LeftMenu">
 
     <RelativeLayout
         android:id="@+id/mlkz_home_menu_login_group"

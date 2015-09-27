@@ -1,4 +1,4 @@
-package ecust.mlkz;
+package ecust.mlkz.homePage;
 
 import android.content.Context;
 import android.content.Intent;
@@ -23,6 +23,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import ecust.main.R;
+import ecust.mlkz.cls_MLKZ_Login;
+import ecust.mlkz.secondaryPage_needBeRefractored.act_MLKZ_Secondary_Page;
 import lib.Const;
 import lib.clsUtils.fileUtil;
 import lib.clsUtils.httpUtil;

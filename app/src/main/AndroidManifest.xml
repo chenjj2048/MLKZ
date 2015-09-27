@@ -30,7 +30,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="ecust.mlkz.act_MLKZ_Home"
+            android:name="ecust.mlkz.homePage.act_MLKZ_Home"
             android:label="@string/title_activity_act__mlkz__home_page" />
         <activity
             android:name="ecust.mlkz.act_MLKZ_Login"
@@ -54,7 +54,7 @@
             android:name="ecust.demotest.testDemoActivity"
             android:label="@string/title_activity_test_demo" />
         <activity
-            android:name="ecust.mlkz.act_MLKZ_Secondary_Page"
+            android:name="ecust.mlkz.secondaryPage_needBeRefractored.act_MLKZ_Secondary_Page"
             android:label="@string/title_activity_act__mlkz__secondary__page" >
         </activity>
     </application>

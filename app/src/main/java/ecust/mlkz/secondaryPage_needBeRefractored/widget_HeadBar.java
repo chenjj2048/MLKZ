@@ -19,7 +19,7 @@
  * .
  */
 
-package ecust.mlkz;
+package ecust.mlkz.secondaryPage_needBeRefractored;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -40,14 +40,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ecust.main.R;
-import ecust.mlkz.act_MLKZ_Secondary_Page.forum_Structs_Collection;
-import ecust.mlkz.act_MLKZ_Secondary_Page.forum_Structs_Collection.struct_forumChildSectionNode;
-import ecust.mlkz.act_MLKZ_Secondary_Page.forum_Structs_Collection.struct_forumDataRoot;
-import ecust.mlkz.act_MLKZ_Secondary_Page.forum_Structs_Collection.struct_forumPosition;
-import ecust.mlkz.act_MLKZ_Secondary_Page.forum_Structs_Collection.struct_forumSubjectClassificationNode;
+import ecust.mlkz.secondaryPage_needBeRefractored.struct_Forum_Items.struct_forumChildSectionNode;
+import ecust.mlkz.secondaryPage_needBeRefractored.struct_Forum_Items.struct_forumDataRoot;
+import ecust.mlkz.secondaryPage_needBeRefractored.struct_Forum_Items.struct_forumPosition;
+import ecust.mlkz.secondaryPage_needBeRefractored.struct_Forum_Items.struct_forumSubjectClassificationNode;
 import lib.clsDimensionConvert;
 import lib.clsUtils.ScreenUtil;
-import lib.clsUtils.logUtil;
 
 /**
  * 梅陇客栈二级页面 顶部的bar
@@ -56,7 +54,7 @@ import lib.clsUtils.logUtil;
  * 2.主题分类(可选项)
  * 3.新帖排序
  */
-public class headbar_Secondary_Page extends LinearLayout implements View.OnClickListener,
+public class widget_HeadBar extends LinearLayout implements View.OnClickListener,
         PopupWindow.OnDismissListener, View.OnTouchListener {
     //按发帖时间排序
     protected final static int SORT_BY_POSTTIME = 0;
@@ -66,8 +64,12 @@ public class headbar_Secondary_Page extends LinearLayout implements View.OnClick
     private final static int LEFT_CATALOG = 1;
     private final static int MIDDLE_CLASSIFICATION = 2;
     private final static int RIGHT_SORT = 3;
-    //记录ListView点击下的item及listView中第一个可见项，用于ListView在onScroll后是否需要显示
-    private int listViewLastItemHashcode;
+    //记录ListView点击下的item
+    private int listViewLastItem;
+    //移动的距离
+    private int moveDistance;
+    //上次的纵坐标
+    private int lastY;
     //点击事件回调
     private OnHeadbarClickListener onHeadbarClickListener;
     //弹出框
@@ -87,24 +89,24 @@ public class headbar_Secondary_Page extends LinearLayout implements View.OnClick
     //上下文
     private Context context;
     //数据集
-    private struct_forumDataRoot mData = new forum_Structs_Collection().new struct_forumDataRoot();
+    private struct_forumDataRoot mData = new struct_forumDataRoot();
     //字体颜色
     private int textUnfocusedColor;
     private int textFocusedColor;
 
-    public headbar_Secondary_Page(Context context) {
+    public widget_HeadBar(Context context) {
         super(context);
         this.context = context;
         init();
     }
 
-    public headbar_Secondary_Page(Context context, AttributeSet attrs) {
+    public widget_HeadBar(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
         init();
     }
 
-    public headbar_Secondary_Page(Context context, AttributeSet attrs, int defStyleAttr) {
+    public widget_HeadBar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
         this.context = context;
@@ -167,15 +169,19 @@ public class headbar_Secondary_Page extends LinearLayout implements View.OnClick
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 //记录点击下的位置是否没变
-                listViewLastItemHashcode = listView.pointToPosition((int) event.getX(), (int) event.getY());
-                listViewLastItemHashcode = listViewLastItemHashcode ^ listView.getFirstVisiblePosition();
+                listViewLastItem = listView.pointToPosition((int) event.getX(), (int) event.getY());
+                moveDistance = 0;
+                lastY = (int) event.getY();
                 break;
             case MotionEvent.ACTION_MOVE:
+                moveDistance += Math.abs(event.getY() - lastY);
+                lastY = (int) event.getY();
                 break;
             case MotionEvent.ACTION_UP:
                 //确定点击item的位置(点击项与listView第一项均没变，才算UP事件)
                 final int pos = listView.pointToPosition((int) event.getX(), (int) event.getY());
-                if (pos < 0 || listViewLastItemHashcode != (pos ^ listView.getFirstVisiblePosition()))
+                final int limitMoveDistance = clsDimensionConvert.dip2px(this.context, 5);
+                if (pos < 0 || pos != listViewLastItem || moveDistance > limitMoveDistance)
                     break;
 
                 String str = listView.getAdapter().getItem(pos).toString();

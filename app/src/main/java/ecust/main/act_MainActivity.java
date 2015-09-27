@@ -10,7 +10,7 @@ import android.widget.Button;
 
 import ecust.demotest.testDemoActivity;
 import ecust.lecture.act_Lecture_Catalog;
-import ecust.mlkz.act_MLKZ_Home;
+import ecust.mlkz.homePage.act_MLKZ_Home;
 import ecust.news.act_News_Catalog;
 import ecust.school_calendar.act_School_Calendar;
 import lib.clsUtils.pathFactory;

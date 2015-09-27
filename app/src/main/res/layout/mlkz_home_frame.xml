@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="ecust.mlkz.act_MLKZ_Home">
+    tools:context="ecust.mlkz.homePage.act_MLKZ_Home">
 
     <!--梅陇客栈主页面框架-->
     <include layout="@layout/part_actionbar" />

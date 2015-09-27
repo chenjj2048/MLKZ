@@ -19,7 +19,7 @@
  * .
  */
 
-package ecust.mlkz;
+package ecust.mlkz.homePage;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -29,6 +29,7 @@ import android.support.v4.app.FragmentTransaction;
 
 import ecust.main.R;
 import ecust.main.act_MainActivity;
+import ecust.mlkz.act_MLKZ_Login;
 import lib.Global;
 
 public class act_MLKZ_Home extends FragmentActivity {
