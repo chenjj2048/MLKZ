@@ -104,7 +104,7 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.mlkz_secondary_page);
+        setContentView(R.layout.old_mlkz_secondary_page);
 
         //设置当前版块标题、URL
         forumData.setSectionTitle(getIntent().getStringExtra("title"));

@@ -13,6 +13,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
+    <android:uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:name="lib.clsApplication"
@@ -56,6 +57,10 @@
         <activity
             android:name="ecust.mlkz.secondaryPage_needBeRefractored.act_MLKZ_Secondary_Page"
             android:label="@string/title_activity_act__mlkz__secondary__page" >
+        </activity>
+        <activity
+            android:name="ecust.mlkz.secondaryPage.activity_MLKZ_Secondary_Page"
+            android:label="@string/title_activity_activity__mlkz__secondary__page" >
         </activity>
     </application>
 

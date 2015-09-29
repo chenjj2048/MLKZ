@@ -24,6 +24,7 @@ import java.util.List;
 
 import ecust.main.R;
 import ecust.mlkz.cls_MLKZ_Login;
+import ecust.mlkz.secondaryPage.activity_MLKZ_Secondary_Page;
 import ecust.mlkz.secondaryPage_needBeRefractored.act_MLKZ_Secondary_Page;
 import lib.Const;
 import lib.clsUtils.fileUtil;
@@ -290,7 +291,7 @@ class bbsCatalogAdapter extends BaseAdapter implements View.OnTouchListener {
 
                 //打开新页面
                 if (tag != null) {
-                    Intent intent = new Intent(this.context, act_MLKZ_Secondary_Page.class);
+                    Intent intent = new Intent(this.context, activity_MLKZ_Secondary_Page.class);
                     intent.putExtra("title", tag.getTitle())
                             .putExtra("url", tag.getUrl());
                     this.context.startActivity(intent);

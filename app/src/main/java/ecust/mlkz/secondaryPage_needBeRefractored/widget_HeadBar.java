@@ -114,7 +114,7 @@ public class widget_HeadBar extends LinearLayout implements View.OnClickListener
 
     private void init() {
         //加载布局
-        LayoutInflater.from(this.context).inflate(R.layout.mlkz_secondary_page_headbar, this);
+        LayoutInflater.from(this.context).inflate(R.layout.old_mlkz_secondary_page_headbar, this);
 
         //设置控件引用
         section = (TextView) findViewById(R.id.mlkz_secondary_page_headbar_section);
@@ -263,7 +263,7 @@ public class widget_HeadBar extends LinearLayout implements View.OnClickListener
      * 左侧-版块所在
      */
     private void showLeftSectionView() {
-        View view = LayoutInflater.from(this.context).inflate(R.layout.mlkz_headbar_left_section, null);
+        View view = LayoutInflater.from(this.context).inflate(R.layout.old_mlkz_headbar_left_section, null);
         view.setTag(LEFT_CATALOG);
 
         //1.设置三级版块标题
