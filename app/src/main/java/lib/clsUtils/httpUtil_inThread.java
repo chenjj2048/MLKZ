@@ -91,10 +91,10 @@ public class httpUtil_inThread {
             //6.获取流数据
             int ResponseCode = response.getStatusLine().getStatusCode();
             if (ResponseCode == 200) {
-                BufferedReader br = new BufferedReader(new InputStreamReader(entity.getContent()));
+                BufferedReader br = new BufferedReader(new InputStreamReader(entity.getContent(), strEncoding));
                 String temp;
                 while ((temp = br.readLine()) != null) {
-                    String str = new String(temp.trim().getBytes(), strEncoding);
+                    String str = new String(temp.trim().getBytes());
                     sb.append(str);
                     sb.append("\r\n");
                 }

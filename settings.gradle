@@ -1,1 +1,1 @@
-include ':app', ':pulltorefresh', ':viewpagerindicator'
+include ':app', ':pulltorefresh', ':viewpagerindicator', ':volley'

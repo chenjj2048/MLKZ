@@ -10,9 +10,19 @@
 
     <!--跳转、分类、排序的bar-->
     <!--<ecust.mlkz.secondaryPage_needBeRefractored.widget_HeadBar-->
-        <!--android:id="@+id/mlkz_secondary_page_headbar"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content" />-->
+    <!--android:id="@+id/mlkz_secondary_page_headbar"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content" />-->
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/mlkz_secondary_page_textview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </ScrollView>
 
     <FrameLayout
         android:layout_width="match_parent"

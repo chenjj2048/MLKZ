@@ -23,15 +23,20 @@ package ecust.mlkz.secondaryPage;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.TextView;
 
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserFactory;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 
 import ecust.main.R;
 import ecust.mlkz.cls_MLKZ_Login;
 import lib.Global;
 import lib.clsUtils.httpUtil;
-import lib.clsUtils.logUtil;
+
 
 public class activity_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttpVisitListener {
     //Cookie
@@ -47,24 +52,46 @@ public class activity_MLKZ_Secondary_Page extends Activity implements httpUtil.O
 
         //设置当前版块标题、URL
         final String sectionTitle = getIntent().getStringExtra("title");
-         String sectionURL = getIntent().getStringExtra("url");
+        String sectionURL = getIntent().getStringExtra("url");
 
         //地址由WAP版转换为电脑版
-        //From: http://bbs.ecust.edu.cn/forum.php?mod=forumdisplay&fid=91&mobile=yes
-        //To:   http://bbs.ecust.edu.cn/forum.php?mod=forumdisplay&fid=91
-        sectionURL=sectionURL.replace("&mobile=yes","");
-
+        sectionURL = adressConvertToWAP(sectionURL, false);
 
         //当前cookie
         cookie = new cls_MLKZ_Login(this).getPreference().getCookie();
         httpUtil.getSingleton().getHttp(sectionURL, cookie, this);
+
+    }
+
+
+    /**
+     * 地址格式转换，能获取不同的网页结果
+     * From: http://bbs.ecust.edu.cn/forum.php?mod=forumdisplay&fid=91&mobile=yes
+     * To:   http://bbs.ecust.edu.cn/forum.php?mod=forumdisplay&fid=91&mobile=no
+     *
+     * @param url          地址
+     * @param convertToWAP true转为WAP格式，false转为PC格式
+     * @return URL
+     */
+    private String adressConvertToWAP(String url, boolean convertToWAP) {
+        final String style_WAP = "&mobile=yes";
+        final String style_PC = "&mobile=no";
+
+        if (convertToWAP) {
+            //WAP登陆
+            return url.replace(style_PC, style_WAP);
+        } else {
+            //PC登陆
+            return url.replace(style_WAP, style_PC);
+        }
     }
 
     @Override
     public void onHttpLoadCompleted(String url, String cookie, boolean bSucceed, String returnHtmlMessage) {
         if (!bSucceed) return;
 
-        logUtil.e(this, returnHtmlMessage);
+        TextView textView = (TextView) findViewById(R.id.mlkz_secondary_page_textview);
+        textView.setText(returnHtmlMessage);
 
         //解析数据
         htmlParser.parseHtmlData(returnHtmlMessage);

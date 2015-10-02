@@ -31,6 +31,10 @@ import java.io.InputStream;
 
 import lib.clsUtils.logUtil;
 
+
+/**
+ * Html网页解析类
+ */
 public class htmlParser {
     private static final String tag = "mlkz.secondaryPage.htmlParser";
 
@@ -64,7 +68,7 @@ public class htmlParser {
                 case XmlPullParser.START_TAG:
                     final String id = parser.getAttributeValue(null, "id");
                     final String className = parser.getAttributeValue(null, "class");
-                    logUtil.e(tag,parser.getLineNumber()+" "+id+" "+className);
+
                     if ("div".equals(parser.getName())) {
                         if ("pt".equals(id) && "bm cl".equals(className)) {
                             //解析版块目录
@@ -100,7 +104,7 @@ public class htmlParser {
             try {
                 event = parser.next();
             } catch (Exception e) {
-                logUtil.w(tag, "[未成对标签] Line=" + parser.getLineNumber());
+                logUtil.d(tag, "[未成对标签] Line=" + parser.getLineNumber());
             }
         }
     }
