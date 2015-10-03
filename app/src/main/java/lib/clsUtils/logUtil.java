@@ -69,6 +69,18 @@ public class logUtil {
         Toast.makeText(clsApplication.getContext(), msg, Toast.LENGTH_SHORT).show();
     }
 
+    public static void v(Object object, String msg) {
+        if (msg == null) return;
+        if (isDebug)
+            Log.v(object.getClass().getCanonicalName(), msg);
+    }
+
+    public static void v(String tag, String msg) {
+        if (msg == null) return;
+        if (isDebug)
+            Log.v(tag, msg);
+    }
+
     public static void d(Object object, String msg) {
         if (msg == null) return;
         if (isDebug)

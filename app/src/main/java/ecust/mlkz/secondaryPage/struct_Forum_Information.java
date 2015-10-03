@@ -21,8 +21,9 @@
 
 package ecust.mlkz.secondaryPage;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import lib.clsUtils.logUtil;
 
 /**
  * 二级页面
@@ -30,13 +31,14 @@ import java.util.List;
  */
 public class struct_Forum_Information {
     /**
-     * 论坛贴子类型
+     * 处理网页URL
+     * 添加头部http://bbs.ecust.edu.cn/
+     * 替换&amp;为&
      */
-    protected static final int POST_STATUS_NORMAL = 0;
-    protected static final int POST_STATUS_TOP = 1;
-    protected static final int POST_STATUS_LOCK = 2;
-    protected static final int POST_STATUS_VOTE = 3;
-    protected static final int POST_STATUS_BOUNTY = 4;
+    private static String decorateURL(String url) {
+        url = url.replace("&amp;", "&");
+        return url;
+    }
 
     /**
      * 帖子结构
@@ -62,28 +64,32 @@ public class struct_Forum_Information {
         //查看数量
         private int readCount = 0;
 
-        //===============================
-        //帖子-火
-        private boolean isHot = false;
-        //帖子-精
-        private boolean isExcellent = false;
-        //贴子-含图
-        private boolean hasPicture = false;
-        //贴子-被评分
-        private boolean hasPraise = false;
+        //=============================
+        //贴子所在分类主题
+        private String classificationName = "";
+        //贴子特性
+        private struct_PostAttribute postAttribute = new struct_PostAttribute();
+        //回帖奖励
+        private int rewardSum = 0;
 
-        //贴子类型
-        private int forumPostType = POST_STATUS_NORMAL;
+        public int getRewardSum() {
+            return rewardSum;
+        }
 
-        //贴子分类名称
-        private String classificationName;
+        public void setRewardSum(int rewardSum) {
+            this.rewardSum = rewardSum;
+        }
+
+        public struct_PostAttribute getPostAttribute() {
+            return postAttribute;
+        }
 
         public String getTitle() {
             return title;
         }
 
         public void setTitle(String title) {
-            this.title = title;
+            this.title = decorateURL(title);
         }
 
         public String getPostUrl() {
@@ -134,52 +140,83 @@ public class struct_Forum_Information {
             this.readCount = readCount;
         }
 
-        public boolean isHot() {
-            return isHot;
-        }
-
-        public void setIsHot(boolean isHot) {
-            this.isHot = isHot;
-        }
-
-        public boolean isExcellent() {
-            return isExcellent;
-        }
-
-        public void setIsExcellent(boolean isExcellent) {
-            this.isExcellent = isExcellent;
-        }
-
-        public boolean isHasPicture() {
-            return hasPicture;
-        }
-
-        public void setHasPicture(boolean hasPicture) {
-            this.hasPicture = hasPicture;
-        }
-
-        public boolean isHasPraise() {
-            return hasPraise;
-        }
-
-        public void setHasPraise(boolean hasPraise) {
-            this.hasPraise = hasPraise;
-        }
-
-        public int getForumPostType() {
-            return forumPostType;
-        }
-
-        public void setForumPostType(int forumPostType) {
-            this.forumPostType = forumPostType;
-        }
-
         public String getClassificationName() {
             return classificationName;
         }
 
         public void setClassificationName(String classificationName) {
             this.classificationName = classificationName;
+        }
+    }
+
+    /**
+     * 贴子特性
+     */
+    protected static class struct_PostAttribute {
+        //============多选项===============
+        //帖子-热门
+        public boolean isHot = false;
+        //帖子-精品
+        public boolean isExcellent = false;
+        //贴子-含图
+        public boolean hasPictures = false;
+        //贴子-被评分
+        public boolean hasPraise = false;
+        //贴子-含附件(这项暂时就不用了)
+        //public boolean hasAttachment = false;
+
+        //============复合项===============
+        //置顶帖
+        public boolean isTop = false;
+
+        //============单选项===============
+        //贴子被锁定
+        public boolean isLock = false;
+        //投票贴
+        public boolean isVote = false;
+        //悬赏贴
+        public boolean isBounty = false;
+
+        /**
+         * 获取帖子类型
+         */
+        protected String getPostAttribute() {
+            StringBuffer sb = new StringBuffer();
+            if (isTop) sb.append("置顶贴 ");
+
+            if (isLock) sb.append("锁贴 ");
+            if (isVote) sb.append("投票贴 ");
+            if (isBounty) sb.append("悬赏贴 ");
+
+            if (isHot) sb.append("热门 ");
+            if (isExcellent) sb.append("精品 ");
+            if (hasPictures) sb.append("含图 ");
+            if (hasPraise) sb.append("贴子被评分 ");
+
+            if (sb.length() <= 0)
+                sb.append("无特性");
+            return new String(sb);
+        }
+
+        /**
+         * 根据图片URL地址来确定贴子类型（锁定、投票、悬赏）
+         *
+         * @param postAttribute 象形图片的URL地址
+         */
+        protected void setPostAttribute(String postAttribute) {
+            switch (postAttribute) {
+                case "template/eis_012/img/pollsmall.gif":
+                    this.isVote=true;
+                    break;
+                case "template/eis_012/img/folder_new.gif":
+                    //正常贴，什么都没有
+                    break;
+                case "template/eis_012/img/pin_1.gif":
+                    //置顶帖（前面已经处理过了，这里就不处理了）
+                    break;
+                default:
+                    logUtil.w(this, "[未知贴子类型]" + postAttribute);
+            }
         }
     }
 
@@ -232,16 +269,25 @@ public class struct_Forum_Information {
     /**
      * 论坛数据集合
      */
-    protected static class struct_ForumDataCollection{
-      //当前位置
+    protected static class struct_ForumPageAllData {
+        //当前位置
         private struct_CurrentSection currentSection;
         //版块集合
         private List<struct_PrimarySectionNode> primarySectionNodes;
         //发帖地址集合
         private struct_CommitPostURL commitPostURL;
         //精品帖地址
-    //主题分类
-     private  List<  struct_ClassificationNode> classificationNodes;
+        private String excelentPostsURL;
+        //主题分类
+        private List<struct_ClassificationNode> classificationNodes;
+
+        public String getExcelentPostsURL() {
+            return excelentPostsURL;
+        }
+
+        public void setExcelentPostsURL(String excelentPostsURL) {
+            this.excelentPostsURL = excelentPostsURL;
+        }
 
         public struct_CurrentSection getCurrentSection() {
             return currentSection;
@@ -336,11 +382,11 @@ public class struct_Forum_Information {
     /**
      * 一级标题节点
      */
-    protected static class struct_PrimarySectionNode{
+    protected static class struct_PrimarySectionNode {
         //一级标题名称
         private String name;
         //二级节点
-       private List<struct_SecondarySectionNode> secondaryNodes;
+        private List<struct_SecondarySectionNode> secondaryNodes;
 
         public String getName() {
             return name;
@@ -422,7 +468,7 @@ public class struct_Forum_Information {
     /**
      * 版块当前位置
      */
-    protected static class struct_CurrentSection{
+    protected static class struct_CurrentSection {
         protected String primarySectionName;
         protected String secondarySectionName;
         protected String tertiarySectionName;

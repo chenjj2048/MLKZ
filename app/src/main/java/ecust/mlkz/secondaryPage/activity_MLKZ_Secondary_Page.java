@@ -23,24 +23,16 @@ package ecust.mlkz.secondaryPage;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.TextView;
-
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 
 import ecust.main.R;
 import ecust.mlkz.cls_MLKZ_Login;
 import lib.Global;
-import lib.clsUtils.httpUtil;
 
 
-public class activity_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttpVisitListener {
-    //Cookie
+public class activity_MLKZ_Secondary_Page extends Activity implements clsBBSConsole.OnResponseListener {
     private String cookie;
+    private clsBBSConsole mBBSConsole;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,8 +51,16 @@ public class activity_MLKZ_Secondary_Page extends Activity implements httpUtil.O
 
         //当前cookie
         cookie = new cls_MLKZ_Login(this).getPreference().getCookie();
-        httpUtil.getSingleton().getHttp(sectionURL, cookie, this);
 
+        //连接
+        initBBSConsole();
+        mBBSConsole.openNewURlAddress(sectionURL, cookie);
+    }
+
+    //初始化
+    private void initBBSConsole() {
+        mBBSConsole = new clsBBSConsole(this);
+        mBBSConsole.setOnResponseListener(this);
     }
 
 
@@ -86,29 +86,12 @@ public class activity_MLKZ_Secondary_Page extends Activity implements httpUtil.O
         }
     }
 
+    /**
+     * 消息返回
+     */
     @Override
-    public void onHttpLoadCompleted(String url, String cookie, boolean bSucceed, String returnHtmlMessage) {
-        if (!bSucceed) return;
-
+    public void onResponse(String htmlResult) {
         TextView textView = (TextView) findViewById(R.id.mlkz_secondary_page_textview);
-        textView.setText(returnHtmlMessage);
-
-        //解析数据
-        htmlParser.parseHtmlData(returnHtmlMessage);
-    }
-
-    @Override
-    public void onHttpBackgroundThreadLoadCompleted(String url, String cookie, boolean bSucceed, String returnHtmlMessage) {
-
-    }
-
-    @Override
-    public void onPictureLoadCompleted(String url, String cookie, boolean bSucceed, byte[] returnPicBytes) {
-
-    }
-
-    @Override
-    public void onPictureBackgroundThreadLoadCompleted(String url, String cookie, boolean bSucceed, byte[] returnPicBytes) {
-
+        textView.setText(htmlResult);
     }
 }
