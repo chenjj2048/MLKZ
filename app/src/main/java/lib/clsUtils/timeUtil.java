@@ -5,6 +5,8 @@ import android.text.format.Time;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import lib.logUtils.abstract_LogUtil;
+
 
 /**
  * =============================================================================
@@ -101,7 +103,7 @@ public class timeUtil {
             diff /= 12;                                                                         //年数
             return diff + "年前";
         } catch (Exception e) {
-            logUtil.e("[时间解析]", e.toString());
+            abstract_LogUtil.e("[时间解析]", e.toString());
             e.printStackTrace();
             return "";
         }
@@ -117,7 +119,7 @@ public class timeUtil {
             try {
                 date = s.parse(dateParameter);
             } catch (Exception e) {
-                logUtil.e("[时间解析]", e.toString());
+                abstract_LogUtil.e("[时间解析]", e.toString());
             }
             return date;
         }

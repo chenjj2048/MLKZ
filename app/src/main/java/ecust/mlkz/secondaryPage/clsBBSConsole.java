@@ -27,14 +27,14 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import lib.clsUtils.logUtil;
+import ecust.mlkz.secondaryPage.struct_Forum_Information.*;
+import lib.logUtils.abstract_LogUtil;
 
 /**
  * 网页页面操作类
@@ -76,7 +76,7 @@ public class clsBBSConsole implements Response.ErrorListener, Response.Listener<
 
     @Override
     public void onErrorResponse(VolleyError error) {
-        logUtil.e(this, error.getMessage());
+        abstract_LogUtil.e(this, error.getMessage());
     }
 
     /**
@@ -85,8 +85,9 @@ public class clsBBSConsole implements Response.ErrorListener, Response.Listener<
     @Override
     public void onResponse(String response) {
         //数据解析
-        htmlParser.parseHtmlData(response);
+        htmlParser htmlParser = new htmlParser();
 
+        struct_MLKZ_Data mlkz_data = htmlParser.parseAllData(response);
 
         if (onResponseListener != null) {
             onResponseListener.onResponse(response);

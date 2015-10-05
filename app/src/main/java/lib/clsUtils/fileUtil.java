@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import lib.logUtils.abstract_LogUtil;
+
 /**
  * =============================================================================
  * This program is free software: you can redistribute it and/or modify
@@ -45,16 +47,16 @@ public class fileUtil {
             outputStream.write(bytes);
             outputStream.flush();
 
-            logUtil.i("缓存文件保存", "[缓存文件保存成功 - " + getIntegearFormat(bytes.length) + " 字节]" + file.toString());
+            abstract_LogUtil.i("缓存文件保存", "[缓存文件保存成功 - " + getIntegearFormat(bytes.length) + " 字节]" + file.toString());
         } catch (Exception e) {
-            logUtil.e("文件读取错误", e.toString());
+            abstract_LogUtil.e("文件读取错误", e.toString());
         } finally {
             //关闭连接
             try {
                 if (outputStream != null)
                     outputStream.close();
             } catch (IOException e) {
-                logUtil.e("文件关闭错误", e.toString());
+                abstract_LogUtil.e("文件关闭错误", e.toString());
             }
         }
     }
@@ -80,16 +82,16 @@ public class fileUtil {
             result = new byte[size];
             inputStream.read(result);
 
-            logUtil.i("缓存文件读取", "[缓存文件读取成功 - " + getIntegearFormat(size) + " 字节]" + file.getName());
+            abstract_LogUtil.i("缓存文件读取", "[缓存文件读取成功 - " + getIntegearFormat(size) + " 字节]" + file.getName());
         } catch (Exception e) {
-            logUtil.e("文件读取失败", e.toString());
+            abstract_LogUtil.e("文件读取失败", e.toString());
         } finally {
             //关闭文件
             try {
                 if (inputStream != null)
                     inputStream.close();
             } catch (IOException e) {
-                logUtil.e("文件关闭失败", e.toString());
+                abstract_LogUtil.e("文件关闭失败", e.toString());
             }
         }
 
@@ -108,7 +110,7 @@ public class fileUtil {
             objectOutputStream = new ObjectOutputStream(new FileOutputStream(filePath));
             objectOutputStream.writeObject(data);
         } catch (Exception e) {
-            logUtil.e("fileUtil", e.toString());
+            abstract_LogUtil.e("fileUtil", e.toString());
         } finally {
             if (objectOutputStream != null) {
                 try {
@@ -129,7 +131,7 @@ public class fileUtil {
             objectInputStream = new ObjectInputStream(new FileInputStream(filePath));
             result = objectInputStream.readObject();
         } catch (Exception e) {
-            logUtil.e("fileUtil", e.toString());
+            abstract_LogUtil.e("fileUtil", e.toString());
         } finally {
             if (objectInputStream != null) {
                 try {

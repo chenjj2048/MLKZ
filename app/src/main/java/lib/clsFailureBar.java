@@ -6,7 +6,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import ecust.main.R;
-import lib.clsUtils.logUtil;
+import lib.logUtils.abstract_LogUtil;
 
 /**
  * =============================================================================
@@ -83,7 +83,7 @@ public class clsFailureBar implements View.OnClickListener, clsNetworkChangeRece
             //发送重试消息
             if (onWebRetryListenerListener != null)
                 onWebRetryListenerListener.onWebRetryCompleted();
-            logUtil.i(this, "网络可用，重试刷新");
+            abstract_LogUtil.i(this, "网络可用，重试刷新");
         }
     }
 

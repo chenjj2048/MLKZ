@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import lib.clsApplication;
+import lib.logUtils.abstract_LogUtil;
 
 /**
  * =============================================================================
@@ -136,7 +137,7 @@ public class pathFactory {
 
         if (clean_files_count > 0) {
             String msg = "[缓存清理][最大数量=" + maxFilesCount + " 已清除=" + clean_files_count + "]" + path;
-            logUtil.i("pathFactory", msg);
+            abstract_LogUtil.i("pathFactory", msg);
         }
     }
 

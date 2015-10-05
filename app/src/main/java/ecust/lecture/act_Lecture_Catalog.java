@@ -33,7 +33,7 @@ import lib.Global;
 import lib.clsApplication;
 import lib.clsUtils.clsExpiredTimeMangment;
 import lib.clsUtils.httpUtil;
-import lib.clsUtils.logUtil;
+import lib.logUtils.abstract_LogUtil;
 import lib.clsUtils.timeUtil;
 
 /**
@@ -113,7 +113,7 @@ public class act_Lecture_Catalog extends Activity implements
     @Override
     public void onHttpLoadCompleted(String url, String cookie, boolean bSucceed, String rtnHtmlMessage) {
         if (!bSucceed) {
-            logUtil.toast("服务器连接失败,请稍后再试");
+            abstract_LogUtil.toast("服务器连接失败,请稍后再试");
         } else {
             //取出缓存数据
             List<struct_LectureCatalogItem> result = cacheData.get(url);
@@ -130,7 +130,7 @@ public class act_Lecture_Catalog extends Activity implements
 
                 //ListView更新
                 mAdapter.notifyDataSetChanged();
-                logUtil.i(this, "[NotifyDataSetChanged]当前数量=" + mAdapter.getCount());
+                abstract_LogUtil.i(this, "[NotifyDataSetChanged]当前数量=" + mAdapter.getCount());
             }
         }
         flag_isLoading = false;
@@ -211,7 +211,7 @@ public class act_Lecture_Catalog extends Activity implements
 
     public void loadNextPage() {
         if (nextPage == itemIsLastOne)
-            logUtil.toast("已无更多数据");
+            abstract_LogUtil.toast("已无更多数据");
         else {
             //不要重复加载
             if (!flag_isLoading) {
@@ -219,12 +219,12 @@ public class act_Lecture_Catalog extends Activity implements
                     flag_isLoading = true;
                     //获取“下一页”url
                     String website = Const.lecture_url + "?page=" + nextPage;
-                    logUtil.i(this, "[正在加载下一页]" + website);
+                    abstract_LogUtil.i(this, "[正在加载下一页]" + website);
                     httpUtil.getSingleton().getHttp(website, this);
                 } else
-                    logUtil.toast("网络不可用");
+                    abstract_LogUtil.toast("网络不可用");
             } else
-                logUtil.i(this, "[正在加载下一页]加载中，请勿重复");
+                abstract_LogUtil.i(this, "[正在加载下一页]加载中，请勿重复");
         }
     }
 
@@ -293,7 +293,7 @@ public class act_Lecture_Catalog extends Activity implements
 
             //提取分类标题
 //            String catalogTitle = left.getElementsByClass("left_title").text().trim();
-//            logUtil.i(this, "=========" + catalogTitle + "=========");         //日志
+//            abstract_LogUtil.i(this, "=========" + catalogTitle + "=========");         //日志
 
             //提取讲座目录主体部分
             Elements collection_li = left.getElementsByClass("content").first().select("ul").first().select("li");
@@ -310,11 +310,11 @@ public class act_Lecture_Catalog extends Activity implements
 
                 rtnList.add(item);
 
-//                logUtil.i(this, item.title + " " + item.url + " " + item.time);     //日志
+//                abstract_LogUtil.i(this, item.title + " " + item.url + " " + item.time);     //日志
             }
             return rtnList;
         } catch (Exception e) {
-            logUtil.e(this, e.toString());
+            abstract_LogUtil.e(this, e.toString());
             e.printStackTrace();
         }
         return null;
@@ -411,7 +411,7 @@ public class act_Lecture_Catalog extends Activity implements
                 //停留显示数秒刷新信息
                 Thread.sleep(700);
             } catch (Exception e) {
-                logUtil.e(this, e.toString());
+                abstract_LogUtil.e(this, e.toString());
                 e.printStackTrace();
             }
             return null;

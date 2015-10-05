@@ -58,7 +58,7 @@ public class httpUtil {
     public void getHttp(String url, String cookie, OnHttpVisitListener listener) {
         final int id = getUniqueID();   //产生一条操作id
 
-//        logUtil.d(this, url);    //日志
+//        abstract_LogUtil.d(this, url);    //日志
 
         //初始化数据集
         requestCollection item = new requestCollection(id, url, cookie, listener);
@@ -84,7 +84,7 @@ public class httpUtil {
     public void getBitmapBytes(String url, String cookie, OnHttpVisitListener listener) {
         final int id = getUniqueID();   //产生一条操作id
 
-//        logUtil.d(this, url);
+//        abstract_LogUtil.d(this, url);
 
         //初始化数据集
         requestCollection item = new requestCollection(id, url, cookie, listener);

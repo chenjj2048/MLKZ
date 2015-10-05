@@ -4,8 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import lib.Const;
 import lib.clsApplication;
+import lib.logUtils.abstract_LogUtil;
 
 /**
  * =============================================================================
@@ -82,7 +82,7 @@ public class clsExpiredTimeMangment {
             value = defaultValue;
         }
 
-        logUtil.i(this, "[SharedPreference过期管理][GET" + this.tag + "]" + key + "=" + value +
+        abstract_LogUtil.i(this, "[SharedPreference过期管理][GET" + this.tag + "]" + key + "=" + value +
                 " 上次记录时间：" + saved_year + "-" + saved_month + "-" + saved_day + " " + saved_hour + "时");
         return value;
     }
@@ -99,7 +99,7 @@ public class clsExpiredTimeMangment {
         editor.putInt("day", timeUtil.now.getMonthDay());       //记录当前的时间（天）
         editor.putInt("hour", timeUtil.now.getHour());     //记录当前的时间（小时）
         editor.putInt(key, value);
-        logUtil.i(this, "[SharedPreference过期管理][SET" + this.tag + "]" + key + "=" + value);
+        abstract_LogUtil.i(this, "[SharedPreference过期管理][SET" + this.tag + "]" + key + "=" + value);
         editor.apply();
     }
 }

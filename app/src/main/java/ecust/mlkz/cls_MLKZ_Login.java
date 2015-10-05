@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import lib.clsUtils.httpUtil_inThread;
-import lib.clsUtils.logUtil;
+import lib.logUtils.abstract_LogUtil;
 
 /**
  * =============================================================================
@@ -164,7 +164,7 @@ public class cls_MLKZ_Login {
                 return new String(result);
             }
         } catch (Exception e) {
-            logUtil.e(this, e.toString());
+            abstract_LogUtil.e(this, e.toString());
         }
         return "";
     }
@@ -258,7 +258,7 @@ public class cls_MLKZ_Login {
                     Thread.sleep(40);
                 }
             } catch (Exception e) {
-                logUtil.e(this, e.toString());
+                abstract_LogUtil.e(this, e.toString());
             }
 
             return null;
@@ -272,7 +272,7 @@ public class cls_MLKZ_Login {
             if (this.returnMessage.contains("欢迎您回来")) {
                 cls_MLKZ_Login.this.getPreference().saveLoginInformation(username, password, cookieReturn);
 
-                logUtil.i(this, returnMessage);
+                abstract_LogUtil.i(this, returnMessage);
             }
 
             //接口返回

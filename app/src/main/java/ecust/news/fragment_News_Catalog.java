@@ -32,7 +32,7 @@ import lib.Const;
 import lib.clsApplication;
 import lib.clsUtils.clsExpiredTimeMangment;
 import lib.clsUtils.httpUtil;
-import lib.clsUtils.logUtil;
+import lib.logUtils.abstract_LogUtil;
 import lib.clsUtils.timeUtil;
 
 /**
@@ -94,7 +94,7 @@ public class fragment_News_Catalog extends Fragment implements
             //获取地址访问
             if (mAdapter.getCount() <= 0) {
                 isLoading = true;
-                logUtil.i(this, "加载初始数据");
+                abstract_LogUtil.i(this, "加载初始数据");
                 httpUtil.getSingleton().getHttp(catalogUrl, this);
             }
         }
@@ -135,7 +135,7 @@ public class fragment_News_Catalog extends Fragment implements
     //加载下一页
     public void loadNextPage() {
         if (mNewsCatalog.nextPage == mNewsCatalog.itemIsLastOne) {
-            logUtil.toast("已无更多数据");
+            abstract_LogUtil.toast("已无更多数据");
         } else {
             //不要重复加载
             if (!isLoading && clsApplication.receiver.isWebConnected()) {
@@ -144,7 +144,7 @@ public class fragment_News_Catalog extends Fragment implements
                 String website = catalogUrl +
                         String.valueOf(catalogName.equals("通知公告") ? "?page=" : "&page=") +
                         mNewsCatalog.nextPage;
-                logUtil.i(this, "[加载下一页数据]" + website);
+                abstract_LogUtil.i(this, "[加载下一页数据]" + website);
                 httpUtil.getSingleton().getHttp(website, this);
             }
         }
@@ -236,7 +236,7 @@ public class fragment_News_Catalog extends Fragment implements
     @Override
     public void onHttpLoadCompleted(String url, String cookie, boolean bSucceed, String rtnHtmlMessage) {
         if (!bSucceed) {
-            logUtil.toast("服务器连接失败,请稍后再试");
+            abstract_LogUtil.toast("服务器连接失败,请稍后再试");
             isLoading = false;
             return;
         }
@@ -260,7 +260,7 @@ public class fragment_News_Catalog extends Fragment implements
         //更新ListView中数据
         if (result.size() > 0) {
             mAdapter.notifyDataSetChanged();
-            logUtil.i(this, "[NotifyDataSetChanged]当前数量=" + mAdapter.getCount());
+            abstract_LogUtil.i(this, "[NotifyDataSetChanged]当前数量=" + mAdapter.getCount());
         }
 
         cacheData.remove(url);
@@ -305,7 +305,7 @@ public class fragment_News_Catalog extends Fragment implements
                 //提取分类标题
                 String catalogTitle = left.getElementsByClass("left_title").text().trim();
                 //日志
-//                logUtil.i(this, "=========" + catalogTitle + "=========");
+//                abstract_LogUtil.i(this, "=========" + catalogTitle + "=========");
 
                 //提取新闻目录主体部分
                 Elements collection_li = left.getElementsByClass("content").first().select("ul").first().select("li");
@@ -325,7 +325,7 @@ public class fragment_News_Catalog extends Fragment implements
                     rtnList.add(item);
 
                     //日志
-//                    logUtil.i(this, item.title + " " + item.url + " " + item.time);
+//                    abstract_LogUtil.i(this, item.title + " " + item.url + " " + item.time);
                 }
                 return rtnList;
             } catch (Exception e) {
@@ -435,7 +435,7 @@ public class fragment_News_Catalog extends Fragment implements
             try {
                 Thread.sleep(700);   //停留显示数秒刷新信息
             } catch (Exception e) {
-                logUtil.e(this, e.toString());
+                abstract_LogUtil.e(this, e.toString());
             }
             return null;
         }

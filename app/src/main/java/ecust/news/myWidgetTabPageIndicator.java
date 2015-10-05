@@ -16,7 +16,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import lib.Global;
-import lib.clsUtils.logUtil;
 
 /**
  * =============================================================================

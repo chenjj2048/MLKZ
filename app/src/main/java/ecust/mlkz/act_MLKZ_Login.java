@@ -35,7 +35,7 @@ import android.widget.Button;
 
 import ecust.main.R;
 import lib.clsUtils.clsSoftKeyBoard;
-import lib.clsUtils.logUtil;
+import lib.logUtils.abstract_LogUtil;
 import widget.myEditText;
 
 //梅陇客栈登陆页面
@@ -88,17 +88,17 @@ public class act_MLKZ_Login extends Activity implements TextWatcher, View.OnClic
     @Override
     public void onClick(View v) {
         if (edittext_Username.getText().length() <= 0) {
-            logUtil.toast("请输入用户名！");
+            abstract_LogUtil.toast("请输入用户名！");
             return;
         }
 
         if (edittext_Password.getText().length() <= 0) {
-            logUtil.toast("请输入密码！");
+            abstract_LogUtil.toast("请输入密码！");
             return;
         }
 
         if (edittext_Password.getText().length() < 6) {
-            logUtil.toast("密码过短，请重新输入！");
+            abstract_LogUtil.toast("密码过短，请重新输入！");
             return;
         }
 
@@ -112,7 +112,7 @@ public class act_MLKZ_Login extends Activity implements TextWatcher, View.OnClic
     public void OnLoginStatusReturn(String username, String password, String rtnMessage, String cookie) {
         loadingDialog.dismiss();
         if (rtnMessage == null || rtnMessage.length() <= 0) {
-            logUtil.toast("登陆失败");
+            abstract_LogUtil.toast("登陆失败");
             return;
         }
         if (rtnMessage.contains("欢迎您回来")) {
@@ -122,11 +122,11 @@ public class act_MLKZ_Login extends Activity implements TextWatcher, View.OnClic
             intent.putExtra(USERNAME, edittext_Username.getText().toString());
             setResult(0, intent);
             finish();
-            logUtil.toast("登陆成功");
+            abstract_LogUtil.toast("登陆成功");
             return;
         }
 
-        logUtil.toast(rtnMessage);      //失败消息
+        abstract_LogUtil.toast(rtnMessage);      //失败消息
     }
 
     //登陆获取cookie

@@ -37,7 +37,7 @@ import ecust.mlkz.secondaryPage_needBeRefractored.struct_Forum_Items.struct_foru
 import ecust.mlkz.secondaryPage_needBeRefractored.struct_Forum_Items.struct_forumPostNode;
 import lib.Global;
 import lib.clsUtils.httpUtil;
-import lib.clsUtils.logUtil;
+import lib.logUtils.abstract_LogUtil;
 
 /**
  * 梅陇客栈-版块发帖目录
@@ -59,19 +59,19 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
                 //跳转到新版块
                 @Override
                 public void jumpToNewSection(String name, String href) {
-                    logUtil.toast(name + " " + href);
+                    abstract_LogUtil.toast(name + " " + href);
                 }
 
                 //子版块被选中
                 @Override
                 public void onChildSectionSelected(String str) {
-                    logUtil.toast("子版块 " + str);
+                    abstract_LogUtil.toast("子版块 " + str);
                 }
 
                 //筛选按钮
                 @Override
                 public void onClassificationSelected(String str) {
-                    logUtil.toast("筛选 = " + str);
+                    abstract_LogUtil.toast("筛选 = " + str);
                 }
 
                 //排序按钮点击
@@ -79,10 +79,10 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
                 public void onSortSelected(int sortByTimeType) {
                     switch (sortByTimeType) {
                         case widget_HeadBar.SORT_BY_POSTTIME:
-                            logUtil.toast("发帖时间");
+                            abstract_LogUtil.toast("发帖时间");
                             break;
                         case widget_HeadBar.SORT_BY_REPLYTIME:
-                            logUtil.toast("回复时间");
+                            abstract_LogUtil.toast("回复时间");
                             break;
                     }
                 }
@@ -92,12 +92,12 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
     private recyclerViewAdapter.OnClickListener onRecyclerViewClickListener = new recyclerViewAdapter.OnClickListener() {
         @Override
         public void OnAuthorSelected(struct_forumPostNode node) {
-            logUtil.toast(node.getAuthorName());
+            abstract_LogUtil.toast(node.getAuthorName());
         }
 
         @Override
         public void OnPostItemSelected(struct_forumPostNode node) {
-            logUtil.toast(node.getTitle() + "\r\n" + node.getPostUrl());
+            abstract_LogUtil.toast(node.getTitle() + "\r\n" + node.getPostUrl());
         }
     };
 
@@ -164,7 +164,7 @@ public class act_MLKZ_Secondary_Page extends Activity implements httpUtil.OnHttp
 
                     if (fab.getVisibility() == View.GONE) {
                         fab.setVisibility(View.VISIBLE);
-                        logUtil.e(this, fab.getY() + " " + fab.getTranslationY());
+                        abstract_LogUtil.e(this, fab.getY() + " " + fab.getTranslationY());
                         fab.startAnimation(animationSet);
                     }
                 }

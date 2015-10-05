@@ -39,7 +39,7 @@ import ecust.mlkz.secondaryPage_needBeRefractored.struct_Forum_Items.struct_foru
 import ecust.mlkz.secondaryPage_needBeRefractored.struct_Forum_Items.struct_forumPosition;
 import ecust.mlkz.secondaryPage_needBeRefractored.struct_Forum_Items.struct_forumPostNode;
 import ecust.mlkz.secondaryPage_needBeRefractored.struct_Forum_Items.struct_forumSubjectClassificationNode;
-import lib.clsUtils.logUtil;
+import lib.logUtils.abstract_LogUtil;
 
 /**
  * 用于HTML页面的解析
@@ -68,7 +68,7 @@ public class htmlParser {
             parser.setInput(inputStream, "UTF-8");
             event = parser.getEventType();
         } catch (XmlPullParserException e) {
-            logUtil.printException(this, e);
+            abstract_LogUtil.printException(this, e);
             return null;
         }
 
@@ -83,10 +83,10 @@ public class htmlParser {
                         result.setForumPosition(forumPosition);
 
                         if (forumPosition != null) {
-                            logUtil.d(this, "========版块位置=========");
-                            logUtil.d(this, "[" + forumPosition.getHomePageName() + "]" + forumPosition.getHomePageURL());
-                            logUtil.d(this, "[" + forumPosition.getSecondaryPageName() + "]" + forumPosition.getSecondaryPageURL());
-                            logUtil.d(this, "[" + forumPosition.getThirdPageName() + "] null URL");
+                            abstract_LogUtil.d(this, "========版块位置=========");
+                            abstract_LogUtil.d(this, "[" + forumPosition.getHomePageName() + "]" + forumPosition.getHomePageURL());
+                            abstract_LogUtil.d(this, "[" + forumPosition.getSecondaryPageName() + "]" + forumPosition.getSecondaryPageURL());
+                            abstract_LogUtil.d(this, "[" + forumPosition.getThirdPageName() + "] null URL");
                         }
 
                         break;
@@ -96,10 +96,10 @@ public class htmlParser {
                         result.setHeadInfo(headInfo);
 
                         if (headInfo != null) {
-                            logUtil.d(this, "=========版块头部信息==========");
-                            logUtil.d(this, "[今日主题数量]" + headInfo.getItem_Count_Today());
-                            logUtil.d(this, "[版块总主题数量]" + headInfo.getItem_Count_Subjects());
-                            logUtil.d(this, "[收藏版块] URL=" + headInfo.getFavoriteSectionURL());
+                            abstract_LogUtil.d(this, "=========版块头部信息==========");
+                            abstract_LogUtil.d(this, "[今日主题数量]" + headInfo.getItem_Count_Today());
+                            abstract_LogUtil.d(this, "[版块总主题数量]" + headInfo.getItem_Count_Subjects());
+                            abstract_LogUtil.d(this, "[收藏版块] URL=" + headInfo.getFavoriteSectionURL());
                         }
                         break;
 
@@ -109,10 +109,10 @@ public class htmlParser {
                         result.setCommitPostURL(commitPostURL);
 
                         if (commitPostURL != null) {
-                            logUtil.d(this, "=========发帖地址==========");
-                            logUtil.d(this, "[发帖]" + commitPostURL.getPostURL());
-                            logUtil.d(this, "[投票]" + commitPostURL.getVoteURL());
-                            logUtil.d(this, "[悬赏]" + commitPostURL.getBountyURL());
+                            abstract_LogUtil.d(this, "=========发帖地址==========");
+                            abstract_LogUtil.d(this, "[发帖]" + commitPostURL.getPostURL());
+                            abstract_LogUtil.d(this, "[投票]" + commitPostURL.getVoteURL());
+                            abstract_LogUtil.d(this, "[悬赏]" + commitPostURL.getBountyURL());
                         }
 
                         break;
@@ -123,7 +123,7 @@ public class htmlParser {
                         struct_forumPostNode item = parsePostItem(parser);
                         if (item != null) {
                             result.forumPosts.add(item);
-                            logUtil.d(this, item.toString());
+                            abstract_LogUtil.d(this, item.toString());
                         }
                         break;
 
@@ -136,9 +136,9 @@ public class htmlParser {
                         if (subjectClassificationList == null) break;
 
                         result.setSubjectClassification(subjectClassificationList);
-                        logUtil.d(this, "============主题分类=============");
+                        abstract_LogUtil.d(this, "============主题分类=============");
                         for (struct_forumSubjectClassificationNode i : subjectClassificationList)
-                            logUtil.d(this, i.toString());
+                            abstract_LogUtil.d(this, i.toString());
 
                         break;
 
@@ -149,12 +149,12 @@ public class htmlParser {
                                 parseChildSection(parser);
 
                         if (childSectionNodeList == null || childSectionNodeList.size() == 0) {
-                            logUtil.d(this, "=========子版块为空=======");
+                            abstract_LogUtil.d(this, "=========子版块为空=======");
                         } else {
                             result.childSections = childSectionNodeList;
-                            logUtil.d(this, "=========解析子版块=========");
+                            abstract_LogUtil.d(this, "=========解析子版块=========");
                             for (struct_forumChildSectionNode i : childSectionNodeList) {
-                                logUtil.d(this, i.toString());
+                                abstract_LogUtil.d(this, i.toString());
                             }
                         }
                         break;
@@ -165,7 +165,7 @@ public class htmlParser {
             try {
                 event = parser.next();
             } catch (Exception e) {
-                logUtil.w(this, "[网页标签未成对] Line=" + parser.getLineNumber());
+                abstract_LogUtil.w(this, "[网页标签未成对] Line=" + parser.getLineNumber());
             }
         }
 
@@ -173,7 +173,7 @@ public class htmlParser {
         try {
             inputStream.close();
         } catch (IOException e) {
-            logUtil.printException(this, e);
+            abstract_LogUtil.printException(this, e);
         }
 
         return result;
@@ -277,7 +277,7 @@ public class htmlParser {
             try {
                 event = parser.next();
             } catch (Exception e) {
-                logUtil.w(this, "[网页标签未成对] Line=" + parser.getLineNumber());
+                abstract_LogUtil.w(this, "[网页标签未成对] Line=" + parser.getLineNumber());
             }
 
 
@@ -540,7 +540,7 @@ public class htmlParser {
             try {
                 event = parser.next();
             } catch (Exception e) {
-                logUtil.w(this, "[未成对标签] Line=" + parser.getLineNumber());
+                abstract_LogUtil.w(this, "[未成对标签] Line=" + parser.getLineNumber());
             }
         }
     }

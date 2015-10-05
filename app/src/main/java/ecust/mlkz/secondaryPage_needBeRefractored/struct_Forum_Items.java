@@ -24,7 +24,7 @@ package ecust.mlkz.secondaryPage_needBeRefractored;
 import java.util.ArrayList;
 import java.util.List;
 
-import lib.clsUtils.logUtil;
+import lib.logUtils.abstract_LogUtil;
 
 /**
  * 论坛数据结构
@@ -187,8 +187,8 @@ public class struct_Forum_Items {
             try {
                 this.item_Count_Today = Integer.parseInt(str.replace("今日", "").trim());
             } catch (Exception e) {
-                logUtil.e(this, str);
-                logUtil.printException(this, e);
+                abstract_LogUtil.e(this, str);
+                abstract_LogUtil.printException(this, e);
             }
         }
 
@@ -207,8 +207,8 @@ public class struct_Forum_Items {
             try {
                 this.item_Count_Subjects = Integer.parseInt(str.replace("主题", "").trim());
             } catch (Exception e) {
-                logUtil.e(this, str);
-                logUtil.printException(this, e);
+                abstract_LogUtil.e(this, str);
+                abstract_LogUtil.printException(this, e);
             }
         }
 
@@ -341,7 +341,7 @@ public class struct_Forum_Items {
                     this.forumPostType = POST_STATUS_BOUNTY;
                     break;
                 default:
-                    logUtil.w(this, "[未能解析的贴子类型-图片]" + picURL);
+                    abstract_LogUtil.w(this, "[未能解析的贴子类型-图片]" + picURL);
             }
         }
 

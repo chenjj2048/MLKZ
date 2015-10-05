@@ -25,11 +25,10 @@ import java.util.List;
 import ecust.main.R;
 import ecust.mlkz.cls_MLKZ_Login;
 import ecust.mlkz.secondaryPage.activity_MLKZ_Secondary_Page;
-import ecust.mlkz.secondaryPage_needBeRefractored.act_MLKZ_Secondary_Page;
 import lib.Const;
 import lib.clsUtils.fileUtil;
 import lib.clsUtils.httpUtil;
-import lib.clsUtils.logUtil;
+import lib.logUtils.abstract_LogUtil;
 import lib.clsUtils.pathFactory;
 import lib.clsUtils.pathFactory.PathType;
 
@@ -148,9 +147,9 @@ public class fragment_MLKZ_HomePage extends Fragment implements httpUtil.OnHttpV
 
     public void printAllDataLog(List<struct_MLKZ_Home_Section> mData) {
         for (struct_MLKZ_Home_Section s0 : mData) {
-            logUtil.d(this, "====" + s0.getSectionName() + "====");
+            abstract_LogUtil.d(this, "====" + s0.getSectionName() + "====");
             for (struct_MLKZ_Home_SubSection s1 : s0.getContentList()) {
-                logUtil.d(this, s1.getTitle() + "  " + s1.getUrl() + "  " + s1.getNew_Message_Count());
+                abstract_LogUtil.d(this, s1.getTitle() + "  " + s1.getUrl() + "  " + s1.getNew_Message_Count());
             }
         }
     }

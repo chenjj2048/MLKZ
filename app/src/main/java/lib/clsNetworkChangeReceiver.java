@@ -7,7 +7,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo.State;
 import android.widget.Toast;
 
-import lib.clsUtils.logUtil;
+import lib.logUtils.abstract_LogUtil;
 
 /**
  * =============================================================================
@@ -55,7 +55,7 @@ public class clsNetworkChangeReceiver extends BroadcastReceiver {
             //没有网络权限
             //AndroidManifest大小写有错误也会报错的！！！
             webConnected = false;
-            logUtil.e(this, e.toString());
+            abstract_LogUtil.e(this, e.toString());
         } finally {
             //回调消息
             if (this.networkStateChangeListener != null)
@@ -88,7 +88,7 @@ public class clsNetworkChangeReceiver extends BroadcastReceiver {
             strStatus = "未知网络";
             result = false;
         }
-        logUtil.i(this, "[网络状态改变]" + strStatus);
+        abstract_LogUtil.i(this, "[网络状态改变]" + strStatus);
         return result;
     }
 

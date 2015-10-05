@@ -16,7 +16,7 @@ import ecust.main.R;
 import lib.Global;
 import lib.clsFailureBar;
 import lib.clsUtils.httpUtil;
-import lib.clsUtils.logUtil;
+import lib.logUtils.abstract_LogUtil;
 
 /**
  * =============================================================================
@@ -51,7 +51,7 @@ public class act_Lecture_Detail extends Activity implements clsFailureBar.OnWebR
             mLectureDetail.clsParse.parseAllData(rtnHtmlMessage);
 
             //存储到sql
-            logUtil.i(this, "讲座信息数据存储");
+            abstract_LogUtil.i(this, "讲座信息数据存储");
             new DataBase_Lecture(this).detail.SaveData(mLectureDetail.mData);
         }
     }
@@ -82,7 +82,7 @@ public class act_Lecture_Detail extends Activity implements clsFailureBar.OnWebR
      */
     @Override
     public void onWebRetryCompleted() {
-        logUtil.i(this, "[重试刷新中]" + mLectureDetail.mData.url);
+        abstract_LogUtil.i(this, "[重试刷新中]" + mLectureDetail.mData.url);
         wFailureBar.setStateLoading();
         httpUtil.getSingleton().getHttp(mLectureDetail.mData.url, this);
     }
@@ -106,12 +106,12 @@ public class act_Lecture_Detail extends Activity implements clsFailureBar.OnWebR
         struct_LectureDetail cacheData = new DataBase_Lecture(this).detail.GetData(lecture_URL);
 
         if (!cacheData.url.equals("")) {
-            logUtil.i(this, "[讲座详细]缓存数据加载成功" + lecture_URL);
+            abstract_LogUtil.i(this, "[讲座详细]缓存数据加载成功" + lecture_URL);
             mLectureDetail.mData = cacheData;
             wFailureBar.setStateSucceed();      //加载成功，隐藏进度条
             mLectureDetail.Show();
         } else {
-            logUtil.i(this, "[讲座详细]网页加载" + lecture_URL);
+            abstract_LogUtil.i(this, "[讲座详细]网页加载" + lecture_URL);
             httpUtil.getSingleton().getHttp(lecture_URL, this); //获取讲座文本内容
         }
     }
@@ -186,7 +186,7 @@ public class act_Lecture_Detail extends Activity implements clsFailureBar.OnWebR
                         }
                     }
                 } catch (Exception e) {
-                    logUtil.i(this, e.toString());
+                    abstract_LogUtil.i(this, e.toString());
                     e.printStackTrace();
                 }
             }

@@ -34,6 +34,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import lib.logUtils.abstract_LogUtil;
+
 /**
  * 用于网络访问
  * 获取文本及图片(字节流)
@@ -105,12 +107,12 @@ public class httpUtil_inThread {
             } else {
                 //ResponseCode非200，失败
                 result = "";
-                logUtil.i(this, "[ResponseCode]" + ResponseCode);
+                abstract_LogUtil.i(this, "[ResponseCode]" + ResponseCode);
             }
         } catch (Exception e) {
             result = "";
-            logUtil.e(this, "[网页获取失败]" + website);
-            logUtil.e(this, "[GetHttp失败]" + e.toString());
+            abstract_LogUtil.e(this, "[网页获取失败]" + website);
+            abstract_LogUtil.e(this, "[GetHttp失败]" + e.toString());
         }
         return result;
     }
@@ -143,13 +145,13 @@ public class httpUtil_inThread {
             is = conn.getInputStream();
             bytes = InputStreamUtils.InputStreamTOByte(is);
         } catch (Exception e) {
-            logUtil.e(this, "[图片加载失败]" + e.toString());
+            abstract_LogUtil.e(this, "[图片加载失败]" + e.toString());
         } finally {
             try {
                 if (is != null)
                     is.close();
             } catch (Exception e) {
-                logUtil.e(this, "[InputStream]关闭失败");
+                abstract_LogUtil.e(this, "[InputStream]关闭失败");
             }
         }
         return bytes;

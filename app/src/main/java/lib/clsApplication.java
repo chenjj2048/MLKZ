@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 
-import lib.clsUtils.logUtil;
+import lib.logUtils.abstract_LogUtil;
 
 /**
  * =============================================================================
@@ -40,7 +40,7 @@ public class clsApplication extends Application {
         //加载网络广播监听
         IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(receiver, filter);
-        logUtil.i(this, "网络广播监听器已开启");
+        abstract_LogUtil.i(this, "网络广播监听器已开启");
     }
 
     @Override
@@ -48,6 +48,6 @@ public class clsApplication extends Application {
         super.onTerminate();
         //注销广播
         clsApplication.getContext().unregisterReceiver(receiver);
-        logUtil.i(this, "网络广播监听器已关闭");
+        abstract_LogUtil.i(this, "网络广播监听器已关闭");
     }
 }

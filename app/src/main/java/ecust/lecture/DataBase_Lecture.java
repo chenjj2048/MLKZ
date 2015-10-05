@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-import lib.clsUtils.logUtil;
+import lib.logUtils.abstract_LogUtil;
 import lib.clsUtils.pathFactory;
 import lib.clsUtils.pathFactory.PathType;
 
@@ -42,14 +42,14 @@ public class DataBase_Lecture extends SQLiteOpenHelper {
     //构造函数
     public DataBase_Lecture(Context context) {
         super(context, dataBaseName, null, currentVersion);
-        logUtil.i(this, "[数据库地址]" + dataBaseName);
+        abstract_LogUtil.i(this, "[数据库地址]" + dataBaseName);
         this.catalog = new clsCatalog();
         this.detail = new clsDetail();
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        logUtil.i(this, "[数据库创建]当前版本=" + currentVersion + " " + dataBaseName);
+        abstract_LogUtil.i(this, "[数据库创建]当前版本=" + currentVersion + " " + dataBaseName);
         //创建新表
         db.execSQL(catalog.CreateTableCatalog);
         db.execSQL(detail.CreateTableDetail);
@@ -57,7 +57,7 @@ public class DataBase_Lecture extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        logUtil.i(this, "[数据库版本更新]" + oldVersion + "→" + newVersion);
+        abstract_LogUtil.i(this, "[数据库版本更新]" + oldVersion + "→" + newVersion);
     }
 
     /**
@@ -95,7 +95,7 @@ public class DataBase_Lecture extends SQLiteOpenHelper {
                     }
                 }
                 db.setTransactionSuccessful();
-                logUtil.i(this, "[数据库添加]共" + count_of_added + "条");
+                abstract_LogUtil.i(this, "[数据库添加]共" + count_of_added + "条");
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -129,14 +129,14 @@ public class DataBase_Lecture extends SQLiteOpenHelper {
                     result.add(item);
                 }
             } catch (Exception e) {
-                logUtil.e(this, e.toString());
+                abstract_LogUtil.e(this, e.toString());
                 e.printStackTrace();
             } finally {
                 //关闭连接
                 if (cursor != null) cursor.close();
                 if (db != null) db.close();
             }
-            logUtil.i(this, "[数据库查询成功]共" + result.size() + "条数据");
+            abstract_LogUtil.i(this, "[数据库查询成功]共" + result.size() + "条数据");
             return result;
         }
     }
@@ -167,7 +167,7 @@ public class DataBase_Lecture extends SQLiteOpenHelper {
                 db.execSQL(insertSQL, new Object[]{mData.title, mData.startTime, mData.address,
                         mData.reporter, mData.organization, mData.remark, mData.url});
             } catch (Exception e) {
-                logUtil.e(this, e.toString());
+                abstract_LogUtil.e(this, e.toString());
                 e.printStackTrace();
             } finally {
                 if (db != null)
@@ -199,7 +199,7 @@ public class DataBase_Lecture extends SQLiteOpenHelper {
                     result.url = cursor.getString(cursor.getColumnIndex("url"));
                 }
             } catch (Exception e) {
-                logUtil.e(this, e.toString());
+                abstract_LogUtil.e(this, e.toString());
                 e.printStackTrace();
             } finally {
                 if (cursor != null) cursor.close();

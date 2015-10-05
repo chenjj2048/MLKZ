@@ -21,9 +21,13 @@
 
 package ecust.mlkz.secondaryPage;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import java.util.HashMap;
 import java.util.List;
 
-import lib.clsUtils.logUtil;
+import lib.logUtils.abstract_LogUtil;
 
 /**
  * 二级页面
@@ -35,9 +39,53 @@ public class struct_Forum_Information {
      * 添加头部http://bbs.ecust.edu.cn/
      * 替换&amp;为&
      */
+    @Nullable
     private static String decorateURL(String url) {
+        if (url == null) return null;
         url = url.replace("&amp;", "&");
         return url;
+    }
+
+    /**
+     * 返回的所有数据
+     */
+    protected static class struct_MLKZ_Data {
+        //1.页面结果
+        public struct_ForumPageAllData mPageInformation;
+        //2.帖子结果
+        public List<struct_PostNode> mPostsList;
+    }
+
+    /**
+     * 排序方式对应的地址
+     */
+    protected static class struct_SortList {
+        //存储各种地址
+        private HashMap<SortStyle, String> hashMap = new HashMap<>();
+
+        /**
+         * 设置排序地址
+         *
+         * @param sortStyle 排序方式
+         * @param url       地址
+         */
+        protected void setSortURL(SortStyle sortStyle, @Nullable String url) {
+            hashMap.put(sortStyle, decorateURL(url));
+        }
+
+        protected String getSortURL(SortStyle sortStyle) {
+            return hashMap.get(sortStyle);
+        }
+
+        //排序方式枚举
+        protected enum SortStyle {
+            DEFAULT,         //默认排序
+            DATELINE,        //发帖时间
+            REPLYS,          //回复数量
+            VIEWS,           //查看数量
+            LAST_POST_TIME,  //最后发表
+            HEATS            //热门
+        }
     }
 
     /**
@@ -46,23 +94,23 @@ public class struct_Forum_Information {
     protected static class struct_PostNode {
         //===============================
         //帖子标题
-        private String title;
+        private String title = "";
         //帖子URL
-        private String postUrl;
+        private String postUrl = "";
 
         //===============================
         //作者信息
-        private struct_Person author;
+        private struct_Person author = new struct_Person();
 
         //===============================
         //发帖时间
-        private String firstReleaseTime;
+        private String firstReleaseTime = "";
         //最后回复时间
-        private String lastReplyTime;
+        private String lastReplyTime = "";
         //回复数量
         private int replyCount = 0;
         //查看数量
-        private int readCount = 0;
+        private int visitCount = 0;
 
         //=============================
         //贴子所在分类主题
@@ -89,7 +137,7 @@ public class struct_Forum_Information {
         }
 
         public void setTitle(String title) {
-            this.title = decorateURL(title);
+            this.title = title;
         }
 
         public String getPostUrl() {
@@ -97,15 +145,11 @@ public class struct_Forum_Information {
         }
 
         public void setPostUrl(String postUrl) {
-            this.postUrl = postUrl;
+            this.postUrl = decorateURL(postUrl);
         }
 
         public struct_Person getAuthor() {
             return author;
-        }
-
-        public void setAuthor(struct_Person author) {
-            this.author = author;
         }
 
         public String getFirstReleaseTime() {
@@ -121,6 +165,7 @@ public class struct_Forum_Information {
         }
 
         public void setLastReplyTime(String lastReplyTime) {
+            lastReplyTime = lastReplyTime.replace("&nbsp;", " ");
             this.lastReplyTime = lastReplyTime;
         }
 
@@ -132,12 +177,12 @@ public class struct_Forum_Information {
             this.replyCount = replyCount;
         }
 
-        public int getReadCount() {
-            return readCount;
+        public int getVisitCount() {
+            return visitCount;
         }
 
-        public void setReadCount(int readCount) {
-            this.readCount = readCount;
+        public void setVisitCount(int visitCount) {
+            this.visitCount = visitCount;
         }
 
         public String getClassificationName() {
@@ -206,7 +251,10 @@ public class struct_Forum_Information {
         protected void setPostAttribute(String postAttribute) {
             switch (postAttribute) {
                 case "template/eis_012/img/pollsmall.gif":
-                    this.isVote=true;
+                    this.isVote = true;
+                    break;
+                case "template/eis_012/img/folder_lock.gif":
+                    this.isLock = true;
                     break;
                 case "template/eis_012/img/folder_new.gif":
                     //正常贴，什么都没有
@@ -215,7 +263,7 @@ public class struct_Forum_Information {
                     //置顶帖（前面已经处理过了，这里就不处理了）
                     break;
                 default:
-                    logUtil.w(this, "[未知贴子类型]" + postAttribute);
+                    abstract_LogUtil.w(this, "[未知贴子类型]" + postAttribute);
             }
         }
     }
@@ -224,23 +272,14 @@ public class struct_Forum_Information {
      * 会员结构
      */
     protected static class struct_Person {
-        //id号
-        private int id;
         //名称
-        private String name;
+        private String name = "";
         //空间URL
-        private String spaceUrl;
+        private String spaceUrl = "";
         //头像地址
-        private String imageUrl;
+        private String imageUrl = "";
 
-        public int getId() {
-            return id;
-        }
-
-        public void setId(int id) {
-            this.id = id;
-        }
-
+        @NonNull
         public String getName() {
             return name;
         }
@@ -249,25 +288,28 @@ public class struct_Forum_Information {
             this.name = name;
         }
 
+        @NonNull
         public String getSpaceUrl() {
             return spaceUrl;
         }
 
         public void setSpaceUrl(String spaceUrl) {
-            this.spaceUrl = spaceUrl;
+            this.spaceUrl = decorateURL(spaceUrl);
         }
 
+        @NonNull
         public String getImageUrl() {
             return imageUrl;
         }
 
         public void setImageUrl(String imageUrl) {
-            this.imageUrl = imageUrl;
+            this.imageUrl = decorateURL(imageUrl);
         }
     }
 
     /**
      * 论坛数据集合
+     * 不包含帖子内容
      */
     protected static class struct_ForumPageAllData {
         //当前位置
@@ -275,18 +317,28 @@ public class struct_Forum_Information {
         //版块集合
         private List<struct_PrimarySectionNode> primarySectionNodes;
         //发帖地址集合
-        private struct_CommitPostURL commitPostURL;
+        private struct_SubmitURL submitURL;
         //精品帖地址
         private String excelentPostsURL;
         //主题分类
         private List<struct_ClassificationNode> classificationNodes;
+        //排序方式
+        private struct_SortList mSortList;
+
+        public struct_SortList getSortList() {
+            return mSortList;
+        }
+
+        public void setSortList(struct_SortList mSortList) {
+            this.mSortList = mSortList;
+        }
 
         public String getExcelentPostsURL() {
             return excelentPostsURL;
         }
 
         public void setExcelentPostsURL(String excelentPostsURL) {
-            this.excelentPostsURL = excelentPostsURL;
+            this.excelentPostsURL = decorateURL(excelentPostsURL);
         }
 
         public struct_CurrentSection getCurrentSection() {
@@ -305,12 +357,12 @@ public class struct_Forum_Information {
             this.primarySectionNodes = primarySectionNodes;
         }
 
-        public struct_CommitPostURL getCommitPostURL() {
-            return commitPostURL;
+        public struct_SubmitURL getSubmitURL() {
+            return submitURL;
         }
 
-        public void setCommitPostURL(struct_CommitPostURL commitPostURL) {
-            this.commitPostURL = commitPostURL;
+        public void setSubmitURL(struct_SubmitURL submitURL) {
+            this.submitURL = submitURL;
         }
 
         public List<struct_ClassificationNode> getClassificationNodes() {
@@ -329,27 +381,34 @@ public class struct_Forum_Information {
         private String name;
         private String url;
 
+        @Override
+        public String toString() {
+            return "[" + name + "] " + url;
+        }
+
         public String getName() {
             return name;
         }
 
-        public void setName(String name) {
+        public struct_ClassificationNode setName(String name) {
             this.name = name;
+            return this;
         }
 
         public String getUrl() {
             return url;
         }
 
-        public void setUrl(String url) {
-            this.url = url;
+        public struct_ClassificationNode setUrl(String url) {
+            this.url = decorateURL(url);
+            return this;
         }
     }
 
     /**
      * 发帖地址（发帖、发投票、发悬赏，暂不包含发活动）
      */
-    protected static class struct_CommitPostURL {
+    protected static class struct_SubmitURL {
         private String postURL;
         private String voteURL;
         private String bountyURL;
@@ -359,7 +418,7 @@ public class struct_Forum_Information {
         }
 
         public void setPostURL(String postURL) {
-            this.postURL = postURL;
+            this.postURL = decorateURL(postURL);
         }
 
         public String getVoteURL() {
@@ -367,7 +426,7 @@ public class struct_Forum_Information {
         }
 
         public void setVoteURL(String voteURL) {
-            this.voteURL = voteURL;
+            this.voteURL = decorateURL(voteURL);
         }
 
         public String getBountyURL() {
@@ -375,7 +434,7 @@ public class struct_Forum_Information {
         }
 
         public void setBountyURL(String bountyURL) {
-            this.bountyURL = bountyURL;
+            this.bountyURL = decorateURL(bountyURL);
         }
     }
 
@@ -392,8 +451,9 @@ public class struct_Forum_Information {
             return name;
         }
 
-        public void setName(String name) {
+        public struct_PrimarySectionNode setName(String name) {
             this.name = name;
+            return this;
         }
 
         public List<struct_SecondarySectionNode> getSecondaryNodes() {
@@ -416,20 +476,27 @@ public class struct_Forum_Information {
         //三级节点
         private List<struct_TertiarySectionNode> tertiaryNodes;
 
+        @Override
+        public String toString() {
+            return "[" + name + "] " + url;
+        }
+
         public String getName() {
             return name;
         }
 
-        public void setName(String name) {
+        public struct_SecondarySectionNode setName(String name) {
             this.name = name;
+            return this;
         }
 
         public String getUrl() {
             return url;
         }
 
-        public void setUrl(String url) {
-            this.url = url;
+        public struct_SecondarySectionNode setUrl(String url) {
+            this.url = decorateURL(url);
+            return this;
         }
 
         public List<struct_TertiarySectionNode> getTertiaryNodes() {
@@ -461,7 +528,7 @@ public class struct_Forum_Information {
         }
 
         public void setUrl(String url) {
-            this.url = url;
+            this.url = decorateURL(url);
         }
     }
 
@@ -472,5 +539,12 @@ public class struct_Forum_Information {
         protected String primarySectionName;
         protected String secondarySectionName;
         protected String tertiarySectionName;
+
+        @Override
+        public String toString() {
+            return "一级标题=" + primarySectionName +
+                    "  二级标题=" + secondarySectionName +
+                    "  三级标题=" + tertiarySectionName;
+        }
     }
 }

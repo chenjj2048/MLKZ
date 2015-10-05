@@ -11,7 +11,7 @@ import ecust.main.R;
 import lib.clsApplication;
 import lib.clsUtils.pathFactory;
 import lib.clsUtils.pathFactory.PathType;
-import lib.clsUtils.logUtil;
+import lib.logUtils.abstract_LogUtil;
 
 /**
  * =============================================================================
@@ -47,7 +47,7 @@ public class DataBase_News extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        logUtil.i(this, "[数据库创建]当前版本=" + currentVersion + " " + dataBaseName);
+        abstract_LogUtil.i(this, "[数据库创建]当前版本=" + currentVersion + " " + dataBaseName);
 
         String[] arr_catalog = clsApplication.getContext()
                 .getResources().getStringArray(R.array.news_section_name);
@@ -60,7 +60,7 @@ public class DataBase_News extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-        logUtil.i(this, "[数据库版本更新]" + oldVersion + "→" + newVersion);
+        abstract_LogUtil.i(this, "[数据库版本更新]" + oldVersion + "→" + newVersion);
     }
 
     public class clsCatalog {
@@ -101,7 +101,7 @@ public class DataBase_News extends SQLiteOpenHelper {
                 if (cursor != null) cursor.close();
                 if (db != null) db.close();
             }
-            logUtil.i(this, "[数据库查询成功][" + currentCatalogTableName + "]共" + result.size() + "条数据");
+            abstract_LogUtil.i(this, "[数据库查询成功][" + currentCatalogTableName + "]共" + result.size() + "条数据");
             return result;
         }
 
@@ -127,7 +127,7 @@ public class DataBase_News extends SQLiteOpenHelper {
                     }
                 }
                 db.setTransactionSuccessful();
-                logUtil.i(this, "[数据库数据添加成功][" + currentCatalogTableName + "]共" +
+                abstract_LogUtil.i(this, "[数据库数据添加成功][" + currentCatalogTableName + "]共" +
                         count_of_item_added + "条");
             } catch (Exception e) {
                 e.printStackTrace();

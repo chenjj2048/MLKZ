@@ -38,7 +38,7 @@ import lib.clsFailureBar;
 import lib.clsUtils.InputStreamUtils;
 import lib.clsUtils.fileUtil;
 import lib.clsUtils.httpUtil;
-import lib.clsUtils.logUtil;
+import lib.logUtils.abstract_LogUtil;
 import lib.clsUtils.pathFactory;
 import lib.clsUtils.pathFactory.PathType;
 import lib.clsUtils.timeUtil;
@@ -255,7 +255,7 @@ public class act_News_Detail extends Activity implements clsFailureBar.OnWebRetr
             picHolder.isLoading = true;     //正在加载
 
             httpUtil.getSingleton().getBitmapBytes(url, this);        //下载
-            logUtil.i(this, "[图片开始下载-线程数量" + current_Thread_Pic_Download + "]" + url);
+            abstract_LogUtil.i(this, "[图片开始下载-线程数量" + current_Thread_Pic_Download + "]" + url);
         }
     }
 
@@ -375,11 +375,11 @@ public class act_News_Detail extends Activity implements clsFailureBar.OnWebRetr
                 picHolder.show = false;
                 picHolder.getBitmap().recycle();
                 picHolder.setBitmap(null);
-//                logUtil.i(this, "[回收后Bitmap占用总大小] " +
+//                abstract_LogUtil.i(this, "[回收后Bitmap占用总大小] " +
 //                        String.format("%,d", mNewsContent.sum_bytes_of_bitmap));
             }
         } catch (Exception e) {
-            logUtil.e(this, e.toString());
+            abstract_LogUtil.e(this, e.toString());
             e.printStackTrace();
         }
     }
@@ -403,14 +403,14 @@ public class act_News_Detail extends Activity implements clsFailureBar.OnWebRetr
         }
 
         if (url.contains("http://172.") && picHolder.getBitmap() == null) {
-            logUtil.toast("当前非校园网，无法加载内网图片!");
+            abstract_LogUtil.toast("当前非校园网，无法加载内网图片!");
         }
     }
 
     @Override
     public void onWebRetryCompleted() {
         //获取新闻文本内容
-        logUtil.i(this, "[重试刷新中]" + news_URL);
+        abstract_LogUtil.i(this, "[重试刷新中]" + news_URL);
         wFailureBar.setStateLoading();
         httpUtil.getSingleton().getHttp(news_URL, this);
     }
@@ -423,7 +423,7 @@ public class act_News_Detail extends Activity implements clsFailureBar.OnWebRetr
         //获取新闻地址URL、所在分类版块
         news_URL = getIntent().getStringExtra("URL");
         catalogName = getIntent().getStringExtra("catalogName");
-        logUtil.i(this, "[新闻详细内容加载]" + news_URL);
+        abstract_LogUtil.i(this, "[新闻详细内容加载]" + news_URL);
 
         Global.setTitle(this, "新闻详情");
         initCompents();     //初始化组件引用
@@ -483,7 +483,7 @@ class clsNewsParse {
             //5.从纯文本中解析出一行行内容（图、文字交替）
             result.content = clsNewsParse.parse_BodyLine(result);
         } catch (Exception e) {
-            logUtil.e("详细新闻", "[数据解析错误]" + e.toString());
+            abstract_LogUtil.e("详细新闻", "[数据解析错误]" + e.toString());
             e.printStackTrace();
         }
         return result;
@@ -508,7 +508,7 @@ class clsNewsParse {
             }
             return title;
         } catch (Exception e) {
-            logUtil.e("[解析标题]", e.toString());
+            abstract_LogUtil.e("[解析标题]", e.toString());
             e.printStackTrace();
             return "";
         }
@@ -583,7 +583,7 @@ class clsNewsParse {
                 targetData.release_time = date;                       //如：2015-07-02 10:32
             }
         } catch (Exception e) {
-            logUtil.e("[解析头部]", e.toString());
+            abstract_LogUtil.e("[解析头部]", e.toString());
             e.printStackTrace();
         }
     }
@@ -613,7 +613,7 @@ class clsNewsParse {
 
             return body;
         } catch (Exception e) {
-            logUtil.e("[解析Body]", e.toString());
+            abstract_LogUtil.e("[解析Body]", e.toString());
             e.printStackTrace();
         }
         return "";
@@ -670,7 +670,7 @@ class clsNewsParse {
                 }
             }
         } catch (Exception e) {
-            logUtil.e("parse_BodyLine", "数据解析错误");
+            abstract_LogUtil.e("parse_BodyLine", "数据解析错误");
             e.printStackTrace();
         }
         return result;
