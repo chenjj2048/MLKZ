@@ -21,6 +21,7 @@
 
 package ecust.mlkz.secondaryPage;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Request;
@@ -29,37 +30,56 @@ import com.android.volley.Response.Listener;
 import com.android.volley.toolbox.HttpHeaderParser;
 
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
 
-import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_ForumPageAllData;
+import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_MLKZ_Data;
 
 /**
  * 自定义VollyRequest
- * 解析请求页面的结果到struct_ForumPageAllData类
+ * 解析请求页面的结果到struct_MLKZ_Data类
  */
-public class mlkzRequest extends Request<struct_ForumPageAllData> {
-    private final Response.Listener<struct_ForumPageAllData> mListener;
+public class mlkzRequest extends Request<struct_MLKZ_Data> {
+    private final Response.Listener<struct_MLKZ_Data> mListener;
+    private String cookie;
 
     /**
      * 构造函数
      */
-    public mlkzRequest(int method, String url, Listener<struct_ForumPageAllData> mListener,
-                       Response.ErrorListener listener) {
+    protected mlkzRequest(int method, String url, String cookie, Listener<struct_MLKZ_Data> mListener,
+                          Response.ErrorListener listener) {
+        //先转换成PC版地址
         super(method, url, listener);
+        this.cookie = cookie;
         this.mListener = mListener;
+    }
+
+    /**
+     * 指定Cookie内容
+     *
+     * @throws AuthFailureError
+     */
+    @Override
+    public Map<String, String> getHeaders() throws AuthFailureError {
+        Map<String, String> headers = new HashMap<>();
+        if (cookie != null && cookie.length() > 0) {
+            headers.put("Cookie", cookie);
+        }
+        return headers;
     }
 
     /**
      * 解析数据到指定格式
      */
     @Override
-    protected Response<struct_ForumPageAllData> parseNetworkResponse(NetworkResponse response) {
+    protected Response<struct_MLKZ_Data> parseNetworkResponse(NetworkResponse response) {
         //网页html源码
         String htmlString;
         try {
             //结果转成字符串
             htmlString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
             //解析
-            struct_ForumPageAllData mResponse = null;
+            struct_MLKZ_Data mResponse = new htmlParser().parseAllData(htmlString);
 
             return Response.success(mResponse, HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException e) {
@@ -68,7 +88,7 @@ public class mlkzRequest extends Request<struct_ForumPageAllData> {
     }
 
     @Override
-    protected void deliverResponse(struct_ForumPageAllData response) {
+    protected void deliverResponse(struct_MLKZ_Data response) {
         mListener.onResponse(response);
     }
 }

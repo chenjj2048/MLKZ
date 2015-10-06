@@ -4,10 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/grey240"
-    tools:context="ecust.mlkz.secondaryPage_needBeRefractored.recyclerViewAdapter">
+    tools:context="ecust.mlkz.secondaryPage.recyclerViewAdapter">
 
+    <!--层级有点深，但怎么优化就怎么报错，以后有空回来再改-->
     <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:cardview="http://schemas.android.com/apk/res-auto"
 
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -15,16 +16,17 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginTop="5dp"
-        app:cardCornerRadius="2dp"
-        app:cardElevation="2dp"
-        app:cardPreventCornerOverlap="true"
-        app:cardUseCompatPadding="false">
+        cardview:cardCornerRadius="2dp"
+        cardview:cardElevation="2dp"
+        cardview:cardPreventCornerOverlap="true"
+        cardview:cardUseCompatPadding="false">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <!--1.这一层背景是白色-->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -35,7 +37,7 @@
                 android:paddingRight="10dp"
                 android:paddingTop="10dp">
 
-                <!--头像-->
+                <!--1.1作者头像-->
                 <ImageView
                     android:id="@+id/mlkz_secondary_page_item_author_image"
                     android:layout_width="50dp"
@@ -43,6 +45,13 @@
                     android:layout_marginBottom="10dp"
                     android:layout_marginRight="10dp" />
 
+                <com.android.volley.toolbox.NetworkImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginRight="10dp"/>
+
+                <!--1.2作者名称-->
                 <TextView
                     android:id="@+id/mlkz_secondary_page_item_authorname"
                     android:layout_width="wrap_content"
@@ -51,6 +60,7 @@
                     android:layout_toRightOf="@id/mlkz_secondary_page_item_author_image"
                     android:singleLine="true" />
 
+                <!--1.3帖子标题-->
                 <TextView
                     android:id="@+id/mlkz_secondary_page_item_title"
                     android:layout_width="match_parent"
@@ -58,19 +68,44 @@
                     android:layout_alignLeft="@id/mlkz_secondary_page_item_author_image"
                     android:layout_below="@id/mlkz_secondary_page_item_author_image" />
 
+                <!--1.4最后回帖时间-->
+                <TextView
+                    android:id="@+id/mlkz_secondary_page_item_lastposttime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@id/mlkz_secondary_page_item_authorname"
+                    android:layout_below="@id/mlkz_secondary_page_item_authorname" />
+
+                <!--1.5主题分类(筛选)-->
+                <TextView
+                    android:id="@+id/mlkz_secondary_page_item_classification"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@id/mlkz_secondary_page_item_title"
+                    android:layout_below="@id/mlkz_secondary_page_item_title" />
+
+                <!--1.6回帖奖励-->
+                <TextView
+                    android:id="@+id/mlkz_secondary_page_item_reward"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true" />
             </RelativeLayout>
 
-            <!--分割线-->
+            <!--2.分割线-->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1px"
                 android:background="@color/grey240" />
 
+            <!--3.这一层略带灰色-->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
+                <!--3.1发帖时间-->
                 <TextView
                     android:id="@+id/mlkz_secondary_page_item_posttime"
                     android:layout_width="0dp"
@@ -80,6 +115,17 @@
                     android:padding="6dp"
                     android:singleLine="true" />
 
+                <!--3.2回复数量-->
+                <TextView
+                    android:id="@+id/mlkz_secondary_page_item_viewscount"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:padding="6dp"
+                    android:singleLine="true" />
+
+                <!--3.3回复数量-->
                 <TextView
                     android:id="@+id/mlkz_secondary_page_item_replycount"
                     android:layout_width="0dp"

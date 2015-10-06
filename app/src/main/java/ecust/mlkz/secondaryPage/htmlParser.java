@@ -43,10 +43,12 @@ import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_SecondarySection
 import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_SortList;
 import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_SortList.SortStyle;
 import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_SubmitURL;
+import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_TertiarySectionNode;
 import lib.logUtils.abstract_LogUtil;
 import lib.logUtils.logUtil;
 import lib.logUtils.logUtil.LogOFF;
 import lib.logUtils.logUtil.LogStatus;
+import lib.logUtils.logUtil.tagStateEnum;
 import lib.myXmlPullParserUtils;
 
 
@@ -57,6 +59,7 @@ import lib.myXmlPullParserUtils;
  * 代码还显得特别凌乱，不方便调试
  * 请照着类似如下地址调试，否则看不懂的的
  * http://bbs.ecust.edu.cn/forum.php?mod=forumdisplay&fid=4
+ * 这地址里各种标签不成对啊！
  */
 public class htmlParser {
     //事件消息类型
@@ -102,7 +105,7 @@ public class htmlParser {
      * @param html html数据
      */
     @Nullable
-    @LogStatus(aliasName = "主循环", logShowClassName = true, logShowCurrentFunction = true)
+    @LogStatus(aliasName = "主循环")
     protected struct_MLKZ_Data parseAllData(String html) {
         //初始化
         initXmlPullParser();
@@ -143,6 +146,15 @@ public class htmlParser {
                         } else if ("vfboxs".equals(className)) {
                             //解析子版块
                             log.d("========子版块========");
+                            parseTertiarySection(allData.mPageInformation);
+                        } else if ("pg".equals(className)) {
+                            //解析下一页地址(有两处，只要解析出一处就行)
+                            if (allData.mPageInformation.getNextPageURL() == null) {
+                                log.d("========下一页地址========");
+                                String nextPageURL = parseNextPageURL();
+                                allData.mPageInformation.setNextPageURL(nextPageURL);
+                                log.d(allData.mPageInformation.getNextPageURL());
+                            }
                         } else if ("th".equals(className)) {
                             //解析精华帖
                             log.d("========精华帖========");
@@ -190,6 +202,74 @@ public class htmlParser {
     }
 
     /**
+     * 解析下一页地址
+     *
+     * @return 返回为空，代表木有下一页，已经到达最后一页
+     */
+    @Nullable
+    private String parseNextPageURL() {
+        while (pointer.moveToNextStartTag("a", "div") != pointer.TAG_NOT_FOUND) {
+            String href = parser.getAttributeValue(null, "href");
+            String className = parser.getAttributeValue(null, "class");
+
+            if (!"nxt".equals(className)) continue;
+
+            return href;
+        }
+        return null;
+    }
+
+    /**
+     * 解析子版块(三级版块)
+     *
+     * @param pageData 数据
+     */
+    @LogStatus(aliasName = "子版块")
+    private void parseTertiarySection(struct_ForumPageAllData pageData) {
+        //当前版块
+        struct_CurrentSection currentSection = pageData.getCurrentSection();
+
+        //目标节点
+        struct_SecondarySectionNode targetNode = null;
+
+        logUtil log = new logUtil(this);
+
+        //先获取二级版块
+        label_Found:
+        for (struct_PrimarySectionNode mPrimaryNode : pageData.getPrimarySectionNodes()) {
+            if (!mPrimaryNode.getName().equals(currentSection.primarySectionName)) continue;
+
+            //一级版块已经找到,继续找二级的
+            for (struct_SecondarySectionNode mSecondaryNode : mPrimaryNode.getSecondaryNodes()) {
+                if (!mSecondaryNode.getName().equals(currentSection.secondarySectionName)) continue;
+                //已经找到了
+                targetNode = mSecondaryNode;
+                break label_Found;
+            }
+        }
+
+        log.Assert(this, targetNode != null, "找不到目标节点");
+        if (targetNode == null) return;
+
+        //设置三级节点
+        List<struct_TertiarySectionNode> mList = new ArrayList<>();
+        while (pointer.moveToNextStartTag("dt", "table") != pointer.TAG_NOT_FOUND) {
+            pointer.moveToNextStartTag("a", "dt");
+            String href = parser.getAttributeValue(null, "href");
+            String name = pointer.moveToNextText(2);
+
+            //新建节点
+            struct_TertiarySectionNode mTertiaryNode = new struct_TertiarySectionNode();
+            mTertiaryNode.setName(name).setUrl(href);
+            log.d("[" + name + "] " + href);
+
+            //添加到父节点
+            mList.add(mTertiaryNode);
+        }
+        targetNode.setTertiaryNodes(mList);
+    }
+
+    /**
      * 获取一级版块数组
      */
     @NonNull
@@ -220,7 +300,7 @@ public class htmlParser {
     /**
      * 一级版块
      */
-    @LogStatus(aliasName = "一级版块")
+    @LogStatus(aliasName = "一级版块", tagState = tagStateEnum.showOnlyAliasName)
     private void parseSecondarySection(struct_PrimarySectionNode fatherNode) {
         String href;
         String title;
@@ -244,7 +324,7 @@ public class htmlParser {
      */
     @NonNull
     @LogOFF
-    @LogStatus(aliasName = "主题分类")
+    @LogStatus(aliasName = "主题分类", tagState = tagStateEnum.showOnlyAliasName)
     private List<struct_ClassificationNode> parseClassification() {
         List<struct_ClassificationNode> result = new ArrayList<>();
         logUtil log = new logUtil(this);
@@ -302,7 +382,7 @@ public class htmlParser {
      */
     @NonNull
     @LogOFF
-    @LogStatus(aliasName = "排序方式")
+    @LogStatus(aliasName = "排序方式", tagState = tagStateEnum.showOnlyAliasName)
     private struct_SortList parseSortList() {
         String url;
         SortStyle sortStyle;
@@ -452,8 +532,6 @@ public class htmlParser {
             String strClassification = pointer.moveToNextText(2);
             node.setClassificationName(strClassification);
             pointer.moveToNextStartTag("a", null);
-        } else {
-            node.setClassificationName("无");
         }
         log.d("[2.主题分类] " + node.getClassificationName());
 

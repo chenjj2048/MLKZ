@@ -33,15 +33,10 @@ import java.lang.reflect.Method;
  * 保证每个类都能控制各自日志的输出
  */
 public final class logUtil extends abstract_LogUtil {
-    //tagName自动为声明时的 ClassName + MethodName
+    //tagName
     private String tagName;
     //决定这一层是否启用Log
     private boolean logEnable = true;
-    //决定TAG中是否显示类
-
-    private boolean logShowClass = true;
-    //决定TAG中是否显示调用处的函数
-    private boolean logShowFunction = true;
 
     /**
      * @param this_obj 传个this进来就行
@@ -56,6 +51,10 @@ public final class logUtil extends abstract_LogUtil {
         StackTraceElement stacktrace = Thread.currentThread().getStackTrace()[depth];
         String className = stacktrace.getClassName();
         String methodName = stacktrace.getMethodName();
+
+        //默认结果
+        String aliasName = "";
+        tagStateEnum tagState = tagStateEnum.showMethodAndAlias;
 
         //遍历函数获得注解(不允许用在具有重名的函数上)
         Method[] methods = this_obj.getClass().getDeclaredMethods();
@@ -72,27 +71,54 @@ public final class logUtil extends abstract_LogUtil {
             //注解2：Log状态
             LogStatus annotation = method.getAnnotation(LogStatus.class);
             if (annotation != null) {
-                //TAG中是否显示类名、调用处函数及Log别名
-                if (annotation.aliasName() != null && annotation.aliasName().length() > 0) {
-                    this.tagName = methodName + " - " + annotation.aliasName();
-                    return;
-                } else {
-                    this.logShowFunction = annotation.logShowCurrentFunction();
-                    this.logShowClass = annotation.logShowClassName();
-                }
+                aliasName = annotation.aliasName();
+                if (aliasName == null)
+                    aliasName = "";
+
+                tagState = annotation.tagState();
             }
             break;
         }
 
         //设置标签名称
-        if (logShowClass && logShowFunction)
-            this.tagName = className + "-【" + methodName + "】";
-        else if (logShowClass)
-            this.tagName = className;
-        else if (logShowFunction)
-            this.tagName = methodName;
-        else
-            logUtil.w(this, "LogStatus两个参数不能都是false吧");
+        if (aliasName.equals(""))
+            tagState = tagStateEnum.showClassAndMethod;
+
+        switch (tagState) {
+            case showMethodAndAlias:
+                this.tagName = methodName + " - " + aliasName;
+                break;
+            case showClassAndMethod:
+                this.tagName = className + " - " + methodName;
+                break;
+            case showClassAndAlias:
+                this.tagName = className + " - " + aliasName;
+                break;
+            case showAll:
+                this.tagName = className + " - " + methodName + " - " + aliasName;
+                break;
+            case showOnlyAliasName:
+                this.tagName = aliasName;
+                break;
+            case showOnlyMethod:
+                this.tagName = methodName;
+                break;
+            case showOnlyClass:
+                this.tagName = className;
+                break;
+            default:
+                this.tagName = "错误的标签";
+        }
+    }
+
+    /**
+     * 断言
+     * android studio里assert不知道怎么就不起作用，自己写个输出日志
+     */
+    public void Assert(boolean condition, String errorMessage) {
+        if (logEnable && !condition) {
+            abstract_LogUtil.w(tagName, errorMessage);
+        }
     }
 
     @SuppressWarnings("deprecation")
@@ -125,6 +151,15 @@ public final class logUtil extends abstract_LogUtil {
         abstract_LogUtil.e(tagName, str);
     }
 
+    public enum tagStateEnum {
+        //只显示一处标签
+        showOnlyClass, showOnlyMethod, showOnlyAliasName,
+        //显示两处标签
+        showClassAndMethod, showClassAndAlias, showMethodAndAlias,
+        //显示三处标签
+        showAll
+    }
+
     /**
      * 日志TAG状态
      */
@@ -134,11 +169,8 @@ public final class logUtil extends abstract_LogUtil {
         //Log别名标签(一旦这个属性不为空，另两个属性就作废)
         String aliasName();
 
-        //是否显示类
-        boolean logShowClassName() default true;
-
-        //是否显示函数
-        boolean logShowCurrentFunction() default true;
+        //TAG显示的状态
+        tagStateEnum tagState() default tagStateEnum.showMethodAndAlias;
     }
 
     /**

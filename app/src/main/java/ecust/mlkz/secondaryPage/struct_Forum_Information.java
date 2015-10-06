@@ -42,7 +42,14 @@ public class struct_Forum_Information {
     @Nullable
     private static String decorateURL(String url) {
         if (url == null) return null;
+        final String BBS = "http://bbs.ecust.edu.cn";
+
         url = url.replace("&amp;", "&");
+        if (!url.startsWith("http://"))
+            if (url.startsWith("/"))
+                url = BBS + url;
+            else
+                url = BBS + "/" + url;
         return url;
     }
 
@@ -119,6 +126,22 @@ public class struct_Forum_Information {
         private struct_PostAttribute postAttribute = new struct_PostAttribute();
         //回帖奖励
         private int rewardSum = 0;
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            struct_PostNode postNode = (struct_PostNode) o;
+
+            return !(postUrl != null ? !postUrl.equals(postNode.postUrl) : postNode.postUrl != null);
+
+        }
+
+        @Override
+        public int hashCode() {
+            return postUrl != null ? postUrl.hashCode() : 0;
+        }
 
         public int getRewardSum() {
             return rewardSum;
@@ -324,6 +347,17 @@ public class struct_Forum_Information {
         private List<struct_ClassificationNode> classificationNodes;
         //排序方式
         private struct_SortList mSortList;
+        //下一页的URL，为空代表已经到达最后了
+        private String nextPageURL;
+
+        public String getNextPageURL() {
+            return nextPageURL;
+        }
+
+        //转成PC版
+        public void setNextPageURL(String nextPageURL) {
+            this.nextPageURL = activity_MLKZ_Secondary_Page.addressConvertToWAP(decorateURL(nextPageURL), false);
+        }
 
         public struct_SortList getSortList() {
             return mSortList;
@@ -341,6 +375,7 @@ public class struct_Forum_Information {
             this.excelentPostsURL = decorateURL(excelentPostsURL);
         }
 
+        @Nullable
         public struct_CurrentSection getCurrentSection() {
             return currentSection;
         }
@@ -519,16 +554,18 @@ public class struct_Forum_Information {
             return name;
         }
 
-        public void setName(String name) {
+        public struct_TertiarySectionNode setName(String name) {
             this.name = name;
+            return this;
         }
 
         public String getUrl() {
             return url;
         }
 
-        public void setUrl(String url) {
+        public struct_TertiarySectionNode setUrl(String url) {
             this.url = decorateURL(url);
+            return this;
         }
     }
 
