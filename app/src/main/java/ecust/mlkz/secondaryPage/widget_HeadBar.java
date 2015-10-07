@@ -113,34 +113,6 @@
 //    }
 //
 //    private void init() {
-//        //加载布局
-//        LayoutInflater.from(this.context).inflate(R.layout.old_mlkz_secondary_page_headbar, this);
-//
-//        //设置控件引用
-//        section = (TextView) findViewById(R.id.mlkz_secondary_page_headbar_section);
-//        classification = (TextView) findViewById(R.id.mlkz_secondary_page_headbar_classification);
-//        sort = (TextView) findViewById(R.id.mlkz_secondary_page_headbar_sort);
-//        linearLayout = (LinearLayout) this.getChildAt(0);
-//
-//        //设置监听
-//        section.setOnClickListener(this);
-//        classification.setOnClickListener(this);
-//        sort.setOnClickListener(this);
-//
-//        //设置画笔
-//        paint = new Paint();
-//        paint.setColor(getResources().getColor(R.color.grey230));
-//        final int dp = 1;
-//        paint.setStrokeWidth(clsDimensionConvert.dip2px(this.context, dp));
-//
-//        //调用onDraw,不然画不出来,内容随意
-//        this.setBackgroundColor(0);
-//
-//        //设置字体颜色
-//        textUnfocusedColor = getResources().getColor(R.color.black26);
-//        textFocusedColor = getResources().getColor(android.R.color.holo_orange_dark);
-//
-//        setDefaultTextColor();
 //    }
 //
 //    //设置默认字体颜色
@@ -395,54 +367,5 @@
 //    }
 //
 //
-//    @Override
-//    protected void onDraw(Canvas canvas) {
-//        canvas.drawColor(Color.WHITE);
 //
-//        int width = this.getWidth();
-//        int height = this.getHeight();
-//
-//        //画分割线
-//        if (classification.getVisibility() == VISIBLE) {
-//            //共三块部分
-//            canvas.drawLine(width / 3, 0, width / 3, height, paint);
-//            canvas.drawLine(width / 3 * 2, 0, width / 3 * 2, height, paint);
-//        } else {
-//            //这块暂时不用，以后有需要再改
-//            //共二块部分
-//            canvas.drawLine(width / 2, 0, width / 2, height, paint);
-//        }
-//
-//        //底线
-//        canvas.drawLine(0, height - paint.getStrokeWidth() / 2,
-//                width, height - paint.getStrokeWidth() / 2, paint);
-//    }
-//
-//    protected void setOnHeadbarClickListener(OnHeadbarClickListener listener) {
-//        this.onHeadbarClickListener = listener;
-//    }
-//
-//    /**
-//     * 设置数据集
-//     */
-//    public void setData(struct_forumDataRoot result) {
-//        this.mData = result;
-//    }
-//
-//    /**
-//     * 点击接口
-//     */
-//    interface OnHeadbarClickListener {
-//        //跳转至新版块
-//        void jumpToNewSection(String name, String href);
-//
-//        //子版块
-//        void onChildSectionSelected(String str);
-//
-//        //筛选
-//        void onClassificationSelected(String str);
-//
-//        //排序
-//        void onSortSelected(int sortByTimeType);
-//    }
 //}

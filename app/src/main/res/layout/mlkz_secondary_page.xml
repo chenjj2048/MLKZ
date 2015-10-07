@@ -9,17 +9,18 @@
     <include layout="@layout/part_actionbar" />
 
     <!--头部的导航菜单-->
-    <ecust.mlkz.secondaryPage.HeadBar
+    <ecust.mlkz.secondaryPage.HeadBar xmlns:headbar="http://schemas.android.com/apk/res-auto"
         android:id="@+id/mlkz_secondary_page_headbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-    </ecust.mlkz.secondaryPage.HeadBar>
+        android:layout_height="wrap_content"
+        headbar:tabPadding="5dp"
+        headbar:textFocusedColor="@android:color/holo_orange_light" />
 
     <!--主体内容-->
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:layout_weight="1">
         <!--贴子内容-->
         <android.support.v7.widget.RecyclerView
             android:id="@+id/mlkz_secondary_page_recyclerview"

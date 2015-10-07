@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="HeadBar">
+        <attr name="textUnfocusedColor" format="color" />
+        <attr name="textFocusedColor" format="color" />
+        <attr name="tabTextSize" format="dimension" />
+        <attr name="tabPadding" format="dimension" />
+    </declare-styleable>
+</resources>

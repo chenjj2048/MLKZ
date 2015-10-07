@@ -160,7 +160,7 @@ public class struct_Forum_Information {
         }
 
         public void setTitle(String title) {
-            this.title = title;
+            this.title = title.replace("&amp;", "&");
         }
 
         public String getPostUrl() {

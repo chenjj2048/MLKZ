@@ -71,7 +71,8 @@ public class activity_MLKZ_Secondary_Page extends Activity implements Listener<s
             final int lastItemPosition = layoutManager.findLastCompletelyVisibleItemPosition();
             final int totalItemCount = layoutManager.getItemCount();
 
-            if (newState == RecyclerView.SCROLL_STATE_IDLE && lastItemPosition >= totalItemCount - 1) {
+            if (newState == RecyclerView.SCROLL_STATE_IDLE && lastItemPosition >= totalItemCount - 1
+                    && totalItemCount != 0) {
                 //到达底部
                 onRecyclerViewBottom();
             }
@@ -152,7 +153,9 @@ public class activity_MLKZ_Secondary_Page extends Activity implements Listener<s
         //初始化HeadBar
         mHeadBar = (HeadBar) findViewById(R.id.mlkz_secondary_page_headbar);
         mHeadBar.addTab("版块", this);
-        mHeadBar.addTab("筛选",this);
+        mHeadBar.addTab("筛选", this);
+        mHeadBar.addTab("还有没", this);
+
     }
 
     @Override
