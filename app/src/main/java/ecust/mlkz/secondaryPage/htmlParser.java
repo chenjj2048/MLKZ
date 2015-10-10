@@ -549,7 +549,11 @@ public class htmlParser {
         if ("span".equals(parser.getName()) && "xi1".equals(parser.getAttributeValue(null, "class"))) {
             pointer.moveToNextText(2);
             String str = pointer.moveToNextText(2);
-            node.setRewardSum(Integer.valueOf(str.trim()));
+            try {
+                node.setRewardSum(Integer.valueOf(str.trim()));
+            } catch (NumberFormatException e) {
+                logUtil.printException(this, e);
+            }
         }
         log.d("[6.回帖奖励] " + node.getRewardSum());
 

@@ -77,7 +77,7 @@
                     android:layout_below="@id/mlkz_secondary_page_item_authorname" />
 
                 <!--1.5主题分类(筛选)-->
-                <TextView
+                <ecust.mlkz.secondaryPage.RoundRectTextView
                     android:id="@+id/mlkz_secondary_page_item_classification"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

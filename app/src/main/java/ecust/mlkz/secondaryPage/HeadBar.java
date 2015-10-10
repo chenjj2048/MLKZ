@@ -34,12 +34,9 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
-import java.util.HashMap;
-
 import ecust.main.R;
 import lib.clsDimensionConvert;
 import lib.clsUtils.ScreenUtil;
-import lib.logUtils.logUtil;
 
 /**
  * 顶部的Tab
@@ -61,12 +58,10 @@ public class HeadBar extends LinearLayout implements View.OnClickListener, Popup
     private int mTextSize;
     //TextViewPadding
     private int mPadding = 0;
-    //Tab的数量
-    private int mCount = 0;
     //PopupWindow
     private PopupWindow mPopupWindow;
-    //数据集
-    private HashMap<String, OnTagClickListener> mHashMap;
+    //监听器
+    private OnTagClickListener listener;
     //画笔
     private Paint mPaint;
 
@@ -117,7 +112,6 @@ public class HeadBar extends LinearLayout implements View.OnClickListener, Popup
      * 初始化
      */
     private void init() {
-        this.mHashMap = new HashMap<>(5);
         this.setOrientation(HORIZONTAL);
         this.setGravity(Gravity.CENTER);
         //默认字体大小
@@ -127,7 +121,6 @@ public class HeadBar extends LinearLayout implements View.OnClickListener, Popup
         mPaint.setColor(getResources().getColor(DEFAULT_PAINT_COLOR));
         mPaint.setStrokeWidth(clsDimensionConvert.dip2px(getContext(), DEFAULT_PAINT_SIZE_DP));
         mPaint.setAntiAlias(true);
-        mPaint.setStyle(Paint.Style.FILL);
         //刷新
         invalidateLayout();
     }
@@ -141,44 +134,11 @@ public class HeadBar extends LinearLayout implements View.OnClickListener, Popup
     }
 
     /**
-     * 显示View（会添加一个半透明黑色背景）
-     */
-    private void popupView(View view) {
-        //View最大只显示7成
-        final int screenHeight = ScreenUtil.getScreenHeight(getContext());
-        final float maxHeight = screenHeight * 0.7f;
-        view.measure(0, MeasureSpec.makeMeasureSpec((int) maxHeight, MeasureSpec.AT_MOST));
-        view.setLayoutParams(new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, view.getMeasuredHeight()));
-
-        //设置半透明背景
-        View backgroundView = new View(getContext());
-        backgroundView.setBackgroundColor(Color.argb(0x80, 0, 0, 0));
-        //背景设置点击事件
-        backgroundView.setTag(BACKGROUND_VIEW_CLICKED);
-        backgroundView.setOnClickListener(this);
-
-        //容器内添加要显示的View和半透明背景
-        LinearLayout viewGroup = new LinearLayout(getContext());
-        viewGroup.setOrientation(VERTICAL);
-        viewGroup.addView(view);
-        viewGroup.addView(backgroundView);
-
-        //显示
-        mPopupWindow = new PopupWindow(viewGroup, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-        mPopupWindow.setOnDismissListener(this);
-        mPopupWindow.showAsDropDown(this);
-    }
-
-    /**
      * 添加可供点击的标签
      *
-     * @param name               标签名称
-     * @param onTagClickListener 回调函数
+     * @param name 标签名称
      */
-    protected void addTab(String name, OnTagClickListener onTagClickListener) {
-        this.mHashMap.put(name, onTagClickListener);
-
+    protected HeadBar addTab(String name) {
         //新建TextView
         TextView textView = new TextView(getContext());
         textView.setText(name);
@@ -207,9 +167,11 @@ public class HeadBar extends LinearLayout implements View.OnClickListener, Popup
         this.addView(linearLayout, lp);
 
         //设置点击事件
-        linearLayout.setTag(mCount++);
+        linearLayout.setTag(this.getChildCount() - 1);
         linearLayout.setDescendantFocusability(FOCUS_BLOCK_DESCENDANTS);
         linearLayout.setOnClickListener(this);
+
+        return this;
     }
 
     @Override
@@ -218,6 +180,7 @@ public class HeadBar extends LinearLayout implements View.OnClickListener, Popup
         final float height = this.getHeight();
         final float half_PaintStrokeWidth = mPaint.getStrokeWidth() / 2;
 
+        //背景色
         canvas.drawColor(Color.WHITE);
         //绘制底线
         canvas.drawLine(0, height - half_PaintStrokeWidth,
@@ -265,16 +228,9 @@ public class HeadBar extends LinearLayout implements View.OnClickListener, Popup
                     TextView textView = (TextView) ((LinearLayout) v).getChildAt(0);
                     changeTabStatus(textView, true);
 
-
-                    logUtil.toast(item + "");
-                    TextView tv = new TextView(getContext());
-                    tv.setBackgroundResource(android.R.color.holo_orange_light);
-                    tv.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 50));
-                    tv.setGravity(Gravity.CENTER);
-                    tv.setText("aaa " + item);
-                    tv.setTextSize(40);
-                    tv.setTextColor(getResources().getColor(android.R.color.holo_blue_light));
-                    popupView(tv);
+                    //抛出事件
+                    if (this.listener != null)
+                        listener.onHeadBarTagClick(item, new NewWindow());
                 }
                 break;
         }
@@ -293,7 +249,49 @@ public class HeadBar extends LinearLayout implements View.OnClickListener, Popup
         }
     }
 
-    protected interface OnTagClickListener {
-        void onHeadBarTagClick(String name);
+    /**
+     * 设置监听
+     */
+    public void setOnTagClickListener(OnTagClickListener listener) {
+        this.listener = listener;
+    }
+
+    public interface OnTagClickListener {
+        void onHeadBarTagClick(int position, NewWindow mWindow);
+    }
+
+    /**
+     * 弹出View的一个类，供接口调用
+     */
+    public class NewWindow {
+        /**
+         * 显示View（会添加一个半透明黑色背景）
+         */
+        public void popupView(View view) {
+            //View最大只显示7成
+            final int screenHeight = ScreenUtil.getScreenHeight(getContext());
+            final float maxHeight = screenHeight * 0.7f;
+            view.measure(0, MeasureSpec.makeMeasureSpec((int) maxHeight, MeasureSpec.AT_MOST));
+            view.setLayoutParams(new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, view.getMeasuredHeight()));
+
+            //设置半透明背景
+            View backgroundView = new View(getContext());
+            backgroundView.setBackgroundColor(Color.argb(0x80, 0, 0, 0));
+            //背景设置点击事件
+            backgroundView.setTag(BACKGROUND_VIEW_CLICKED);
+            backgroundView.setOnClickListener(HeadBar.this);
+
+            //容器内添加要显示的View和半透明背景
+            LinearLayout viewGroup = new LinearLayout(getContext());
+            viewGroup.setOrientation(VERTICAL);
+            viewGroup.addView(view);
+            viewGroup.addView(backgroundView);
+
+            //显示
+            mPopupWindow = new PopupWindow(viewGroup, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+            mPopupWindow.setOnDismissListener(HeadBar.this);
+            mPopupWindow.showAsDropDown(HeadBar.this);
+        }
     }
 }

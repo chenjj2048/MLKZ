@@ -25,6 +25,12 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -37,6 +43,8 @@ import java.util.List;
 
 import ecust.main.R;
 import ecust.mlkz.cls_MLKZ_Login;
+import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_ClassificationNode;
+import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_CurrentSection;
 import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_MLKZ_Data;
 import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_PostNode;
 import lib.Global;
@@ -56,6 +64,8 @@ public class activity_MLKZ_Secondary_Page extends Activity implements Listener<s
     private RecyclerView mRecyclerView;
     //顶部栏
     private HeadBar mHeadBar;
+    //清除旧数据标记
+    private boolean mFlagCleanOldData;
     /**
      * RecyclerView滚动监听
      */
@@ -92,6 +102,7 @@ public class activity_MLKZ_Secondary_Page extends Activity implements Listener<s
         final String style_WAP = "&mobile=yes";
         final String style_PC = "&mobile=no";
 
+        if (url == null) return null;
         if (!url.contains("&mobile="))
             url += style_PC;
         if (convertToWAP) {
@@ -108,7 +119,7 @@ public class activity_MLKZ_Secondary_Page extends Activity implements Listener<s
         //加载下一页
         String nextPageURL = mAdapter.getData().mPageInformation.getNextPageURL();
         if (nextPageURL != null)
-            openNewPage(nextPageURL);
+            openNewPage(nextPageURL, false);
     }
 
     @Override
@@ -126,15 +137,17 @@ public class activity_MLKZ_Secondary_Page extends Activity implements Listener<s
         initViews();
 
         //加载新页面
-        openNewPage(sectionURL);
+        openNewPage(sectionURL, false);
     }
 
     /**
      * 打开一个新的链接
      *
-     * @param url 地址
+     * @param url          地址
+     * @param cleanOldData 清除原有数据
      */
-    private void openNewPage(String url) {
+    private void openNewPage(String url, boolean cleanOldData) {
+        mFlagCleanOldData = cleanOldData;
         //当前cookie
         String cookie = new cls_MLKZ_Login(this).getPreference().getCookie();
         //访问
@@ -152,15 +165,45 @@ public class activity_MLKZ_Secondary_Page extends Activity implements Listener<s
 
         //初始化HeadBar
         mHeadBar = (HeadBar) findViewById(R.id.mlkz_secondary_page_headbar);
-        mHeadBar.addTab("版块", this);
-        mHeadBar.addTab("筛选", this);
-        mHeadBar.addTab("还有没", this);
+        mHeadBar.addTab("版块").addTab("排序");
+        mHeadBar.setOnTagClickListener(this);
+    }
 
+    /**
+     * 主题分类（筛选）被点击
+     */
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        final int pos = item.getItemId();
+        //获取节点信息-主题分类
+        struct_ClassificationNode mClassificationNode =
+                mAdapter.getData().mPageInformation.getClassificationNodes().get(pos);
+
+        //跳转新页面
+        openNewPage(mClassificationNode.getUrl(), true);
+
+        return super.onContextItemSelected(item);
     }
 
     @Override
-    public void onHeadBarTagClick(String name) {
-
+    public void onHeadBarTagClick(int position, HeadBar.NewWindow mWindow) {
+        View mPopView = null;
+        switch (position) {
+            case 0:
+            case 1:
+            case 2:
+                TextView tv = new TextView(this);
+                tv.setBackgroundResource(android.R.color.holo_orange_light);
+                tv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 50));
+                tv.setGravity(Gravity.CENTER);
+                tv.setText(position + " aaa " + Math.random());
+                tv.setTextSize(40);
+                tv.setTextColor(getResources().getColor(android.R.color.holo_blue_light));
+                mPopView = tv;
+                break;
+        }
+        if (mPopView != null)
+            mWindow.popupView(mPopView);
     }
 
     @Override
@@ -170,18 +213,32 @@ public class activity_MLKZ_Secondary_Page extends Activity implements Listener<s
 
     @Override
     public void onResponse(struct_MLKZ_Data newData) {
-
-        if (mAdapter.getData() != null) {
-            //取得旧数据，并在其后面添加新数据
-            List<struct_PostNode> oldData = mAdapter.getData().mPostsList;
-            for (struct_PostNode i : newData.mPostsList) {
-                //判断是否重复
-                if (!oldData.contains(i))
-                    oldData.add(i);
+        //设置标题
+        struct_CurrentSection mCurrentSection = newData.mPageInformation.getCurrentSection();
+        if (mCurrentSection != null)
+            if (mCurrentSection.tertiarySectionName != null && mCurrentSection.tertiarySectionName.length() > 0) {
+                Global.setTitle(this, "梅陇客栈 - " + mCurrentSection.tertiarySectionName);
+            } else {
+                Global.setTitle(this, "梅陇客栈 - " + mCurrentSection.secondarySectionName);
             }
-            //替换数据
-            newData.mPostsList = oldData;
+
+        //判断是否与旧数据进行合并
+        if (!mFlagCleanOldData) {
+            if (mAdapter.getData() != null) {
+                //取得旧数据，并在其后面添加新数据
+                List<struct_PostNode> oldData = mAdapter.getData().mPostsList;
+                for (struct_PostNode i : newData.mPostsList) {
+                    //判断是否重复
+                    if (!oldData.contains(i))
+                        oldData.add(i);
+                }
+                //替换数据
+                newData.mPostsList = oldData;
+            }
+        } else {
+            mRecyclerView.scrollToPosition(0);
         }
+        //设置数据
         mAdapter.setData(newData);
     }
 

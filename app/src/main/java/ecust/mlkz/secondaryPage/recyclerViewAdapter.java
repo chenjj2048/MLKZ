@@ -25,6 +25,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.util.LruCache;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,6 +51,8 @@ public class recyclerViewAdapter extends RecyclerView.Adapter<recyclerViewAdapte
     private ImageLoader mImageLoader;
     //数据集
     private struct_MLKZ_Data mData;
+    //点击事件类
+    private Listeners mListeners = new Listeners();
 
     public recyclerViewAdapter(Context context, RequestQueue mQueue) {
         this.context = context;
@@ -77,16 +80,28 @@ public class recyclerViewAdapter extends RecyclerView.Adapter<recyclerViewAdapte
     public void onBindViewHolder(final ViewHolder viewHolder, int position) {
         //数据集
         struct_PostNode node = mData.mPostsList.get(position);
-        //第一行
+        //=================第一行==================
         viewHolder.mTitle.setText(node.getTitle());
         viewHolder.mAuthorName.setText(node.getAuthor().getName());
         viewHolder.mLastReplyTime.setText(node.getLastReplyTime());
-        viewHolder.mClassification.setText(node.getClassificationName());
+        //主题分类(筛选)
+        if (node.getClassificationName().equals("")) {
+            viewHolder.mClassification.setVisibility(View.GONE);
+        } else {
+            viewHolder.mClassification.setText(node.getClassificationName());
+            viewHolder.mClassification.setTextSize(lib.clsDimensionConvert.dip2px(this.context, 6));
+            viewHolder.mClassification.setVisibility(View.VISIBLE);
+            viewHolder.mClassification.setOnClickListener(mListeners.mClassificationClick);
+            viewHolder.mClassification.setOnCreateContextMenuListener(mListeners.mClassificationContextMenu);
+        }
+        //回帖奖励
         if (node.getRewardSum() > 0)
             viewHolder.mRewardSum.setText("回帖奖励 " + node.getRewardSum());
         else
             viewHolder.mRewardSum.setText("");
-        //第二行
+
+
+        //==================第二行================
         viewHolder.mFirstReleaseTime.setText(node.getFirstReleaseTime());
         viewHolder.mViewsCount.setText("查看 " + node.getVisitCount());
         viewHolder.mReplyCount.setText("回复 " + node.getReplyCount());
@@ -108,6 +123,38 @@ public class recyclerViewAdapter extends RecyclerView.Adapter<recyclerViewAdapte
     @Override
     public int getItemCount() {
         return (mData == null || mData.mPostsList == null) ? 0 : mData.mPostsList.size();
+    }
+
+    /**
+     * 监听集合
+     */
+    private class Listeners {
+        /**
+         * 主题分类-点击
+         */
+        private View.OnClickListener mClassificationClick = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //打开上下文菜单
+                v.performLongClick();
+            }
+        };
+
+        /**
+         * 显示上下文菜单
+         */
+        private View.OnCreateContextMenuListener mClassificationContextMenu = new View.OnCreateContextMenuListener() {
+            @Override
+            public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+                //添加主题分类
+                for (int i = 0; i < mData.mPageInformation.getClassificationNodes().size(); i++) {
+                    menu.add(0, i, 0, mData.mPageInformation.getClassificationNodes().get(i).getName());
+                }
+                menu.setHeaderTitle("主题筛选");
+            }
+        };
+
+
     }
 
     /**
@@ -160,7 +207,7 @@ public class recyclerViewAdapter extends RecyclerView.Adapter<recyclerViewAdapte
         TextView mReplyCount;       //回复数量
 
         @InjectView(R.id.mlkz_secondary_page_item_classification)
-        TextView mClassification;   //主题分类（标签筛选）
+        RoundRectTextView mClassification;   //主题分类（标签筛选）
 
         @InjectView(R.id.mlkz_secondary_page_item_reward)
         TextView mRewardSum;        //回帖奖励
