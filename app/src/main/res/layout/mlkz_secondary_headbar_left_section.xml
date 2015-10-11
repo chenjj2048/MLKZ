@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="horizontal"
+    tools:context="ecust.mlkz.secondaryPage.activity_MLKZ_Secondary_Page">
+
+    <ListView
+        android:id="@+id/mlkz_secondary_headbar_listview1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@android:color/holo_orange_light" />
+
+    <ListView
+        android:id="@+id/mlkz_secondary_headbar_listview2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@android:color/holo_green_dark" />
+
+    <ListView
+        android:id="@+id/mlkz_secondary_headbar_listview3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@android:color/holo_blue_light" />
+</LinearLayout>

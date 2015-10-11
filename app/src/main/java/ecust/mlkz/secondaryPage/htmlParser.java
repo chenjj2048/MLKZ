@@ -41,7 +41,6 @@ import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_PostNode;
 import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_PrimarySectionNode;
 import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_SecondarySectionNode;
 import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_SortList;
-import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_SortList.SortStyle;
 import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_SubmitURL;
 import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_TertiarySectionNode;
 import lib.logUtils.abstract_LogUtil;
@@ -237,18 +236,18 @@ public class htmlParser {
         //先获取二级版块
         label_Found:
         for (struct_PrimarySectionNode mPrimaryNode : pageData.getPrimarySectionNodes()) {
-            if (!mPrimaryNode.getName().equals(currentSection.primarySectionName)) continue;
+            if (!mPrimaryNode.getName().equals(currentSection.getPrimarySectionName())) continue;
 
             //一级版块已经找到,继续找二级的
             for (struct_SecondarySectionNode mSecondaryNode : mPrimaryNode.getSecondaryNodes()) {
-                if (!mSecondaryNode.getName().equals(currentSection.secondarySectionName)) continue;
+                if (!mSecondaryNode.getName().equals(currentSection.getPrimarySectionName()))
+                    continue;
                 //已经找到了
                 targetNode = mSecondaryNode;
                 break label_Found;
             }
         }
 
-        log.Assert(this, targetNode != null, "找不到目标节点");
         if (targetNode == null) return;
 
         //设置三级节点
@@ -323,7 +322,7 @@ public class htmlParser {
      * 获取分类筛选数组(如 全部、求助、讨论、科普知识、学术知识、其他) 或 "全部"
      */
     @NonNull
-    @LogOFF
+//    @LogOFF
     @LogStatus(aliasName = "主题分类", tagState = tagStateEnum.showOnlyAliasName)
     private List<struct_ClassificationNode> parseClassification() {
         List<struct_ClassificationNode> result = new ArrayList<>();
@@ -385,30 +384,30 @@ public class htmlParser {
     @LogStatus(aliasName = "排序方式", tagState = tagStateEnum.showOnlyAliasName)
     private struct_SortList parseSortList() {
         String url;
-        SortStyle sortStyle;
         struct_SortList result = new struct_SortList();
         while (pointer.moveToNextStartTag("a", "div") != pointer.TAG_NOT_FOUND) {
             url = parser.getAttributeValue(null, "href");
+            String mTitle;
             //设置对应属性
             if (url.contains("dateline"))
-                sortStyle = SortStyle.DATELINE;
+                mTitle = "发帖时间";
             else if (url.contains("replies"))
-                sortStyle = SortStyle.REPLYS;
+                mTitle = "回复数量";
             else if (url.contains("views"))
-                sortStyle = SortStyle.VIEWS;
+                mTitle = "查看数量";
             else if (url.contains("lastpost"))
-                sortStyle = SortStyle.LAST_POST_TIME;
+                mTitle = "最后发表时间";
             else if (url.contains("heats"))
-                sortStyle = SortStyle.HEATS;
+                mTitle = "热门";
             else
-                sortStyle = SortStyle.DEFAULT;
+                mTitle = "默认排序";
 
             //赋值
-            result.setSortURL(sortStyle, url);
-            new logUtil(this).d(sortStyle.name() + " " + url);
+            result.putSortUrl(mTitle, url);
+            new logUtil(this).d(mTitle + " " + url);
 
             //抵达了最后一项，就退出
-            if (sortStyle == SortStyle.HEATS)
+            if ("热门".equals(mTitle))
                 break;
         }
         return result;
@@ -450,17 +449,17 @@ public class htmlParser {
                 case 1:
                     //一级版块名称
                     temp = pointer.moveToNextText(2);
-                    result.primarySectionName = temp;
+                    result.setPrimarySectionName(temp);
                     break;
                 case 2:
                     //二级版块名称
                     temp = pointer.moveToNextText(2);
-                    result.secondarySectionName = temp;
+                    result.setSecondarySectionName(temp);
                     break;
                 case 3:
                     //三级版块名称
                     temp = pointer.moveToNextText(2);
-                    result.tertiarySectionName = temp;
+                    result.setTertiarySectionName(temp);
                     break;
             }
         }

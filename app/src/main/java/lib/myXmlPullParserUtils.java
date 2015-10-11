@@ -28,6 +28,7 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import lib.logUtils.abstract_LogUtil;
+import lib.logUtils.logUtil;
 
 /**
  * 自定义XmlPullParser的辅助工具
@@ -86,8 +87,18 @@ public class myXmlPullParserUtils {
         int event = XmlPullParser.START_DOCUMENT;
         try {
             event = parser.next();
-        } catch (Exception e) {
-            //
+        } catch (Exception e1) {
+            logUtil.v(this, "未成对标签");
+            try {
+                event = parser.getEventType();
+            } catch (XmlPullParserException e2) {
+                /**
+                 * ==================重要================
+                 * next()失败的话，还要再次获取event值
+                 * 有时候碰上未成对的标签，报错，返回了一个错误的event，直接导致后续解析接连出错
+                 * 害我调试了半天
+                 */
+            }
         }
         return event;
     }
@@ -183,6 +194,7 @@ public class myXmlPullParserUtils {
         try {
             return parser.getEventType();
         } catch (XmlPullParserException e) {
+            //正常使用，一般不会报错
             return -1;
         }
     }

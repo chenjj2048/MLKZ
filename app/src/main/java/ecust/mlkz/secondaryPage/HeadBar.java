@@ -23,9 +23,13 @@ package ecust.mlkz.secondaryPage;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
@@ -64,6 +68,9 @@ public class HeadBar extends LinearLayout implements View.OnClickListener, Popup
     private OnTagClickListener listener;
     //画笔
     private Paint mPaint;
+    //箭头图标
+    private Drawable mDrawableUp;
+    private Drawable mDrawableDown;
 
     public HeadBar(Context context) {
         this(context, null);
@@ -75,14 +82,20 @@ public class HeadBar extends LinearLayout implements View.OnClickListener, Popup
 
     public HeadBar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
         initAttributes(context, attrs, defStyleAttr);
+        init();
     }
 
     /**
      * 加载特性
      */
     private void initAttributes(Context context, AttributeSet attrs, int defStyleAttr) {
+        //设置下默认属性
+        mTextUnfocusedColor = new TextView(getContext()).getCurrentTextColor();
+        mTextFocusedColor = mTextUnfocusedColor;
+        mTextSize = clsDimensionConvert.dip2px(getContext(), DEFAULT_TEXT_SIZE_DP);
+
+        //加载属性
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.HeadBar, defStyleAttr, 0);
         for (int i = 0; i < a.getIndexCount(); i++) {
             int attr = a.getIndex(i);
@@ -114,8 +127,6 @@ public class HeadBar extends LinearLayout implements View.OnClickListener, Popup
     private void init() {
         this.setOrientation(HORIZONTAL);
         this.setGravity(Gravity.CENTER);
-        //默认字体大小
-        this.mTextSize = clsDimensionConvert.dip2px(getContext(), DEFAULT_TEXT_SIZE_DP);
         //画笔
         mPaint = new Paint();
         mPaint.setColor(getResources().getColor(DEFAULT_PAINT_COLOR));
@@ -123,6 +134,9 @@ public class HeadBar extends LinearLayout implements View.OnClickListener, Popup
         mPaint.setAntiAlias(true);
         //刷新
         invalidateLayout();
+        //绘制Drawable
+        this.mDrawableUp = createArrowDrawable(this.mTextFocusedColor, false);
+        this.mDrawableDown = createArrowDrawable(this.mTextUnfocusedColor, true);
     }
 
     /**
@@ -143,16 +157,12 @@ public class HeadBar extends LinearLayout implements View.OnClickListener, Popup
         TextView textView = new TextView(getContext());
         textView.setText(name);
         textView.setLineSpacing(0, 1.1f);
-        if (mTextUnfocusedColor != 0) {
-            //非默认颜色
-            textView.setTextColor(mTextUnfocusedColor);
-        } else {
-            //获取默认颜色
-            mTextUnfocusedColor = textView.getCurrentTextColor();
-        }
         textView.setTextSize(mTextSize);
         textView.setSingleLine();
+        textView.setGravity(Gravity.CENTER);
         textView.setPadding(0, mPadding, 0, mPadding);
+        changeTabStatus(textView, false);
+
         textView.setLayoutParams(new LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
@@ -202,10 +212,14 @@ public class HeadBar extends LinearLayout implements View.OnClickListener, Popup
      * @param focused 是否为选中项
      */
     private void changeTabStatus(TextView textView, boolean focused) {
-        if (focused)
+        if (focused) {
             textView.setTextColor(mTextFocusedColor);
-        else
+            textView.setCompoundDrawables(null, null, mDrawableUp, null);
+        } else {
             textView.setTextColor(mTextUnfocusedColor);
+            textView.setCompoundDrawables(null, null, mDrawableDown, null);
+        }
+        textView.setCompoundDrawablePadding(lib.clsDimensionConvert.dip2px(getContext(), 5));
     }
 
     /**
@@ -256,6 +270,52 @@ public class HeadBar extends LinearLayout implements View.OnClickListener, Popup
         this.listener = listener;
     }
 
+    /**
+     * 创建一个Drawable
+     */
+    @SuppressWarnings("deprecation")
+    private Drawable createArrowDrawable(int color, boolean arrowDown) {
+        final int widths = (int) (this.mTextSize * 0.6f);
+        final int heights = widths * 2;
+
+        //画笔
+        Paint mDrawablePaint = new Paint();
+        mDrawablePaint.setColor(color);
+        mDrawablePaint.setAntiAlias(true);
+        mDrawablePaint.setStrokeWidth(clsDimensionConvert.dip2px(getContext(), DEFAULT_PAINT_SIZE_DP));
+
+        //新建位图
+        Bitmap bitmap = Bitmap.createBitmap(heights, widths, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        canvas.drawColor(Color.TRANSPARENT);
+        if (arrowDown) {
+            //向下箭头
+            canvas.drawLine(0, 0, widths, widths, mDrawablePaint);
+            canvas.drawLine(widths, widths, heights, 0, mDrawablePaint);
+        } else {
+            //向上箭头
+            canvas.drawLine(0, widths, widths, 0, mDrawablePaint);
+            canvas.drawLine(widths, 0, heights, widths, mDrawablePaint);
+        }
+
+        //转成Drawable
+        Drawable drawable = new BitmapDrawable(bitmap);
+        drawable.setBounds(0, 0, heights, widths);
+        return drawable;
+    }
+
+    /**
+     * 关闭当前的View
+     */
+    public void closeCurrentView() {
+        if (mPopupWindow != null) {
+            mPopupWindow.dismiss();
+        } else {
+            //重置下TextView状态
+            this.onDismiss();
+        }
+    }
+
     public interface OnTagClickListener {
         void onHeadBarTagClick(int position, NewWindow mWindow);
     }
@@ -267,7 +327,12 @@ public class HeadBar extends LinearLayout implements View.OnClickListener, Popup
         /**
          * 显示View（会添加一个半透明黑色背景）
          */
-        public void popupView(View view) {
+        public void popupView(@Nullable View view) {
+            if (view == null) {
+                HeadBar.this.closeCurrentView();
+                return;
+            }
+
             //View最大只显示7成
             final int screenHeight = ScreenUtil.getScreenHeight(getContext());
             final float maxHeight = screenHeight * 0.7f;

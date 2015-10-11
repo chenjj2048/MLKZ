@@ -72,7 +72,7 @@ public class recyclerViewAdapter extends RecyclerView.Adapter<recyclerViewAdapte
     @Override
     @SuppressWarnings("all")
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(this.context).inflate(R.layout.mlkz_seconary_recyclerview_item, null);
+        View view = LayoutInflater.from(this.context).inflate(R.layout.mlkz_secondary_recyclerview_item, null);
         return new ViewHolder(view);
     }
 
@@ -81,7 +81,10 @@ public class recyclerViewAdapter extends RecyclerView.Adapter<recyclerViewAdapte
         //数据集
         struct_PostNode node = mData.mPostsList.get(position);
         //=================第一行==================
+        //标题
         viewHolder.mTitle.setText(node.getTitle());
+        viewHolder.mTitle.setTextColor(this.context.getResources().getColor(R.color.black26));
+
         viewHolder.mAuthorName.setText(node.getAuthor().getName());
         viewHolder.mLastReplyTime.setText(node.getLastReplyTime());
         //主题分类(筛选)
@@ -146,6 +149,8 @@ public class recyclerViewAdapter extends RecyclerView.Adapter<recyclerViewAdapte
         private View.OnCreateContextMenuListener mClassificationContextMenu = new View.OnCreateContextMenuListener() {
             @Override
             public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+                if (mData == null || mData.mPageInformation == null) return;
+                if (mData.mPageInformation.getClassificationNodes() == null) return;
                 //添加主题分类
                 for (int i = 0; i < mData.mPageInformation.getClassificationNodes().size(); i++) {
                     menu.add(0, i, 0, mData.mPageInformation.getClassificationNodes().get(i).getName());

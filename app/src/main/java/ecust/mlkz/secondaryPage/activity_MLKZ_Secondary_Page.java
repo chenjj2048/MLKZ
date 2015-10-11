@@ -22,15 +22,16 @@
 package ecust.mlkz.secondaryPage;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.Gravity;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -47,6 +48,7 @@ import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_ClassificationNo
 import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_CurrentSection;
 import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_MLKZ_Data;
 import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_PostNode;
+import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_SortList;
 import lib.Global;
 import lib.logUtils.logUtil;
 
@@ -67,9 +69,22 @@ public class activity_MLKZ_Secondary_Page extends Activity implements Listener<s
     //清除旧数据标记
     private boolean mFlagCleanOldData;
     /**
+     * 排序选项被点击
+     */
+    public AdapterView.OnItemClickListener mSortItemClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            struct_SortList mSortList = mAdapter.getData().mPageInformation.getSortList();
+            String url = mSortList.mUrl.get(position);
+            openNewPage(url, true);
+            //隐藏菜单
+            mHeadBar.closeCurrentView();
+        }
+    };
+    /**
      * RecyclerView滚动监听
      */
-    private RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
+    public RecyclerView.OnScrollListener onRecyclerViewScrollListener = new RecyclerView.OnScrollListener() {
         private LinearLayoutManager layoutManager;
 
         @Override
@@ -148,10 +163,14 @@ public class activity_MLKZ_Secondary_Page extends Activity implements Listener<s
      */
     private void openNewPage(String url, boolean cleanOldData) {
         mFlagCleanOldData = cleanOldData;
+        if (cleanOldData)
+            mAdapter.setData(null);
+
         //当前cookie
         String cookie = new cls_MLKZ_Login(this).getPreference().getCookie();
         //访问
         url = addressConvertToWAP(url, false);
+
         mQueue.add(new mlkzRequest(Request.Method.GET, url, cookie, this, this));
     }
 
@@ -161,7 +180,7 @@ public class activity_MLKZ_Secondary_Page extends Activity implements Listener<s
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new recyclerViewAdapter(this, mQueue);
         mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.addOnScrollListener(onScrollListener);
+        mRecyclerView.addOnScrollListener(onRecyclerViewScrollListener);
 
         //初始化HeadBar
         mHeadBar = (HeadBar) findViewById(R.id.mlkz_secondary_page_headbar);
@@ -170,7 +189,7 @@ public class activity_MLKZ_Secondary_Page extends Activity implements Listener<s
     }
 
     /**
-     * 主题分类（筛选）被点击
+     * HeadBar主题分类（筛选）被点击
      */
     @Override
     public boolean onContextItemSelected(MenuItem item) {
@@ -185,25 +204,80 @@ public class activity_MLKZ_Secondary_Page extends Activity implements Listener<s
         return super.onContextItemSelected(item);
     }
 
+    /**
+     * HeadBar被点击
+     */
     @Override
     public void onHeadBarTagClick(int position, HeadBar.NewWindow mWindow) {
         View mPopView = null;
         switch (position) {
             case 0:
+                //版块按钮
+                mPopView = createCatalogView();
+                break;
             case 1:
-            case 2:
-                TextView tv = new TextView(this);
-                tv.setBackgroundResource(android.R.color.holo_orange_light);
-                tv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 50));
-                tv.setGravity(Gravity.CENTER);
-                tv.setText(position + " aaa " + Math.random());
-                tv.setTextSize(40);
-                tv.setTextColor(getResources().getColor(android.R.color.holo_blue_light));
-                mPopView = tv;
+                //排序按钮
+                mPopView = createSortListView();
                 break;
         }
-        if (mPopView != null)
-            mWindow.popupView(mPopView);
+        mWindow.popupView(mPopView);
+    }
+
+    /**
+     * 创建版块目录
+     */
+    private View createCatalogView() {
+        if (mAdapter.getData() == null) return null;
+        //加载布局文件
+        View view = getLayoutInflater().inflate(R.layout.mlkz_secondary_headbar_left_section, null);
+        catalogListView mCatalogListView = new catalogListView(this, view, mAdapter.getData().mPageInformation);
+
+        return mCatalogListView.getView();
+
+    }
+
+    /**
+     * 创建排序的ListView
+     */
+    @SuppressWarnings("unchecked")
+    private ListView createSortListView() {
+        //获取数据集
+        if (mAdapter.getData() == null) return null;
+        struct_SortList mSortData = mAdapter.getData().mPageInformation.getSortList();
+
+        final ListView listView = new ListView(this);
+        listView.setBackgroundColor(Color.WHITE);
+        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, mSortData.mTitle);
+        listView.setAdapter(adapter);
+        //点击事件
+        listView.setOnItemClickListener(mSortItemClickListener);
+        listView.setOnTouchListener(new View.OnTouchListener() {
+            int lastDownPosition;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                ListView mListView = (ListView) v;
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        lastDownPosition = mListView.pointToPosition((int) event.getX(), (int) event.getY());
+                    case MotionEvent.ACTION_MOVE:
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        //获取点击的位置
+                        final int position = mListView.pointToPosition((int) event.getX(), (int) event.getY());
+                        if (position == lastDownPosition && position != -1) {
+                            //分发OnItemClick事件，触发不了，找不到被什么抢了焦点
+                            mListView.performItemClick(mListView, position, 0);
+                            break;
+                        }
+                    case MotionEvent.ACTION_CANCEL:
+                        mHeadBar.closeCurrentView();
+                        return true;
+                }
+                return false;
+            }
+        });
+        return listView;
     }
 
     @Override
@@ -213,13 +287,15 @@ public class activity_MLKZ_Secondary_Page extends Activity implements Listener<s
 
     @Override
     public void onResponse(struct_MLKZ_Data newData) {
+        mHeadBar.closeCurrentView();
+
         //设置标题
         struct_CurrentSection mCurrentSection = newData.mPageInformation.getCurrentSection();
         if (mCurrentSection != null)
-            if (mCurrentSection.tertiarySectionName != null && mCurrentSection.tertiarySectionName.length() > 0) {
-                Global.setTitle(this, "梅陇客栈 - " + mCurrentSection.tertiarySectionName);
+            if (mCurrentSection.getTertiarySectionName() != null && mCurrentSection.getTertiarySectionName().length() > 0) {
+                Global.setTitle(this, "梅陇客栈 - " + mCurrentSection.getTertiarySectionName());
             } else {
-                Global.setTitle(this, "梅陇客栈 - " + mCurrentSection.secondarySectionName);
+                Global.setTitle(this, "梅陇客栈 - " + mCurrentSection.getSecondarySectionName());
             }
 
         //判断是否与旧数据进行合并
@@ -240,6 +316,7 @@ public class activity_MLKZ_Secondary_Page extends Activity implements Listener<s
         }
         //设置数据
         mAdapter.setData(newData);
+
     }
 
     @Override
@@ -249,3 +326,4 @@ public class activity_MLKZ_Secondary_Page extends Activity implements Listener<s
         mQueue.stop();
     }
 }
+

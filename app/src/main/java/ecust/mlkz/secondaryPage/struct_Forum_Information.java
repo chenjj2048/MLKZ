@@ -24,7 +24,7 @@ package ecust.mlkz.secondaryPage;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 
 import lib.logUtils.abstract_LogUtil;
@@ -67,31 +67,25 @@ public class struct_Forum_Information {
      * 排序方式对应的地址
      */
     protected static class struct_SortList {
-        //存储各种地址
-        private HashMap<SortStyle, String> hashMap = new HashMap<>();
+        public List<String> mTitle = new ArrayList<>();
+        public List<String> mUrl = new ArrayList<>();
 
         /**
-         * 设置排序地址
+         * 存储地址
          *
-         * @param sortStyle 排序方式
-         * @param url       地址
+         * @param key 排序方式名称
+         * @param Url 对应地址
          */
-        protected void setSortURL(SortStyle sortStyle, @Nullable String url) {
-            hashMap.put(sortStyle, decorateURL(url));
-        }
-
-        protected String getSortURL(SortStyle sortStyle) {
-            return hashMap.get(sortStyle);
-        }
-
-        //排序方式枚举
-        protected enum SortStyle {
-            DEFAULT,         //默认排序
-            DATELINE,        //发帖时间
-            REPLYS,          //回复数量
-            VIEWS,           //查看数量
-            LAST_POST_TIME,  //最后发表
-            HEATS            //热门
+        public void putSortUrl(String key, @Nullable String Url) {
+            Url = decorateURL(Url);
+            if (key != null && Url != null)
+                if ("默认排序".equals(key)) {
+                    mTitle.add(0, key);
+                    mUrl.add(0, Url);
+                } else {
+                    mTitle.add(key);
+                    mUrl.add(Url);
+                }
         }
     }
 
@@ -521,6 +515,9 @@ public class struct_Forum_Information {
         }
 
         public struct_SecondarySectionNode setName(String name) {
+            //原来标题太长，替换掉
+            if (name != null && name.contains("新生报到"))
+                name = "新生报到";
             this.name = name;
             return this;
         }
@@ -573,9 +570,36 @@ public class struct_Forum_Information {
      * 版块当前位置
      */
     protected static class struct_CurrentSection {
-        protected String primarySectionName;
-        protected String secondarySectionName;
-        protected String tertiarySectionName;
+        private String primarySectionName;
+        private String secondarySectionName;
+        private String tertiarySectionName;
+
+        public String getPrimarySectionName() {
+            return primarySectionName;
+        }
+
+        public void setPrimarySectionName(String primarySectionName) {
+            this.primarySectionName = primarySectionName;
+        }
+
+        public String getSecondarySectionName() {
+            return secondarySectionName;
+        }
+
+        public void setSecondarySectionName(String secondarySectionName) {
+            //标题太长，替换一下
+            if (secondarySectionName != null && secondarySectionName.contains("新生报到"))
+                secondarySectionName = "新生报到";
+            this.secondarySectionName = secondarySectionName;
+        }
+
+        public String getTertiarySectionName() {
+            return tertiarySectionName;
+        }
+
+        public void setTertiarySectionName(String tertiarySectionName) {
+            this.tertiarySectionName = tertiarySectionName;
+        }
 
         @Override
         public String toString() {
