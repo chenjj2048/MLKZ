@@ -239,16 +239,22 @@ public class htmlParser {
             if (!mPrimaryNode.getName().equals(currentSection.getPrimarySectionName())) continue;
 
             //一级版块已经找到,继续找二级的
+            log.v("找到一级版块 - " + mPrimaryNode.getName());
             for (struct_SecondarySectionNode mSecondaryNode : mPrimaryNode.getSecondaryNodes()) {
-                if (!mSecondaryNode.getName().equals(currentSection.getPrimarySectionName()))
+                log.v("二级版块枚举 - " + mSecondaryNode.getName());
+                if (!mSecondaryNode.getName().equals(currentSection.getSecondarySectionName()))
                     continue;
                 //已经找到了
+                log.v("找到二级版块 - " + mSecondaryNode.getName());
                 targetNode = mSecondaryNode;
                 break label_Found;
             }
         }
 
-        if (targetNode == null) return;
+        if (targetNode == null) {
+            log.w("未发现当前版块");
+            return;
+        }
 
         //设置三级节点
         List<struct_TertiarySectionNode> mList = new ArrayList<>();
@@ -261,7 +267,7 @@ public class htmlParser {
             struct_TertiarySectionNode mTertiaryNode = new struct_TertiarySectionNode();
             mTertiaryNode.setName(name).setUrl(href);
             log.d("[" + name + "] " + href);
-
+//            log.d(pageData.getCurrentSection().getSecondarySectionName() + "|" + name + "|" + href);
             //添加到父节点
             mList.add(mTertiaryNode);
         }

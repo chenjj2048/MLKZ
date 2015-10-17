@@ -547,6 +547,14 @@ public class struct_Forum_Information {
         private String name;
         private String url;
 
+        public struct_TertiarySectionNode() {
+        }
+
+        public struct_TertiarySectionNode(String name, String url) {
+            this.setName(name);
+            this.setUrl(url);
+        }
+
         public String getName() {
             return name;
         }
@@ -598,6 +606,8 @@ public class struct_Forum_Information {
         }
 
         public void setTertiarySectionName(String tertiarySectionName) {
+            if (tertiarySectionName!=null)
+                tertiarySectionName=tertiarySectionName.trim();
             this.tertiarySectionName = tertiarySectionName;
         }
 

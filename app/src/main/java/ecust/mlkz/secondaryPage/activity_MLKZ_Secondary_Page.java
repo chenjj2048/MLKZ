@@ -49,6 +49,7 @@ import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_CurrentSection;
 import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_MLKZ_Data;
 import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_PostNode;
 import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_SortList;
+import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_TertiarySectionNode;
 import lib.Global;
 import lib.logUtils.logUtil;
 
@@ -213,11 +214,11 @@ public class activity_MLKZ_Secondary_Page extends Activity implements Listener<s
         switch (position) {
             case 0:
                 //版块按钮
-                mPopView = createCatalogView();
+                mPopView = createLeftCatalogView();
                 break;
             case 1:
                 //排序按钮
-                mPopView = createSortListView();
+                mPopView = createRightSortListView();
                 break;
         }
         mWindow.popupView(mPopView);
@@ -226,21 +227,29 @@ public class activity_MLKZ_Secondary_Page extends Activity implements Listener<s
     /**
      * 创建版块目录
      */
-    private View createCatalogView() {
+    private View createLeftCatalogView() {
         if (mAdapter.getData() == null) return null;
-        //加载布局文件
-        View view = getLayoutInflater().inflate(R.layout.mlkz_secondary_headbar_left_section, null);
-        catalogListView mCatalogListView = new catalogListView(this, view, mAdapter.getData().mPageInformation);
-
-        return mCatalogListView.getView();
-
+        //创建一个版块选择的View
+        catalogListView mCatalogListView = new catalogListView(this);
+        mCatalogListView.setData(mAdapter.getData().mPageInformation);
+        mCatalogListView.setOnChildSectionSelectedListener(new catalogListView.OnChildSectionSelectedListener() {
+            //有选中需跳转的节点
+            @Override
+            public void OnChildSectionSelected(struct_TertiarySectionNode mSection_3rd) {
+                //打开新页面
+                openNewPage(mSection_3rd.getUrl(), true);
+                //关闭PopupWindow
+                mHeadBar.closeCurrentView();
+            }
+        });
+        return mCatalogListView;
     }
 
     /**
      * 创建排序的ListView
      */
     @SuppressWarnings("unchecked")
-    private ListView createSortListView() {
+    private ListView createRightSortListView() {
         //获取数据集
         if (mAdapter.getData() == null) return null;
         struct_SortList mSortData = mAdapter.getData().mPageInformation.getSortList();

@@ -5,26 +5,32 @@
     android:layout_height="match_parent"
     android:background="@android:color/white"
     android:orientation="horizontal"
-    tools:context="ecust.mlkz.secondaryPage.activity_MLKZ_Secondary_Page">
+    tools:context="ecust.mlkz.secondaryPage.catalogListView">
 
     <ListView
         android:id="@+id/mlkz_secondary_headbar_listview1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:background="@android:color/holo_orange_light" />
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp"
+        android:scrollbars="none" />
 
     <ListView
         android:id="@+id/mlkz_secondary_headbar_listview2"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_weight="1"
-        android:background="@android:color/holo_green_dark" />
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp"
+        android:scrollbars="none" />
 
     <ListView
         android:id="@+id/mlkz_secondary_headbar_listview3"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_weight="1"
-        android:background="@android:color/holo_blue_light" />
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp"
+        android:scrollbars="none" />
 </LinearLayout>

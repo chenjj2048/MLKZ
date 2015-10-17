@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         headbar:tabPadding="5dp"
-        headbar:textFocusedColor="@android:color/holo_orange_light" />
+        headbar:textFocusedColor="@android:color/holo_red_light" />
 
     <!--主体内容-->
     <FrameLayout
