@@ -21,16 +21,21 @@
 
 package ecust.mlkz.secondaryPage;
 
-import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 
 import com.android.volley.Request;
@@ -39,6 +44,7 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
+import com.github.clans.fab.FloatingActionButton;
 
 import java.util.List;
 
@@ -50,14 +56,14 @@ import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_MLKZ_Data;
 import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_PostNode;
 import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_SortList;
 import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_TertiarySectionNode;
-import lib.Global;
 import lib.logUtils.logUtil;
+import widget.HorizontalFabMenu;
 
 
 /**
  * 显示帖子目录及各版块信息
  */
-public class activity_MLKZ_Secondary_Page extends Activity implements Listener<struct_MLKZ_Data>, ErrorListener,
+public class activity_MLKZ_Secondary_Page extends AppCompatActivity implements Listener<struct_MLKZ_Data>, ErrorListener,
         HeadBar.OnTagClickListener {
     //Volley队列
     private RequestQueue mQueue;
@@ -65,10 +71,15 @@ public class activity_MLKZ_Secondary_Page extends Activity implements Listener<s
     private recyclerViewAdapter mAdapter;
     //RecyclerView
     private RecyclerView mRecyclerView;
+    //ToolBar
+    private Toolbar mToolbar;
     //顶部栏
     private HeadBar mHeadBar;
+    //FAB按钮组
+    private HorizontalFabMenu mFabMenu;
     //清除旧数据标记
     private boolean mFlagCleanOldData;
+
     /**
      * 排序选项被点击
      */
@@ -143,7 +154,8 @@ public class activity_MLKZ_Secondary_Page extends Activity implements Listener<s
         super.onCreate(savedInstanceState);
         setContentView(R.layout.mlkz_secondary_page);
 
-        Global.setTitle(this, "梅陇客栈");
+        //初始化标题栏
+        initToolBar();
 
         //设置当前版块标题、URL
         String sectionURL = getIntent().getStringExtra("url");
@@ -154,6 +166,22 @@ public class activity_MLKZ_Secondary_Page extends Activity implements Listener<s
 
         //加载新页面
         openNewPage(sectionURL, false);
+
+    }
+
+    /**
+     * 初始化标题栏
+     */
+    private void initToolBar() {
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mToolbar.setTitle("梅陇客栈");
+        setSupportActionBar(mToolbar);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add("aa");menu.add("bb");menu.add("cc");
+        return super.onCreateOptionsMenu(menu);
     }
 
     /**
@@ -166,6 +194,8 @@ public class activity_MLKZ_Secondary_Page extends Activity implements Listener<s
         mFlagCleanOldData = cleanOldData;
         if (cleanOldData)
             mAdapter.setData(null);
+        if (mAdapter.getItemCount() == 0)
+            mRecyclerView.setVisibility(View.INVISIBLE);
 
         //当前cookie
         String cookie = new cls_MLKZ_Login(this).getPreference().getCookie();
@@ -187,6 +217,11 @@ public class activity_MLKZ_Secondary_Page extends Activity implements Listener<s
         mHeadBar = (HeadBar) findViewById(R.id.mlkz_secondary_page_headbar);
         mHeadBar.addTab("版块").addTab("排序");
         mHeadBar.setOnTagClickListener(this);
+        mHeadBar.attachToRecyclerView(mRecyclerView);
+
+        //FAB按钮组合
+        mFabMenu = (HorizontalFabMenu) findViewById(R.id.mlkz_secondary_page_fab_menu);
+        mFabMenu.attachToRecyclerView(mRecyclerView);
     }
 
     /**
@@ -297,16 +332,19 @@ public class activity_MLKZ_Secondary_Page extends Activity implements Listener<s
     @Override
     public void onResponse(struct_MLKZ_Data newData) {
         mHeadBar.closeCurrentView();
+        mRecyclerView.setVisibility(View.VISIBLE);
 
         //设置标题
         struct_CurrentSection mCurrentSection = newData.mPageInformation.getCurrentSection();
-        if (mCurrentSection != null)
+        if (mCurrentSection != null) {
+            String title;
             if (mCurrentSection.getTertiarySectionName() != null && mCurrentSection.getTertiarySectionName().length() > 0) {
-                Global.setTitle(this, "梅陇客栈 - " + mCurrentSection.getTertiarySectionName());
+                title = "梅陇客栈 - " + mCurrentSection.getTertiarySectionName();
             } else {
-                Global.setTitle(this, "梅陇客栈 - " + mCurrentSection.getSecondarySectionName());
+                title = "梅陇客栈 - " + mCurrentSection.getSecondarySectionName();
             }
-
+            mToolbar.setTitle(title);
+        }
         //判断是否与旧数据进行合并
         if (!mFlagCleanOldData) {
             if (mAdapter.getData() != null) {

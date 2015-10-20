@@ -3,7 +3,12 @@
     <!--统一默认的字体大小、及颜色等信息-->
 
     <!-- Application主题 -->
-    <style name="AppBaseTheme" parent="Theme.AppCompat.Light">
+    <style name="AppBaseTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!--为ToolBar做准备-->
+        <!--http://stackoverflow.com/questions/26515058/this-activity-already-has-an-action-bar-supplied-by-the-window-decor#-->
+        <!--<item name="windowActionBar">false</item>-->
+        <!--<item name="android:windowNoTitle">true</item>-->
+
         <!-- 自定义的风格 -->
         <item name="android:textViewStyle">@style/Base_TextView</item>
     </style>

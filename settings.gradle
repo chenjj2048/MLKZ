@@ -1,1 +1,1 @@
-include ':app', ':pulltorefresh', ':viewpagerindicator', ':volley'
+include ':app', ':pulltorefresh', ':viewpagerindicator', ':volley', ':floatingactionbutton'

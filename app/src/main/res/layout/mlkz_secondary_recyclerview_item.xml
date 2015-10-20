@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/grey240"
+    android:background="@android:color/transparent"
     tools:context="ecust.mlkz.secondaryPage.recyclerViewAdapter">
 
     <!--层级有点深，但怎么优化就怎么报错，以后有空回来再改-->
@@ -49,7 +49,7 @@
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_marginBottom="10dp"
-                    android:layout_marginRight="10dp"/>
+                    android:layout_marginRight="10dp" />
 
                 <!--1.2作者名称-->
                 <TextView

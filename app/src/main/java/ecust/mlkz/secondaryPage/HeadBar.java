@@ -30,10 +30,13 @@ import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -195,6 +198,8 @@ public class HeadBar extends LinearLayout implements View.OnClickListener, Popup
         //绘制底线
         canvas.drawLine(0, height - half_PaintStrokeWidth,
                 width, height - half_PaintStrokeWidth, mPaint);
+        //绘制顶部线
+        canvas.drawLine(0, half_PaintStrokeWidth, width, half_PaintStrokeWidth, mPaint);
 
         //绘制分割线
         final int iCount = this.getChildCount();
@@ -314,6 +319,48 @@ public class HeadBar extends LinearLayout implements View.OnClickListener, Popup
             //重置下TextView状态
             this.onDismiss();
         }
+    }
+
+    /**
+     * 随RecyclerView的滑动，显示隐藏组件
+     */
+    public void attachToRecyclerView(RecyclerView mRecyclerView) {
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            //最小移动距离
+            final int minScrollOffset = 0;
+            Animation mAnimationShow;
+            Animation mAnimationHide;
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                if (Math.abs(dy) > minScrollOffset) {
+                    //初始化动画
+                    if (mAnimationShow == null || mAnimationHide == null) {
+                        mAnimationShow = AnimationUtils.loadAnimation(getContext(), R.anim.headbar_show);
+                        mAnimationHide = AnimationUtils.loadAnimation(getContext(), R.anim.headbar_hide);
+                    }
+
+                    final boolean isVisible = (HeadBar.this.getVisibility() == View.VISIBLE);
+                    if (dy > 0) {
+                        //向下滑动隐藏
+                        if (isVisible) {
+                            mAnimationShow.cancel();
+                            HeadBar.this.startAnimation(mAnimationHide);
+                            HeadBar.this.setVisibility(View.GONE);
+                        }
+                    } else {
+                        //向上滑动显示
+                        if (!isVisible) {
+                            mAnimationHide.cancel();
+                            HeadBar.this.startAnimation(mAnimationShow);
+                            HeadBar.this.setVisibility(View.VISIBLE);
+                        }
+                    }
+                }
+            }
+        });
     }
 
     public interface OnTagClickListener {
