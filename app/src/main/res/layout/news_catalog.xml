@@ -5,15 +5,13 @@
     android:orientation="vertical"
     tools:context="ecust.news.act_News_Catalog">
 
-    <!--华理助手-->
-    <!--华理新闻 主界面-->
-
-    <include layout="@layout/part_actionbar" />
+    <include layout="@layout/toolbar" />
 
     <ecust.news.myWidgetTabPageIndicator
         android:id="@+id/news_catalog_myTabPageIndicator"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:background="@color/blue_i_like" />
 
     <android.support.v4.view.ViewPager
         android:id="@+id/news_Catalog_Viewpager"

@@ -2,11 +2,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
     android:orientation="vertical"
     tools:context="ecust.lecture.act_Lecture_Detail">
 
-    <include layout="@layout/part_actionbar" />
+    <include layout="@layout/toolbar" />
 
     <include layout="@layout/part_failurebar" />
 
@@ -16,6 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:background="@android:color/white"
         android:scrollbars="none">
 
         <LinearLayout

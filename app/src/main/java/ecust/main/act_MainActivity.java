@@ -1,6 +1,5 @@
 package ecust.main;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,6 +13,8 @@ import ecust.mlkz.homePage.act_MLKZ_Home;
 import ecust.news.act_News_Catalog;
 import ecust.school_calendar.act_School_Calendar;
 import lib.clsUtils.pathFactory;
+import myWidget.BaseAppCompatActivity;
+import statistics.clsUmeng;
 
 /**
  * =============================================================================
@@ -33,7 +34,7 @@ import lib.clsUtils.pathFactory;
  * Created by 彩笔怪盗基德 on 2015/5/20
  * Copyright (C) 2015 彩笔怪盗基德
  */
-public class act_MainActivity extends Activity implements View.OnClickListener {
+public class act_MainActivity extends BaseAppCompatActivity implements View.OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +43,6 @@ public class act_MainActivity extends Activity implements View.OnClickListener {
 
         //初始化组件
         initComponents();
-
     }
 
     private void initComponents() {
@@ -98,6 +98,7 @@ public class act_MainActivity extends Activity implements View.OnClickListener {
         dialog.setNegativeButton("是", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                clsUmeng.onKillProcess(act_MainActivity.this);
                 System.exit(0);        //进程通通杀死，清理内存
             }
         });

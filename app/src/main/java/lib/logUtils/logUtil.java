@@ -112,6 +112,19 @@ public final class logUtil extends abstract_LogUtil {
     }
 
     /**
+     * 输出异常
+     *
+     * @param msg 消息内容
+     */
+    public static void throwException(String msg) {
+        try {
+            throw new Exception(msg);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * 断言
      * android studio里assert不知道怎么就不起作用，自己写个输出日志
      */

@@ -1,6 +1,5 @@
 package ecust.lecture;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -14,6 +13,7 @@ import android.widget.TextView;
 
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
+import com.umeng.analytics.MobclickAgent;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -29,12 +29,13 @@ import java.util.List;
 import ecust.main.R;
 import ecust.main.act_MainActivity;
 import lib.Const;
-import lib.Global;
 import lib.clsApplication;
 import lib.clsUtils.clsExpiredTimeMangment;
 import lib.clsUtils.httpUtil;
-import lib.logUtils.abstract_LogUtil;
 import lib.clsUtils.timeUtil;
+import lib.logUtils.abstract_LogUtil;
+import myWidget.BaseAppCompatActivity;
+import statistics.clsUmeng;
 
 /**
  * =============================================================================
@@ -56,7 +57,7 @@ import lib.clsUtils.timeUtil;
  */
 
 //讲座版块详细目录
-public class act_Lecture_Catalog extends Activity implements
+public class act_Lecture_Catalog extends BaseAppCompatActivity implements
         PullToRefreshBase.OnLastItemVisibleListener,
         PullToRefreshBase.OnRefreshListener2, AdapterView.OnItemClickListener,
         httpUtil.OnHttpVisitListener {
@@ -72,9 +73,6 @@ public class act_Lecture_Catalog extends Activity implements
 
     private DataBase_Lecture dataBase_lecture = new DataBase_Lecture(this);    //获取数据库
     private HashMap<String, List<struct_LectureCatalogItem>> cacheData = new HashMap<>();  //临时存放解析出来的数据
-
-    public act_Lecture_Catalog() {
-    }
 
     /**
      * 子线程中运行，避免listview卡顿
@@ -149,8 +147,6 @@ public class act_Lecture_Catalog extends Activity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.lecture_catalog);
 
-        Global.setTitle(this, "讲座信息");   //设置标题
-
         wListView = (PullToRefreshListView) findViewById(R.id.lecture_listview_pulltorefresh);
         wListView.setMode(PullToRefreshBase.Mode.PULL_FROM_START);   //只允许下拉刷新
 
@@ -167,12 +163,27 @@ public class act_Lecture_Catalog extends Activity implements
         nextPage = new clsExpiredTimeMangment(this).getInt("nextPage", 1);
 
         initializeLoadData();       //初次尝试加载
+
+        //标题
+        initToolBar();
+    }
+
+    private void initToolBar() {
+        getSupportToolBar(this).setTitle("讲座信息");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         save_NextPage();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //统计事件
+        clsUmeng.onEvent(this);
+        clsUmeng.onPause(this);
     }
 
     /**

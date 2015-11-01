@@ -23,19 +23,15 @@ package ecust.mlkz.secondaryPage;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
 import android.widget.ListView;
 
 import com.android.volley.Request;
@@ -44,7 +40,6 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
-import com.github.clans.fab.FloatingActionButton;
 
 import java.util.List;
 
@@ -57,13 +52,14 @@ import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_PostNode;
 import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_SortList;
 import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_TertiarySectionNode;
 import lib.logUtils.logUtil;
-import widget.HorizontalFabMenu;
+import myWidget.BaseAppCompatActivity;
+import myWidget.HorizontalFabMenu;
 
 
 /**
  * 显示帖子目录及各版块信息
  */
-public class activity_MLKZ_Secondary_Page extends AppCompatActivity implements Listener<struct_MLKZ_Data>, ErrorListener,
+public class activity_MLKZ_Secondary_Page extends BaseAppCompatActivity implements Listener<struct_MLKZ_Data>, ErrorListener,
         HeadBar.OnTagClickListener {
     //Volley队列
     private RequestQueue mQueue;
@@ -71,15 +67,10 @@ public class activity_MLKZ_Secondary_Page extends AppCompatActivity implements L
     private recyclerViewAdapter mAdapter;
     //RecyclerView
     private RecyclerView mRecyclerView;
-    //ToolBar
-    private Toolbar mToolbar;
     //顶部栏
     private HeadBar mHeadBar;
-    //FAB按钮组
-    private HorizontalFabMenu mFabMenu;
     //清除旧数据标记
     private boolean mFlagCleanOldData;
-
     /**
      * 排序选项被点击
      */
@@ -166,21 +157,19 @@ public class activity_MLKZ_Secondary_Page extends AppCompatActivity implements L
 
         //加载新页面
         openNewPage(sectionURL, false);
-
     }
 
-    /**
-     * 初始化标题栏
-     */
     private void initToolBar() {
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        mToolbar.setTitle("梅陇客栈");
-        setSupportActionBar(mToolbar);
+        Toolbar mToolBar = getSupportToolBar(this);
+        mToolBar.setTitle("梅陇客栈");
+        setSupportActionBar(mToolBar);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add("aa");menu.add("bb");menu.add("cc");
+        menu.add("aa");
+        menu.add("bb");
+        menu.add("cc");
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -220,8 +209,12 @@ public class activity_MLKZ_Secondary_Page extends AppCompatActivity implements L
         mHeadBar.attachToRecyclerView(mRecyclerView);
 
         //FAB按钮组合
-        mFabMenu = (HorizontalFabMenu) findViewById(R.id.mlkz_secondary_page_fab_menu);
+        HorizontalFabMenu mFabMenu = (HorizontalFabMenu) findViewById(R.id.mlkz_secondary_page_fab_menu);
         mFabMenu.attachToRecyclerView(mRecyclerView);
+        //发帖、投票、发悬赏 - 点击事件
+        PostNewItemClickListener mPostNewItemClickListener = new PostNewItemClickListener();
+        for (int i = 0; i < mFabMenu.getChildCount(); i++)
+            mFabMenu.getChildAt(i).setOnClickListener(mPostNewItemClickListener);
     }
 
     /**
@@ -343,7 +336,7 @@ public class activity_MLKZ_Secondary_Page extends AppCompatActivity implements L
             } else {
                 title = "梅陇客栈 - " + mCurrentSection.getSecondarySectionName();
             }
-            mToolbar.setTitle(title);
+            getSupportToolBar(this).setTitle(title);
         }
         //判断是否与旧数据进行合并
         if (!mFlagCleanOldData) {
@@ -363,7 +356,6 @@ public class activity_MLKZ_Secondary_Page extends AppCompatActivity implements L
         }
         //设置数据
         mAdapter.setData(newData);
-
     }
 
     @Override
@@ -371,6 +363,31 @@ public class activity_MLKZ_Secondary_Page extends AppCompatActivity implements L
         super.onDestroy();
         mQueue.cancelAll(this);
         mQueue.stop();
+    }
+
+    /**
+     * 发帖、投票、发布悬赏 - 按钮点击事件
+     */
+    class PostNewItemClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.mlkz_secondary_page_post_content:
+                    //发帖
+                    logUtil.toast("发帖");
+                    break;
+                case R.id.mlkz_secondary_page_post_vote:
+                    //投票
+                    logUtil.toast("投票");
+                    break;
+                case R.id.mlkz_secondary_page_post_bounty:
+                    //发悬赏
+                    logUtil.toast("发悬赏");
+                    break;
+                default:
+                    logUtil.toast("what");
+            }
+        }
     }
 }
 

@@ -72,7 +72,6 @@ public class myWidgetTabPageIndicator extends HorizontalScrollView implements Vi
     }
 
     private void init() {
-        this.setBackgroundResource(android.R.color.holo_green_light);
         this.setHorizontalScrollBarEnabled(false);
         linearLayout = new LinearLayout(getContext());
         linearLayout.setOrientation(LinearLayout.HORIZONTAL);

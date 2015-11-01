@@ -1,18 +1,21 @@
 package ecust.news;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+
+import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import ecust.main.R;
 import ecust.main.act_MainActivity;
-import lib.Global;
+import myWidget.BaseAppCompatActivity;
+import statistics.clsUmeng;
 
 /**
  * =============================================================================
@@ -32,7 +35,7 @@ import lib.Global;
  * Created by 彩笔怪盗基德 on 2015/6/30
  * Copyright (C) 2015 彩笔怪盗基德
  */
-public class act_News_Catalog extends FragmentActivity implements ViewPager.OnPageChangeListener {
+public class act_News_Catalog extends BaseAppCompatActivity implements ViewPager.OnPageChangeListener {
     private int currentFragmentPosition = 0;        //当前Fragment的索引值
     private List<Fragment> mFragments = new ArrayList<>();   //数据集
     private final FragmentPagerAdapter mFragmentAdapter = new FragmentPagerAdapter(getSupportFragmentManager()) {
@@ -92,8 +95,12 @@ public class act_News_Catalog extends FragmentActivity implements ViewPager.OnPa
         if (savedInstanceState != null)
             currentFragmentPosition = savedInstanceState.getInt("para1");
 
-        Global.setTitle(this, "华理新闻");
+        initToolBar();
         initComponents();
+    }
+
+    private void initToolBar() {
+        getSupportToolBar(this).setTitle("华理新闻");
     }
 
     /**
@@ -135,6 +142,9 @@ public class act_News_Catalog extends FragmentActivity implements ViewPager.OnPa
     @Override
     protected void onResume() {
         super.onResume();
+        //统计
+        clsUmeng.onEvent(this);
+
         //初始化要加载的Fragment
         onPageSelected(currentFragmentPosition);
     }

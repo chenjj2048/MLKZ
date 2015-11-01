@@ -5,7 +5,11 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 
+import com.umeng.analytics.AnalyticsConfig;
+import com.umeng.analytics.MobclickAgent;
+
 import lib.logUtils.abstract_LogUtil;
+import statistics.clsUmeng;
 
 /**
  * =============================================================================
@@ -41,6 +45,9 @@ public class clsApplication extends Application {
         IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(receiver, filter);
         abstract_LogUtil.i(this, "网络广播监听器已开启");
+
+        //友盟日志加密
+        clsUmeng.enableEncrypt(true);
     }
 
     @Override

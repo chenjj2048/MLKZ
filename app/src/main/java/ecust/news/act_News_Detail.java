@@ -1,6 +1,5 @@
 package ecust.news;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -38,10 +37,12 @@ import lib.clsFailureBar;
 import lib.clsUtils.InputStreamUtils;
 import lib.clsUtils.fileUtil;
 import lib.clsUtils.httpUtil;
-import lib.logUtils.abstract_LogUtil;
 import lib.clsUtils.pathFactory;
 import lib.clsUtils.pathFactory.PathType;
 import lib.clsUtils.timeUtil;
+import lib.logUtils.abstract_LogUtil;
+import myWidget.BaseAppCompatActivity;
+import statistics.clsUmeng;
 
 /**
  * =============================================================================
@@ -61,7 +62,7 @@ import lib.clsUtils.timeUtil;
  * Created by 彩笔怪盗基德 on 2015/6/30
  * Copyright (C) 2015 彩笔怪盗基德
  */
-public class act_News_Detail extends Activity implements clsFailureBar.OnWebRetryListener,
+public class act_News_Detail extends BaseAppCompatActivity implements clsFailureBar.OnWebRetryListener,
         httpUtil.OnHttpVisitListener, View.OnClickListener,
         AbsListView.OnScrollListener {
     static int listview_scroll_items_per_second;   //ListView滚动速度
@@ -92,6 +93,12 @@ public class act_News_Detail extends Activity implements clsFailureBar.OnWebRetr
     public static String getHtmlHash(String url) {
         //设置后缀
         return Global.getStringHash(url);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        clsUmeng.onEvent(this);
     }
 
     @Override
@@ -425,7 +432,7 @@ public class act_News_Detail extends Activity implements clsFailureBar.OnWebRetr
         catalogName = getIntent().getStringExtra("catalogName");
         abstract_LogUtil.i(this, "[新闻详细内容加载]" + news_URL);
 
-        Global.setTitle(this, "新闻详情");
+        initToolBar();
         initCompents();     //初始化组件引用
 
         //获取缓存
@@ -438,6 +445,10 @@ public class act_News_Detail extends Activity implements clsFailureBar.OnWebRetr
             //获取新闻文本内容
             httpUtil.getSingleton().getHttp(news_URL, this);
         }
+    }
+
+    private void initToolBar() {
+        getSupportToolBar(this).setTitle("新闻详情");
     }
 
     //读取存储对象
@@ -803,7 +814,7 @@ class NewsAdapter extends BaseAdapter {
         //从表中查下有木有Bitmap
         PicHolder picHolder = mNewsContent.bitmapHashMap.get(url);
 
-        if (picHolder==null)
+        if (picHolder == null)
             return new ImageView(context);
 
         //没有图片

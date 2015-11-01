@@ -148,7 +148,7 @@ public class pathFactory {
 
     //处理部分缓存文件
     public static void cleanCacheFiles() {
-        cleanCacheFiles(PathType.NEWS_DETAIL_PICTURE_CACHE, 200);
+        cleanCacheFiles(PathType.NEWS_DETAIL_PICTURE_CACHE, 50);
         cleanCacheFiles(PathType.NEWS_DETAIL_CONTENT_CACHE, 100);
     }
 

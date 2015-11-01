@@ -36,7 +36,7 @@ import android.widget.Button;
 import ecust.main.R;
 import lib.clsUtils.clsSoftKeyBoard;
 import lib.logUtils.abstract_LogUtil;
-import widget.myEditText;
+import myWidget.myEditText;
 
 //梅陇客栈登陆页面
 public class act_MLKZ_Login extends Activity implements TextWatcher, View.OnClickListener,

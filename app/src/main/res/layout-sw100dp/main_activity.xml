@@ -1,0 +1,58 @@
+<!--临时性文件-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    tools:context="ecust.main.act_MainActivity">
+
+    <Button
+        android:id="@+id/mainActivity_MLKZ"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="@string/title_activity_act__mlkz__home_page"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/mainActivity_News"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#be33b5e5"
+        android:text="华理新闻"
+        android:textColor="@android:color/white"
+        android:textSize="24dp" />
+
+    <Button
+        android:id="@+id/mainActivity_Lecture"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#a033b5e5"
+        android:text="讲座信息"
+        android:textColor="@android:color/white"
+        android:textSize="24dp" />
+
+    <Button
+        android:id="@+id/mainActivity_SchoolCalendar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:background="#ffffff"
+        android:padding="20dp"
+        android:text="校历"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/mainActivity_Test"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:background="@color/green1"
+        android:padding="20dp"
+        android:text="测试"
+        android:visibility="gone" />
+</LinearLayout>
+

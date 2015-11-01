@@ -1,8 +1,11 @@
 package ecust.lecture;
 
-import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -13,10 +16,11 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import ecust.main.R;
-import lib.Global;
 import lib.clsFailureBar;
 import lib.clsUtils.httpUtil;
 import lib.logUtils.abstract_LogUtil;
+import myWidget.BaseAppCompatActivity;
+import statistics.clsUmeng;
 
 /**
  * =============================================================================
@@ -36,10 +40,14 @@ import lib.logUtils.abstract_LogUtil;
  * Created by 彩笔怪盗基德 on 2015/6/5
  * Copyright (C) 2015 彩笔怪盗基德
  */
-public class act_Lecture_Detail extends Activity implements clsFailureBar.OnWebRetryListener,
+public class act_Lecture_Detail extends BaseAppCompatActivity implements clsFailureBar.OnWebRetryListener,
         httpUtil.OnHttpVisitListener {
+    private static final int MENU_ACTION_VIEW = Menu.FIRST;
     private clsLectureDetail mLectureDetail;            //学术讲座版块解析类
     private clsFailureBar wFailureBar;            //失败，加载条
+
+    //链接地址
+    private String lecture_URL;
 
     /**
      * 解析数据，保存数据
@@ -93,12 +101,14 @@ public class act_Lecture_Detail extends Activity implements clsFailureBar.OnWebR
         setContentView(R.layout.lecture_detail);
 
         //获取新闻地址URL、所在分类版块
-        String lecture_URL = getIntent().getStringExtra("URL");
+        lecture_URL = getIntent().getStringExtra("URL");
+
+        //标题
+        initToolBar();
 
         mLectureDetail = new clsLectureDetail();
         mLectureDetail.mData.url = lecture_URL;
 
-        Global.setTitle(this, "学术讲座");
         wFailureBar = new clsFailureBar(this);
         wFailureBar.setOnWebRetryListener(this);
 
@@ -116,10 +126,40 @@ public class act_Lecture_Detail extends Activity implements clsFailureBar.OnWebR
         }
     }
 
+    private void initToolBar() {
+        getSupportToolBar(this).setTitle("学术讲座");
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         wFailureBar.setOnWebRetryListener(null);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        clsUmeng.onEvent(this);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(0, MENU_ACTION_VIEW, 0, "在浏览器中打开");
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            case MENU_ACTION_VIEW:
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(lecture_URL));
+                startActivity(intent);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     /**
