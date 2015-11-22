@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
-import com.umeng.analytics.MobclickAgent;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -27,14 +26,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import ecust.main.R;
-import ecust.main.act_MainActivity;
 import lib.Const;
 import lib.clsApplication;
 import lib.clsUtils.clsExpiredTimeMangment;
 import lib.clsUtils.httpUtil;
 import lib.clsUtils.timeUtil;
 import lib.logUtils.abstract_LogUtil;
-import myWidget.BaseAppCompatActivity;
+import CustomWidgets.BaseAppCompatActivity;
 import statistics.clsUmeng;
 
 /**
@@ -57,7 +55,7 @@ import statistics.clsUmeng;
  */
 
 //讲座版块详细目录
-public class act_Lecture_Catalog extends BaseAppCompatActivity implements
+public class activity_Lecture_Catalog extends BaseAppCompatActivity implements
         PullToRefreshBase.OnLastItemVisibleListener,
         PullToRefreshBase.OnRefreshListener2, AdapterView.OnItemClickListener,
         httpUtil.OnHttpVisitListener {
@@ -203,12 +201,6 @@ public class act_Lecture_Catalog extends BaseAppCompatActivity implements
         if (value_current > value_obtained) {
             expiredTimeMangment.putInt("nextPage", value_current);
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        startActivity(new Intent(this, act_MainActivity.class));     //跳回至主界面
     }
 
     /**

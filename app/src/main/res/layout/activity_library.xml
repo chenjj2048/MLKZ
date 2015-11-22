@@ -1,0 +1,90 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="ecust.library.activity_library">
+
+    <!--Todo:Toolbar、SearchView、头部图片滚动栏、预约即将到期提醒、图书馆座位查询、图书馆新闻-->
+
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TableRow>
+            <!--书目查询-->
+            <TextView
+                android:id="@+id/library_book_query"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@android:color/holo_orange_light"
+                android:gravity="center"
+                android:paddingBottom="20dp"
+                android:layout_weight="1"
+                android:paddingTop="20dp"
+                android:text="书目查询"
+                android:textColor="@android:color/white"
+                android:textSize="20dp" />
+
+            <!--借还信息查询-->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@android:color/holo_blue_light"
+                android:gravity="center"
+                android:paddingBottom="20dp"
+                android:paddingTop="20dp"
+                android:text="借阅信息查询"
+                android:layout_weight="1"
+                android:textColor="@android:color/white"
+                android:textSize="20dp" />
+        </TableRow>
+
+        <TableRow>
+            <!--图书馆空余座位查询-->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@android:color/holo_purple"
+                android:gravity="center"
+                android:paddingBottom="20dp"
+                android:paddingTop="20dp"
+                android:layout_weight="1"
+                android:text="空余座位查询"
+                android:textColor="@android:color/white"
+                android:textSize="20dp" />
+
+            <!--图书馆介绍-->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@android:color/holo_green_light"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:paddingBottom="20dp"
+                android:paddingTop="20dp"
+                android:text="图书馆介绍"
+                android:textColor="@android:color/white"
+                android:textSize="20dp" />
+        </TableRow>
+
+        <!--设置-->
+        <TableRow>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@android:color/holo_red_light"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:paddingBottom="20dp"
+                android:paddingTop="20dp"
+                android:text="设置"
+                android:textColor="@android:color/white"
+                android:textSize="20dp" />
+        </TableRow>
+    </TableLayout>
+
+
+</LinearLayout>

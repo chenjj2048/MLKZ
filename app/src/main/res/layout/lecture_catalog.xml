@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="ecust.lecture.act_Lecture_Catalog">
+    tools:context="ecust.lecture.activity_Lecture_Catalog">
 
     <include layout="@layout/toolbar" />
 

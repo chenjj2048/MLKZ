@@ -34,7 +34,7 @@ import lib.logUtils.logUtil;
 /**
  * 动态加载布局
  */
-public class injectUtil {
+public class InjectViewUtil {
 
     /**
      * findViewById

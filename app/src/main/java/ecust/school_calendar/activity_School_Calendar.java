@@ -35,7 +35,7 @@ import ecust.main.act_MainActivity;
 import lib.Global;
 import lib.clsUtils.httpUtil;
 
-public class act_School_Calendar extends Activity implements httpUtil.OnHttpVisitListener {
+public class activity_School_Calendar extends Activity implements httpUtil.OnHttpVisitListener {
     //校历URL地址
     private final String url = "http://jwc.ecust.edu.cn/s/75/t/134/p/12/c/4053/list.htm";
 
@@ -68,12 +68,6 @@ public class act_School_Calendar extends Activity implements httpUtil.OnHttpVisi
 
     @Override
     public void onPictureBackgroundThreadLoadCompleted(String url, String cookie, boolean bSucceed, byte[] rtnPicBytes) {
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        startActivity(new Intent(this, act_MainActivity.class));
     }
 
     //SAX解析器

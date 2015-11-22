@@ -26,6 +26,7 @@ import java.util.HashMap;
  */
 
 // 网络访问类
+    //Todo: 旧版本啊
 public class httpUtil {
     static int uniqueID = 0;
     private static httpUtil mSingleton;

@@ -49,6 +49,15 @@
             android:text="校历" />
 
         <Button
+            android:id="@+id/mainActivity_Library"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:background="@color/green1"
+            android:padding="20dp"
+            android:text="图书馆" />
+
+        <Button
             android:id="@+id/mainActivity_Test"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

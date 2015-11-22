@@ -39,8 +39,8 @@ import com.android.volley.toolbox.ImageLoader.ImageListener;
 import ecust.main.R;
 import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_MLKZ_Data;
 import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_PostNode;
-import lib.injectUtil;
-import lib.injectUtil.InjectView;
+import lib.InjectViewUtil;
+import lib.InjectViewUtil.InjectView;
 import lib.logUtils.logUtil;
 
 /**
@@ -222,7 +222,7 @@ public class recyclerViewAdapter extends RecyclerView.Adapter<recyclerViewAdapte
 
         public ViewHolder(View itemView) {
             super(itemView);
-            injectUtil.inject(this, itemView);
+            InjectViewUtil.inject(this, itemView);
         }
     }
 }

@@ -19,7 +19,7 @@
  * .
  */
 
-package myWidget;
+package CustomWidgets;
 
 import android.animation.ValueAnimator;
 import android.content.Context;

@@ -10,7 +10,7 @@
     app:cardElevation="2dp"
     app:cardPreventCornerOverlap="true"
     app:cardUseCompatPadding="false"
-    tools:context="ecust.lecture.act_Lecture_Catalog">
+    tools:context="ecust.lecture.activity_Lecture_Catalog">
     <!--详细属性值注释见attr_CardView.xml-->
     <!--app:cardMaxElevation="20dp"-->
 

@@ -33,6 +33,7 @@ import lib.logUtils.abstract_LogUtil;
  * 注意：此类的过期时间并非十分严格，跨年、跨月都会返回新数据，要求不高时使用即可,仅更改月份年份无效
  * 暂时仅支持int,后续要用时再添加新的类型
  */
+//Todo:using ASimpleCache
 public class clsExpiredTimeMangment {
     int expireHours = 8;      //数据默认8小时才过期
     SharedPreferences sp;       //SharedPreferences

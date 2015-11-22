@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="ecust.school_calendar.act_School_Calendar">
+    tools:context="ecust.school_calendar.activity_School_Calendar">
 
     <include layout="@layout/part_actionbar" />
 

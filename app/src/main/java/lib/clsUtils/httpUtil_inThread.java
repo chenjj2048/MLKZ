@@ -41,6 +41,7 @@ import lib.logUtils.abstract_LogUtil;
  * 获取文本及图片(字节流)
  * 必须在子线程中执行
  */
+//Todo:准备撤掉
 public class httpUtil_inThread {
     private static final int timeout_text_connection = 3000;         //文本连接超时
     private static final int timeout_text_read = 5000;               //文本读取超时

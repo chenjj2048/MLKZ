@@ -41,7 +41,7 @@ import lib.clsUtils.pathFactory;
 import lib.clsUtils.pathFactory.PathType;
 import lib.clsUtils.timeUtil;
 import lib.logUtils.abstract_LogUtil;
-import myWidget.BaseAppCompatActivity;
+import CustomWidgets.BaseAppCompatActivity;
 import statistics.clsUmeng;
 
 /**

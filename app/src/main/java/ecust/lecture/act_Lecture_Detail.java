@@ -19,7 +19,7 @@ import ecust.main.R;
 import lib.clsFailureBar;
 import lib.clsUtils.httpUtil;
 import lib.logUtils.abstract_LogUtil;
-import myWidget.BaseAppCompatActivity;
+import CustomWidgets.BaseAppCompatActivity;
 import statistics.clsUmeng;
 
 /**
@@ -151,15 +151,13 @@ public class act_Lecture_Detail extends BaseAppCompatActivity implements clsFail
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
             case MENU_ACTION_VIEW:
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(lecture_URL));
                 startActivity(intent);
-                break;
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 
     /**

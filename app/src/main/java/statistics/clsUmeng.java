@@ -22,13 +22,15 @@
 package statistics;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.umeng.analytics.AnalyticsConfig;
 import com.umeng.analytics.MobclickAgent;
 
-import ecust.lecture.act_Lecture_Catalog;
+import ecust.lecture.activity_Lecture_Catalog;
 import ecust.lecture.act_Lecture_Detail;
-import ecust.news.act_News_Catalog;
+import ecust.main.BuildConfig;
+import ecust.news.activity_News_Catalog;
 import ecust.news.act_News_Detail;
 import lib.SecretKey;
 import lib.logUtils.logUtil;
@@ -36,6 +38,7 @@ import lib.logUtils.logUtil;
 /**
  * 友盟统计
  */
+@SuppressWarnings("all")
 public class clsUmeng {
     //onEvent事件
     public static final String EVENT_NEWS_CATALOG = "News_Catalog";
@@ -43,14 +46,22 @@ public class clsUmeng {
     private static final String EVENT_NEWS_DETAIL = "News_Detail";
     private static final String EVENT_LECTURE_DETAIL = "Lecture_Detail";
 
+    //友盟统计是否启用
+    public static boolean isEnable() {
+        return false;
+    }
+
     /**
      * 获得应用渠道
      */
     public static String getChannel() {
-        @SuppressWarnings("all")
-        String channel = "test Channel";
-        //360手机助手
-//        channel = "360";
+        String channel = null;
+        //360手机市场
+//        channel = "360 Market";
+
+        if (BuildConfig.DEBUG || TextUtils.isEmpty(channel))
+            channel = "test Channel";
+
         return channel;
     }
 
@@ -60,6 +71,7 @@ public class clsUmeng {
      * @param context 上下文
      */
     public static void init(Context context) {
+        if (!isEnable()) return;
         AnalyticsConfig.setAppkey(context, SecretKey.get_UMENG_KEY());
         AnalyticsConfig.setChannel(getChannel());
     }
@@ -68,6 +80,7 @@ public class clsUmeng {
      * 日志是否加密
      */
     public static void enableEncrypt(boolean enable) {
+        if (!isEnable()) return;
         AnalyticsConfig.enableEncrypt(enable);
     }
 
@@ -75,6 +88,7 @@ public class clsUmeng {
      * 强退程序时使用，保存相关日志
      */
     public static void onKillProcess(Context context) {
+        if (!isEnable()) return;
         MobclickAgent.onKillProcess(context);
     }
 
@@ -82,6 +96,7 @@ public class clsUmeng {
      * 页面统计
      */
     public static void onResume(Context context) {
+        if (!isEnable()) return;
         MobclickAgent.onResume(context);
     }
 
@@ -89,6 +104,7 @@ public class clsUmeng {
      * 页面统计
      */
     public static void onPause(Context context) {
+        if (!isEnable()) return;
         MobclickAgent.onPause(context);
     }
 
@@ -98,12 +114,13 @@ public class clsUmeng {
      * @param context 根据上下文，确定事件
      */
     public static void onEvent(Context context) {
+        if (!isEnable()) return;
         String event;
-        if (context instanceof act_News_Catalog) {
+        if (context instanceof activity_News_Catalog) {
             event = EVENT_NEWS_CATALOG;
         } else if (context instanceof act_News_Detail) {
             event = EVENT_NEWS_DETAIL;
-        } else if (context instanceof act_Lecture_Catalog) {
+        } else if (context instanceof activity_Lecture_Catalog) {
             event = EVENT_LECTURE_CATALOG;
         } else if (context instanceof act_Lecture_Detail) {
             event = EVENT_LECTURE_DETAIL;

@@ -52,8 +52,8 @@ import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_PostNode;
 import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_SortList;
 import ecust.mlkz.secondaryPage.struct_Forum_Information.struct_TertiarySectionNode;
 import lib.logUtils.logUtil;
-import myWidget.BaseAppCompatActivity;
-import myWidget.HorizontalFabMenu;
+import CustomWidgets.BaseAppCompatActivity;
+import CustomWidgets.HorizontalFabMenu;
 
 
 /**

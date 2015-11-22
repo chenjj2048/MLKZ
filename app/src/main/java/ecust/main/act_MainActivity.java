@@ -7,13 +7,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import CustomWidgets.BaseAppCompatActivity;
 import ecust.demotest.testDemoActivity;
-import ecust.lecture.act_Lecture_Catalog;
-import ecust.mlkz.homePage.act_MLKZ_Home;
-import ecust.news.act_News_Catalog;
-import ecust.school_calendar.act_School_Calendar;
+import ecust.lecture.activity_Lecture_Catalog;
+import ecust.library.activity_library;
+import ecust.mlkz.homePage.activity_MLKZ_Home;
+import ecust.news.activity_News_Catalog;
+import ecust.school_calendar.activity_School_Calendar;
 import lib.clsUtils.pathFactory;
-import myWidget.BaseAppCompatActivity;
 import statistics.clsUmeng;
 
 /**
@@ -35,7 +36,6 @@ import statistics.clsUmeng;
  * Copyright (C) 2015 彩笔怪盗基德
  */
 public class act_MainActivity extends BaseAppCompatActivity implements View.OnClickListener {
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,18 +45,23 @@ public class act_MainActivity extends BaseAppCompatActivity implements View.OnCl
         initComponents();
     }
 
+    /**
+     * 绑定clickListener
+     */
     private void initComponents() {
-        Button mlkz = (Button) findViewById(R.id.mainActivity_MLKZ);
-        Button news = (Button) findViewById(R.id.mainActivity_News);
-        Button lecture = (Button) findViewById(R.id.mainActivity_Lecture);
-        Button test = (Button) findViewById(R.id.mainActivity_Test);
-        Button calendar = (Button) findViewById(R.id.mainActivity_SchoolCalendar);
+        Button mMLKZ = (Button) findViewById(R.id.mainActivity_MLKZ);
+        Button mNews = (Button) findViewById(R.id.mainActivity_News);
+        Button mLecture = (Button) findViewById(R.id.mainActivity_Lecture);
+        Button mTest = (Button) findViewById(R.id.mainActivity_Test);
+        Button mCalendar = (Button) findViewById(R.id.mainActivity_SchoolCalendar);
+        View mLibrary = findViewById(R.id.mainActivity_Library);
 
-        mlkz.setOnClickListener(this);
-        news.setOnClickListener(this);
-        lecture.setOnClickListener(this);
-        test.setOnClickListener(this);
-        calendar.setOnClickListener(this);
+        mMLKZ.setOnClickListener(this);
+        mNews.setOnClickListener(this);
+        mLecture.setOnClickListener(this);
+        mTest.setOnClickListener(this);
+        mCalendar.setOnClickListener(this);
+        mLibrary.setOnClickListener(this);
     }
 
     @Override
@@ -64,32 +69,32 @@ public class act_MainActivity extends BaseAppCompatActivity implements View.OnCl
         switch (v.getId()) {
             //梅陇客栈
             case R.id.mainActivity_MLKZ:
-                startActivity(new Intent(this, act_MLKZ_Home.class));
-                finish();
+                startActivity(new Intent(this, activity_MLKZ_Home.class));
                 break;
             //华理新闻
             case R.id.mainActivity_News:
-                startActivity(new Intent(this, act_News_Catalog.class));
-                finish();
+                startActivity(new Intent(this, activity_News_Catalog.class));
                 break;
             //讲座信息
             case R.id.mainActivity_Lecture:
-                startActivity(new Intent(this, act_Lecture_Catalog.class));
-                finish();
+                startActivity(new Intent(this, activity_Lecture_Catalog.class));
                 break;
             //校历
             case R.id.mainActivity_SchoolCalendar:
-                startActivity(new Intent(this, act_School_Calendar.class));
-                finish();
+                startActivity(new Intent(this, activity_School_Calendar.class));
+                break;
+            //图书馆
+            case R.id.mainActivity_Library:
+                startActivity(new Intent(this, activity_library.class));
                 break;
             //测试
             case R.id.mainActivity_Test:
                 startActivity(new Intent(this, testDemoActivity.class));
-                finish();
                 break;
         }
     }
 
+    //Todo:改
     @Override
     public void onBackPressed() {
         //询问是否返回

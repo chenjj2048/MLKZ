@@ -32,7 +32,7 @@ import ecust.main.act_MainActivity;
 import ecust.mlkz.act_MLKZ_Login;
 import lib.Global;
 
-public class act_MLKZ_Home extends FragmentActivity {
+public class activity_MLKZ_Home extends FragmentActivity {
     private fragment_MLKZ_LeftMenu leftMenu_Fragment;
     private fragment_MLKZ_HomePage body_Fragment;
 
@@ -60,15 +60,6 @@ public class act_MLKZ_Home extends FragmentActivity {
         trans.replace(R.id.mlkz_home_slidingmenu_body, body_Fragment, null);
 
         trans.commit();
-    }
-
-    //回退到主页
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        //回首页
-        Intent homePage = new Intent(this, act_MainActivity.class);
-        startActivity(homePage);
     }
 
     //页面返回了登陆的cookie，主页面尝试用cookie登陆，会出现新版块

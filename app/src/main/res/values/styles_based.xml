@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/apk/res-auto">
     <!--全局的Theme设置-->
     <!--统一默认的字体大小、及颜色等信息-->
 

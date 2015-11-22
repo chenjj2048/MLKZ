@@ -33,7 +33,7 @@ import statistics.clsUmeng;
  */
 public class SplashWindow_1 extends Activity {
     Handler mHandler = new Handler();
-    int DURATION = 1500;
+    int DURATION = 500;
     Runnable mStartRunnable;
 
     @Override
@@ -44,13 +44,15 @@ public class SplashWindow_1 extends Activity {
         mStartRunnable = new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent(SplashWindow_1.this, act_MainActivity.class));
+                Class nextClass = act_MainActivity.class;
+
+                startActivity(new Intent(SplashWindow_1.this, nextClass));
                 overridePendingTransition(R.anim.activity_move_in_from_right, R.anim.activity_move_out_to_left);
             }
         };
 
         if (logUtil.isDebug)
-            logUtil.toast("[Debuging] 渠道 = " + clsUmeng.getChannel());
+            logUtil.toast("[Debuging] 渠道 = " + clsUmeng.getChannel() + "\r\n友盟统计Enable = " + clsUmeng.isEnable());
         else if (clsUmeng.getChannel().contains("test"))
             logUtil.toast("请修改发行渠道");
 

@@ -4,13 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="ecust.mlkz.homePage.act_MLKZ_Home">
+    tools:context="ecust.mlkz.homePage.activity_MLKZ_Home">
 
     <!--梅陇客栈主页面框架-->
     <include layout="@layout/part_actionbar" />
 
     <!--侧滑菜单、主体组合部分-->
-    <myWidget.mlkzSlidingMenu
+    <CustomWidgets.mlkzSlidingMenu
         android:id="@+id/mlkz_home_slidingmenu"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -37,5 +37,5 @@
                 android:orientation="horizontal" />
         </LinearLayout>
 
-    </myWidget.mlkzSlidingMenu>
+    </CustomWidgets.mlkzSlidingMenu>
 </LinearLayout>

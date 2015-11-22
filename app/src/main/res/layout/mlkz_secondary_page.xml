@@ -30,7 +30,7 @@
             headbar:textFocusedColor="@android:color/holo_red_light" />
 
         <!--Fab按钮组-->
-        <myWidget.HorizontalFabMenu
+        <CustomWidgets.HorizontalFabMenu
             android:id="@+id/mlkz_secondary_page_fab_menu"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -57,7 +57,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_progress" />
-        </myWidget.HorizontalFabMenu>
+        </CustomWidgets.HorizontalFabMenu>
 
     </FrameLayout>
 </LinearLayout>

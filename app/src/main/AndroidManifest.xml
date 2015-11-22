@@ -24,25 +24,25 @@
             android:name=".act_MainActivity"
             android:label="@string/title_activity_act__main_page" />
         <activity
-            android:name="ecust.mlkz.homePage.act_MLKZ_Home"
+            android:name="ecust.mlkz.homePage.activity_MLKZ_Home"
             android:label="@string/title_activity_act__mlkz__home_page" />
         <activity
             android:name="ecust.mlkz.act_MLKZ_Login"
             android:label="梅陇客栈-账户登陆" />
         <activity
-            android:name="ecust.news.act_News_Catalog"
+            android:name="ecust.news.activity_News_Catalog"
             android:label="@string/title_activity_act__ecust__news" />
         <activity
             android:name="ecust.news.act_News_Detail"
             android:label="@string/title_activity_act__news__detail" />
         <activity
-            android:name="ecust.lecture.act_Lecture_Catalog"
+            android:name="ecust.lecture.activity_Lecture_Catalog"
             android:label="讲座信息" />
         <activity
             android:name="ecust.lecture.act_Lecture_Detail"
             android:label="讲座详情" />
         <activity
-            android:name="ecust.school_calendar.act_School_Calendar"
+            android:name="ecust.school_calendar.activity_School_Calendar"
             android:label="校历" />
         <activity
             android:name="ecust.demotest.testDemoActivity"
@@ -55,9 +55,17 @@
             android:label="@string/title_activity_splash_window_1">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="ecust.library.activity_library"
+            android:label="@string/title_activity_activity_library" />
+
+        <activity
+            android:name="ecust.library.books_query.activity_books_query"
+            android:label="@string/title_activity_activity_books_query" />
     </application>
 
 </manifest>
