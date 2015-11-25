@@ -1,13 +1,11 @@
-package lib;
+package ecust.main;
 
 import android.app.Application;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 
-import com.umeng.analytics.AnalyticsConfig;
-import com.umeng.analytics.MobclickAgent;
-
+import lib.clsNetworkChangeReceiver;
 import lib.logUtils.abstract_LogUtil;
 import statistics.clsUmeng;
 
@@ -30,6 +28,7 @@ import statistics.clsUmeng;
  * Copyright (C) 2015 彩笔怪盗基德
  */
 public class clsApplication extends Application {
+    //todo:
     public final static clsNetworkChangeReceiver receiver = new clsNetworkChangeReceiver();    //网络消息广播
     private static Context context;
 

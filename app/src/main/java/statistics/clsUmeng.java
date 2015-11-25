@@ -27,13 +27,12 @@ import android.text.TextUtils;
 import com.umeng.analytics.AnalyticsConfig;
 import com.umeng.analytics.MobclickAgent;
 
-import ecust.lecture.activity_Lecture_Catalog;
 import ecust.lecture.act_Lecture_Detail;
+import ecust.lecture.activity_Lecture_Catalog;
 import ecust.main.BuildConfig;
-import ecust.news.activity_News_Catalog;
 import ecust.news.act_News_Detail;
+import ecust.news.activity_News_Catalog;
 import lib.SecretKey;
-import lib.logUtils.logUtil;
 
 /**
  * 友盟统计
@@ -125,8 +124,7 @@ public class clsUmeng {
         } else if (context instanceof act_Lecture_Detail) {
             event = EVENT_LECTURE_DETAIL;
         } else {
-            logUtil.throwException("clsUmeng - onEvent 中未发现指定事件");
-            return;
+            throw new IllegalStateException("clsUmeng - onEvent 中未发现指定事件");
         }
         MobclickAgent.onEvent(context, event);
     }

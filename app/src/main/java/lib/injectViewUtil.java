@@ -54,7 +54,7 @@ public class InjectViewUtil {
                 field.setAccessible(true);
                 field.set(obj, view);
             } catch (Exception e) {
-                logUtil.printException("InjectView失败", e);
+                logUtil.printExceptionLog("InjectView失败", e);
             }
         }
     }

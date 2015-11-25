@@ -6,6 +6,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import ecust.main.R;
+import ecust.main.clsApplication;
 import lib.logUtils.abstract_LogUtil;
 
 /**

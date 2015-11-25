@@ -1,16 +1,13 @@
 package lib;
 
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.content.Context;
-import android.util.Log;
-import android.view.Window;
 import android.widget.TextView;
 
-import java.util.List;
 import java.util.zip.CRC32;
 
 import ecust.main.R;
+import ecust.main.clsApplication;
 
 /**
  * =============================================================================

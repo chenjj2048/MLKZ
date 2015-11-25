@@ -27,7 +27,7 @@ import android.view.inputmethod.InputMethodManager;
 //软键盘
 public class clsSoftKeyBoard {
     //强制隐藏键盘
-    public void hideIME(Context context, View view) {
+    public static void hideIME(Context context, View view) {
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }

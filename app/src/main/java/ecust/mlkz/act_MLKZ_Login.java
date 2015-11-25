@@ -79,7 +79,7 @@ public class act_MLKZ_Login extends Activity implements TextWatcher, View.OnClic
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 //登陆按钮按下后，隐藏软键盘
-                new clsSoftKeyBoard().hideIME(this, v);
+                clsSoftKeyBoard.hideIME(this, v);
                 break;
         }
         return false;

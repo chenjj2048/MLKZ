@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    tools:context="ecust.library.books_query.activity_books_query">
+
+    <!--书名-->
+    <TextView
+        android:id="@+id/library_book_query_item_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <!--作者-->
+    <TextView
+        android:id="@+id/library_book_query_item_author"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <!--出版社-->
+    <TextView
+        android:id="@+id/library_book_query_item_publisher"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <!--出版时间-->
+    <TextView
+        android:id="@+id/library_book_query_item_publishetime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <!--索书号、中图分类号-->
+    <TextView
+        android:id="@+id/library_book_query_item_clcindex"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+</LinearLayout>

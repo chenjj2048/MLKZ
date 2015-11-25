@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ecust.main.R;
-import lib.clsApplication;
+import ecust.main.clsApplication;
 import lib.clsUtils.pathFactory;
 import lib.clsUtils.pathFactory.PathType;
 import lib.logUtils.abstract_LogUtil;

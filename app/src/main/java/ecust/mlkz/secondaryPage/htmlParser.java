@@ -59,6 +59,8 @@ import lib.myXmlPullParserUtils;
  * 请照着类似如下地址调试，否则看不懂的的
  * http://bbs.ecust.edu.cn/forum.php?mod=forumdisplay&fid=4
  * 这地址里各种标签不成对啊！
+ *
+ * 应该是我水平还不够，木有写好
  */
 public class htmlParser {
     //事件消息类型
@@ -74,7 +76,7 @@ public class htmlParser {
     private void initXmlPullParser() {
         //新建解析器
         parser = Xml.newPullParser();
-        //关联指针
+        //关联指针，这东西是接口，继承什么的不好用
         pointer = new myXmlPullParserUtils();
         pointer.setXmlPullParser(parser);
     }
@@ -93,7 +95,7 @@ public class htmlParser {
             event = parser.getEventType();
             return true;
         } catch (XmlPullParserException e) {
-            abstract_LogUtil.printException(this, e);
+            abstract_LogUtil.printExceptionLog(this, e);
             return false;
         }
     }
@@ -557,7 +559,7 @@ public class htmlParser {
             try {
                 node.setRewardSum(Integer.valueOf(str.trim()));
             } catch (NumberFormatException e) {
-                logUtil.printException(this, e);
+                logUtil.printExceptionLog(this, e);
             }
         }
         log.d("[6.回帖奖励] " + node.getRewardSum());

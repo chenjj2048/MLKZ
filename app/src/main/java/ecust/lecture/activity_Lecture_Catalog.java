@@ -27,7 +27,7 @@ import java.util.List;
 
 import ecust.main.R;
 import lib.Const;
-import lib.clsApplication;
+import ecust.main.clsApplication;
 import lib.clsUtils.clsExpiredTimeMangment;
 import lib.clsUtils.httpUtil;
 import lib.clsUtils.timeUtil;

@@ -27,6 +27,7 @@ import java.io.File;
  * 静态常量.
  */
 public class Const {
+    //todo:
     public final static String news_url = "http://news.ecust.edu.cn";
     public final static String lecture_url = "http://news.ecust.edu.cn/reports";   //讲座信息主目录
     public final static String bbs = "http://bbs.ecust.edu.cn";                     //梅陇客栈

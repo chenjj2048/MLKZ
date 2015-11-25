@@ -33,6 +33,8 @@ import lib.logUtils.logUtil;
 /**
  * 自定义XmlPullParser的辅助工具
  */
+//Todo:改改改，好难看,之后准备用ecust.lib.CustomPullParserUtils代替
+@Deprecated
 public class myXmlPullParserUtils {
     public final int TAG_NOT_FOUND = -1;
     private XmlPullParser parser;
@@ -186,6 +188,8 @@ public class myXmlPullParserUtils {
 
         return "";
     }
+
+
 
     /**
      * 封装一下，不用每次都try... catch

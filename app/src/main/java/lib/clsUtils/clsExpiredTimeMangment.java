@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import lib.clsApplication;
+import ecust.main.clsApplication;
 import lib.logUtils.abstract_LogUtil;
 
 /**

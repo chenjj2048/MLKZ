@@ -6,7 +6,7 @@ import android.widget.Toast;
 import java.util.Date;
 
 import ecust.main.BuildConfig;
-import lib.clsApplication;
+import ecust.main.clsApplication;
 
 /**
  * =============================================================================
@@ -25,20 +25,6 @@ import lib.clsApplication;
  * .
  * Created by 彩笔怪盗基德 on 2015/7/11
  * Copyright (C) 2015 彩笔怪盗基德
- */
-
-/**
- * 这个专门作为静态类
- * <p/>
- * 用于输出Log及Toast消息.
- * ============================================
- * log调用方法
- * abstract_LogUtil.log(this,"消息1")
- * abstract_LogUtil.log("标签","消息2")
- * ============================================
- * toast调用方法:
- * abstract_LogUtil.toast("消息");
- * ============================================
  */
 @Deprecated
 public abstract class abstract_LogUtil {
@@ -155,7 +141,7 @@ public abstract class abstract_LogUtil {
     }
 
     @SuppressWarnings("unused")
-    public static void printException(Object object, Exception e) {
+    public static void printExceptionLog(Object object, Exception e) {
         if (isDebug) {
             Log.e(object.getClass().getCanonicalName(), e.toString());
             e.printStackTrace();
@@ -163,7 +149,7 @@ public abstract class abstract_LogUtil {
     }
 
     @SuppressWarnings("unused")
-    public static void printException(String tag, Exception e) {
+    public static void printExceptionLog(String tag, Exception e) {
         if (isDebug) {
             Log.e(tag, e.toString());
             e.printStackTrace();

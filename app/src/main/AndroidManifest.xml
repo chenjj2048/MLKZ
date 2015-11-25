@@ -16,7 +16,7 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
-        android:name="lib.clsApplication"
+        android:name=".clsApplication"
         android:icon="@drawable/ic_launch"
         android:label="华理助手"
         android:theme="@style/AppBaseTheme">

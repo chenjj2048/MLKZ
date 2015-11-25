@@ -21,6 +21,8 @@
 
 package ecust.library.books_query;
 
+import android.text.TextUtils;
+
 /**
  * 书目查询的结果
  */
@@ -63,6 +65,13 @@ public class BooksQueryRequest {
             default:
                 return "徐汇奉贤";
         }
+    }
+
+    /**
+     * 判断请求内容是否为空
+     */
+    public boolean isEmpty() {
+        return TextUtils.isEmpty(title) && TextUtils.isEmpty(author) && TextUtils.isEmpty(publisher);
     }
 
     //馆藏位置枚举类型

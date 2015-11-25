@@ -7,6 +7,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo.State;
 import android.widget.Toast;
 
+import ecust.main.clsApplication;
 import lib.logUtils.abstract_LogUtil;
 
 /**

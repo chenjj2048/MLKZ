@@ -32,7 +32,7 @@ import java.util.Queue;
 import ecust.main.R;
 import lib.Const;
 import lib.Global;
-import lib.clsApplication;
+import ecust.main.clsApplication;
 import lib.clsFailureBar;
 import lib.clsUtils.InputStreamUtils;
 import lib.clsUtils.fileUtil;
