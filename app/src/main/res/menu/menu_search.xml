@@ -1,0 +1,12 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="ecust.library.books_query.activity.BooksQueryActivity">
+    <item
+        android:id="@+id/menu_search"
+        android:actionViewClass="android.widget.EditText"
+        android:icon="@android:drawable/ic_menu_search"
+        android:title="搜索"
+        app:showAsAction="always"
+        android:showAsAction="always"/>
+</menu>

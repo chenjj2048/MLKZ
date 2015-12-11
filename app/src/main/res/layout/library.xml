@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="ecust.library.activity_library">
+    tools:context="ecust.library.LibraryHomeActivity">
 
     <!--Todo:Toolbar、SearchView、头部图片滚动栏、预约即将到期提醒、图书馆座位查询、图书馆新闻-->
 

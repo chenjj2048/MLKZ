@@ -10,12 +10,11 @@ import android.widget.Button;
 import CustomWidgets.BaseAppCompatActivity;
 import ecust.demotest.testDemoActivity;
 import ecust.lecture.activity_Lecture_Catalog;
-import ecust.library.activity_library;
-import ecust.mlkz.homePage.activity_MLKZ_Home;
+import ecust.library.LibraryHomeActivity;
+
 import ecust.news.activity_News_Catalog;
 import ecust.school_calendar.activity_School_Calendar;
-import lib.clsUtils.pathFactory;
-import statistics.clsUmeng;
+import utils.pathFactory;
 
 /**
  * =============================================================================
@@ -49,14 +48,12 @@ public class act_MainActivity extends BaseAppCompatActivity implements View.OnCl
      * 绑定clickListener
      */
     private void initComponents() {
-        Button mMLKZ = (Button) findViewById(R.id.mainActivity_MLKZ);
         Button mNews = (Button) findViewById(R.id.mainActivity_News);
         Button mLecture = (Button) findViewById(R.id.mainActivity_Lecture);
         Button mTest = (Button) findViewById(R.id.mainActivity_Test);
         Button mCalendar = (Button) findViewById(R.id.mainActivity_SchoolCalendar);
         View mLibrary = findViewById(R.id.mainActivity_Library);
 
-        mMLKZ.setOnClickListener(this);
         mNews.setOnClickListener(this);
         mLecture.setOnClickListener(this);
         mTest.setOnClickListener(this);
@@ -67,10 +64,6 @@ public class act_MainActivity extends BaseAppCompatActivity implements View.OnCl
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            //梅陇客栈
-            case R.id.mainActivity_MLKZ:
-                startActivity(new Intent(this, activity_MLKZ_Home.class));
-                break;
             //华理新闻
             case R.id.mainActivity_News:
                 startActivity(new Intent(this, activity_News_Catalog.class));
@@ -85,7 +78,7 @@ public class act_MainActivity extends BaseAppCompatActivity implements View.OnCl
                 break;
             //图书馆
             case R.id.mainActivity_Library:
-                startActivity(new Intent(this, activity_library.class));
+                startActivity(new Intent(this, LibraryHomeActivity.class));
                 break;
             //测试
             case R.id.mainActivity_Test:
@@ -103,7 +96,6 @@ public class act_MainActivity extends BaseAppCompatActivity implements View.OnCl
         dialog.setNegativeButton("是", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                clsUmeng.onKillProcess(act_MainActivity.this);
                 System.exit(0);        //进程通通杀死，清理内存
             }
         });

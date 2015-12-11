@@ -40,7 +40,7 @@ import com.github.clans.fab.FloatingActionButton;
 import java.lang.ref.SoftReference;
 
 import ecust.main.R;
-import lib.clsDimensionConvert;
+import utils.clsDimensionConvert;
 
 /**
  * github没找到水平的FloatingActionButton菜单,只有垂直的

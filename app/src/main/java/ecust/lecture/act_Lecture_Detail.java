@@ -16,11 +16,10 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import ecust.main.R;
-import lib.clsFailureBar;
-import lib.clsUtils.httpUtil;
-import lib.logUtils.abstract_LogUtil;
+import utils.clsFailureBar;
+import utils.httpUtil;
+import utils.logUtils.abstract_LogUtil;
 import CustomWidgets.BaseAppCompatActivity;
-import statistics.clsUmeng;
 
 /**
  * =============================================================================
@@ -134,12 +133,6 @@ public class act_Lecture_Detail extends BaseAppCompatActivity implements clsFail
     protected void onDestroy() {
         super.onDestroy();
         wFailureBar.setOnWebRetryListener(null);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        clsUmeng.onEvent(this);
     }
 
     @Override

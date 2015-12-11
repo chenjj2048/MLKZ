@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ecust.main.R;
-import ecust.main.clsApplication;
-import lib.clsUtils.pathFactory;
-import lib.clsUtils.pathFactory.PathType;
-import lib.logUtils.abstract_LogUtil;
+import ecust.main.App;
+import utils.pathFactory;
+import utils.pathFactory.PathType;
+import utils.logUtils.abstract_LogUtil;
 
 /**
  * =============================================================================
@@ -41,7 +41,7 @@ public class DataBase_News extends SQLiteOpenHelper {
     private String currentCatalogTableName;     //版块名称
 
     public DataBase_News(String currentCatalogTableName) {
-        super(clsApplication.getContext(), dataBaseName, null, currentVersion);
+        super(App.getContext(), dataBaseName, null, currentVersion);
         this.currentCatalogTableName = currentCatalogTableName;
     }
 
@@ -49,7 +49,7 @@ public class DataBase_News extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         abstract_LogUtil.i(this, "[数据库创建]当前版本=" + currentVersion + " " + dataBaseName);
 
-        String[] arr_catalog = clsApplication.getContext()
+        String[] arr_catalog = App.getContext()
                 .getResources().getStringArray(R.array.news_section_name);
 
         //创建8个表，对应8个版块目录

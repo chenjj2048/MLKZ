@@ -3,136 +3,45 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="ecust.library.books_query.activity_books_query">
+    tools:context="ecust.library.books_query.activity.BooksQueryActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <TableLayout
+
+    <SearchView
+        android:id="@+id/library_book_query_searchview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:shrinkColumns="1"
-        android:stretchColumns="2">
+        android:queryHint="输入搜索信息" />
 
-        <TableRow>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:padding="10dp"
+        android:layout_height="match_parent">
+
+        <!--搜索历史-->
+        <LinearLayout
+            android:id="@+id/library_book_query_history"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
             <TextView
-                android:layout_column="1"
-                android:text="标题:"
-                android:textColor="@android:color/holo_blue_light"
-                android:textSize="16sp" />
-
-            <EditText
-                android:id="@+id/library_book_query_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_column="2"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:hint="请输入标题"
-                android:maxLength="20"
-                android:singleLine="true"
-                android:textSize="16sp" />
-        </TableRow>
-
-        <TableRow>
-
-            <TextView
-                android:layout_column="1"
-                android:text="作者:"
+                android:text="搜索历史"
                 android:textColor="@android:color/holo_blue_light"
                 android:textSize="16sp" />
+        </LinearLayout>
 
-            <EditText
-                android:id="@+id/library_book_query_author"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_column="2"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:hint="请输入作者"
-                android:maxLength="20"
-                android:singleLine="true"
-                android:textSize="16sp" />
-        </TableRow>
+        <ListView
+            android:id="@+id/library_book_query_search_listview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
 
-        <TableRow>
-            <!--Todo:delete-->
-            <TextView
-                android:layout_column="1"
-                android:text="出版社:"
-                android:textColor="@android:color/holo_blue_light"
-                android:textSize="16sp" />
 
-            <EditText
-                android:id="@+id/library_book_query_publisher"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_column="2"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:hint="请输入出版社"
-                android:maxLength="20"
-                android:singleLine="true"
-                android:textSize="16sp" />
-        </TableRow>
-
-        <TableRow>
-            <!--Todo:直接用徐汇和奉贤-->
-            <TextView
-                android:layout_column="1"
-                android:text="馆藏校区:"
-                android:textColor="@android:color/holo_blue_light"
-                android:textSize="16sp" />
-
-            <Spinner
-                android:id="@+id/library_book_query_location_spinner"
-                android:layout_column="2"
-                android:gravity="right"
-                android:prompt="@string/app_name"
-                android:textSize="16sp" />
-        </TableRow>
-    </TableLayout>
-
-    <ListView
-        android:id="@+id/library_book_query_listview"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="搜索历史"
-        android:textColor="@android:color/holo_blue_light"
-        android:textSize="16sp" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/library_book_query_clear"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@color/grey90"
-            android:text="重新输入"
-            android:textColor="@android:color/white"
-            android:textSize="20dp" />
-
-        <Button
-            android:id="@+id/library_book_query_search"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@android:color/holo_blue_dark"
-            android:text="查找"
-            android:textColor="@android:color/white"
-            android:textSize="20dp" />
-    </LinearLayout>
 </LinearLayout>

@@ -28,12 +28,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import ecust.main.R;
-import lib.Const;
-import ecust.main.clsApplication;
-import lib.clsUtils.clsExpiredTimeMangment;
-import lib.clsUtils.httpUtil;
-import lib.logUtils.abstract_LogUtil;
-import lib.clsUtils.timeUtil;
+import utils.Const;
+import ecust.main.App;
+import utils.clsExpiredTimeMangment;
+import utils.httpUtil;
+import utils.logUtils.abstract_LogUtil;
+import utils.timeUtil;
 
 /**
  * =============================================================================
@@ -138,7 +138,7 @@ public class fragment_News_Catalog extends Fragment implements
             abstract_LogUtil.toast("已无更多数据");
         } else {
             //不要重复加载
-            if (!isLoading && clsApplication.receiver.isWebConnected()) {
+            if (!isLoading && App.receiver.isWebConnected()) {
                 isLoading = true;
                 //获取“下一页”url，对应的下一个网址略有不同
                 String website = catalogUrl +
@@ -414,7 +414,7 @@ public class fragment_News_Catalog extends Fragment implements
 
             //预加载网络数据
             final int preLoadCount = 100;       //预加载的数据数量,每页为20条数据
-            if (!isLoading && mNewsCatalog.nextPage != mNewsCatalog.itemIsLastOne && clsApplication.receiver.isWebConnected())
+            if (!isLoading && mNewsCatalog.nextPage != mNewsCatalog.itemIsLastOne && App.receiver.isWebConnected())
                 if (position > mNewsCatalog.nextPage * 20 - preLoadCount) {
                     loadNextPage();
                 }

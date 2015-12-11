@@ -25,9 +25,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 
-import lib.logUtils.logUtil;
-import statistics.clsUmeng;
-
 /**
  * 启动页
  */
@@ -50,14 +47,6 @@ public class SplashWindow_1 extends Activity {
                 overridePendingTransition(R.anim.activity_move_in_from_right, R.anim.activity_move_out_to_left);
             }
         };
-
-        if (logUtil.isDebug)
-            logUtil.toast("[Debuging] 渠道 = " + clsUmeng.getChannel() + "\r\n友盟统计Enable = " + clsUmeng.isEnable());
-        else if (clsUmeng.getChannel().contains("test"))
-            logUtil.toast("请修改发行渠道");
-
-        //设置渠道、APP key
-        clsUmeng.init(this);
     }
 
     @Override

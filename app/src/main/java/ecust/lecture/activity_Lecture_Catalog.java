@@ -26,14 +26,14 @@ import java.util.Iterator;
 import java.util.List;
 
 import ecust.main.R;
-import lib.Const;
-import ecust.main.clsApplication;
-import lib.clsUtils.clsExpiredTimeMangment;
-import lib.clsUtils.httpUtil;
-import lib.clsUtils.timeUtil;
-import lib.logUtils.abstract_LogUtil;
+import utils.Const;
+import ecust.main.App;
+import utils.clsExpiredTimeMangment;
+import utils.httpUtil;
+import utils.timeUtil;
+import utils.logUtils.abstract_LogUtil;
 import CustomWidgets.BaseAppCompatActivity;
-import statistics.clsUmeng;
+
 
 /**
  * =============================================================================
@@ -176,14 +176,6 @@ public class activity_Lecture_Catalog extends BaseAppCompatActivity implements
         save_NextPage();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        //统计事件
-        clsUmeng.onEvent(this);
-        clsUmeng.onPause(this);
-    }
-
     /**
      * 设置管理下一页的URL
      * 避免短时间内反复加载网页数据
@@ -218,7 +210,7 @@ public class activity_Lecture_Catalog extends BaseAppCompatActivity implements
         else {
             //不要重复加载
             if (!flag_isLoading) {
-                if (clsApplication.receiver.isWebConnected()) {
+                if (App.receiver.isWebConnected()) {
                     flag_isLoading = true;
                     //获取“下一页”url
                     String website = Const.lecture_url + "?page=" + nextPage;
@@ -391,7 +383,7 @@ public class activity_Lecture_Catalog extends BaseAppCompatActivity implements
 
             //预加载网络数据
             final int preLoadCount = 100;       //预加载的数据数量,每页为20条数据
-            if (!flag_isLoading && nextPage != itemIsLastOne && clsApplication.receiver.isWebConnected())
+            if (!flag_isLoading && nextPage != itemIsLastOne && App.receiver.isWebConnected())
                 if (position > nextPage * 20 - preLoadCount) {
                     loadNextPage();
                 }

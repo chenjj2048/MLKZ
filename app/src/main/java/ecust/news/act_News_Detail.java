@@ -30,19 +30,19 @@ import java.util.List;
 import java.util.Queue;
 
 import ecust.main.R;
-import lib.Const;
-import lib.Global;
-import ecust.main.clsApplication;
-import lib.clsFailureBar;
-import lib.clsUtils.InputStreamUtils;
-import lib.clsUtils.fileUtil;
-import lib.clsUtils.httpUtil;
-import lib.clsUtils.pathFactory;
-import lib.clsUtils.pathFactory.PathType;
-import lib.clsUtils.timeUtil;
-import lib.logUtils.abstract_LogUtil;
+import utils.Const;
+import utils.Global;
+import ecust.main.App;
+import utils.clsFailureBar;
+import utils.InputStreamUtils;
+import utils.fileUtil;
+import utils.httpUtil;
+import utils.pathFactory;
+import utils.pathFactory.PathType;
+import utils.timeUtil;
+import utils.logUtils.abstract_LogUtil;
 import CustomWidgets.BaseAppCompatActivity;
-import statistics.clsUmeng;
+
 
 /**
  * =============================================================================
@@ -93,12 +93,6 @@ public class act_News_Detail extends BaseAppCompatActivity implements clsFailure
     public static String getHtmlHash(String url) {
         //设置后缀
         return Global.getStringHash(url);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        clsUmeng.onEvent(this);
     }
 
     @Override
@@ -250,7 +244,7 @@ public class act_News_Detail extends BaseAppCompatActivity implements clsFailure
         if (current_Thread_Pic_Download >= MAX_THREAD_PIC_DOWNLOAD) return;
 
         //没网络就不加载图片了
-        if (!clsApplication.receiver.isWebConnected()) return;
+        if (!App.receiver.isWebConnected()) return;
 
         PicHolder picHolder = mNewsContent.bitmapHashMap.get(url);
 

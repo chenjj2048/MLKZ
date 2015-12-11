@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ecust.main"
-    android:versionCode="1"
-    android:versionName="1.0">
+    android:versionCode="2"
+    android:versionName="1.1">
 
     <uses-sdk android:minSdkVersion="15" />
 
@@ -16,19 +16,13 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
-        android:name=".clsApplication"
+        android:name=".App"
         android:icon="@drawable/ic_launch"
         android:label="华理助手"
         android:theme="@style/AppBaseTheme">
         <activity
             android:name=".act_MainActivity"
             android:label="@string/title_activity_act__main_page" />
-        <activity
-            android:name="ecust.mlkz.homePage.activity_MLKZ_Home"
-            android:label="@string/title_activity_act__mlkz__home_page" />
-        <activity
-            android:name="ecust.mlkz.act_MLKZ_Login"
-            android:label="梅陇客栈-账户登陆" />
         <activity
             android:name="ecust.news.activity_News_Catalog"
             android:label="@string/title_activity_act__ecust__news" />
@@ -46,10 +40,8 @@
             android:label="校历" />
         <activity
             android:name="ecust.demotest.testDemoActivity"
-            android:label="@string/title_activity_test_demo" />
-        <activity
-            android:name="ecust.mlkz.secondaryPage.activity_MLKZ_Secondary_Page"
-            android:label="@string/title_activity_activity__mlkz__secondary__page" />
+            android:label="@string/title_activity_test_demo">
+        </activity>
         <activity
             android:name=".SplashWindow_1"
             android:label="@string/title_activity_splash_window_1">
@@ -60,11 +52,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="ecust.library.activity_library"
+            android:name="ecust.library.LibraryHomeActivity"
             android:label="@string/title_activity_activity_library" />
-
         <activity
-            android:name="ecust.library.books_query.activity_books_query"
+            android:name="ecust.library.books_query.activity.BooksQueryActivity"
             android:label="@string/title_activity_activity_books_query" />
     </application>
 

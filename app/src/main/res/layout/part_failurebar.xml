@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context="lib.clsFailureBar">
+    tools:context="utils.clsFailureBar">
 
     <!--专门用于include复用，显示加载中，加载失败框-->
     <!--加载进度条-->

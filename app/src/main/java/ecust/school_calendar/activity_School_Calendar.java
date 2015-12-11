@@ -22,7 +22,6 @@
 package ecust.school_calendar;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
 
@@ -31,9 +30,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import ecust.main.R;
-import ecust.main.act_MainActivity;
-import lib.Global;
-import lib.clsUtils.httpUtil;
+import utils.Global;
+import utils.httpUtil;
 
 public class activity_School_Calendar extends Activity implements httpUtil.OnHttpVisitListener {
     //校历URL地址

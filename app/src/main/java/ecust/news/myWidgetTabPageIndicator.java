@@ -15,7 +15,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import lib.Global;
+import utils.Global;
 
 /**
  * =============================================================================

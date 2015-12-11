@@ -10,7 +10,6 @@ import java.util.List;
 
 import ecust.main.R;
 import CustomWidgets.BaseAppCompatActivity;
-import statistics.clsUmeng;
 
 /**
  * =============================================================================
@@ -130,8 +129,6 @@ public class activity_News_Catalog extends BaseAppCompatActivity implements View
     @Override
     protected void onResume() {
         super.onResume();
-        //统计
-        clsUmeng.onEvent(this);
 
         //初始化要加载的Fragment
         onPageSelected(currentFragmentPosition);

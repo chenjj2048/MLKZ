@@ -30,7 +30,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import ecust.main.R;
-import statistics.clsUmeng;
+
 
 /**
  * 所有Activity都继承这里
@@ -58,8 +58,7 @@ public class BaseAppCompatActivity extends AppCompatActivity {
         if (mToolBar == null)
             throw new NullPointerException("ToolBar你没设置么？");
         else {
-            mToolBar.setBackgroundResource(R.color.blue_i_like);
-            mToolBar.setTitleTextColor(Color.argb(240, 255, 255, 255));
+            mToolBar.setBackgroundResource(android.R.color.darker_gray);
             setSupportActionBar(mToolBar);
             if (getSupportActionBar() != null)
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -80,15 +79,11 @@ public class BaseAppCompatActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        //统计每一个页面情况
-        clsUmeng.onResume(this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        //统计每一个页面情况
-        clsUmeng.onPause(this);
     }
 
     @Override
