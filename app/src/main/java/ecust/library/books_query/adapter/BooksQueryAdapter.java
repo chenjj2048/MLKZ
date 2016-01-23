@@ -17,21 +17,24 @@ import android.widget.TextView;
 
 import ecust.main.R;
 
-public abstract class BooksQueryRequestAdapter extends BaseAdapter implements View.OnClickListener {
-    public static final int SEARCH_TITLE = 0;
-    public static final int SEARCH_AUTHOR = 1;
-    public static final int SEARCH_PUBLISHER = 2;
+public class BooksQueryAdapter extends BaseAdapter {
+    public static final int QUERY_TITLE = 0;
+    public static final int QUERY_AUTHOR = 1;
+    public static final int QUERY_PUBLISHER = 2;
     private String mQueryString;
     private Context context;
     private String[] mSearchType = new String[]{"搜标题：", "搜作者：", "搜出版社："};
 
-    public BooksQueryRequestAdapter(Context context) {
+    public BooksQueryAdapter(Context context) {
         this.context = context;
     }
 
     public void setQueryString(String queryString) {
         this.mQueryString = queryString;
-        notifyDataSetChanged();
+    }
+
+    public String getQueryString() {
+        return mQueryString;
     }
 
     @Override
@@ -61,22 +64,6 @@ public abstract class BooksQueryRequestAdapter extends BaseAdapter implements Vi
         mQueryStringTextView.setText(mQueryString);
 
         view.setTag(position);
-        view.setOnClickListener(this);
         return view;
-    }
-
-    /**
-     * 点击后的处理
-     *
-     * @param type            查询的类型
-     * @param typeDescription 查询的类型说明
-     * @param queryString     字符串
-     */
-    public abstract void onBooksQueryRequestClick(int type, String typeDescription, String queryString);
-
-    @Override
-    public void onClick(View v) {
-        int i = (int) (v.getTag());
-        onBooksQueryRequestClick(i, mSearchType[i], mQueryString.trim());
     }
 }

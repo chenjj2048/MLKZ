@@ -3,10 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/white"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    tools:context="ecust.library.books_query.adapter.BooksQueryRequestAdapter">
+    tools:context="ecust.library.books_query.adapter.BooksQueryAdapter">
 
     <ImageView
         android:layout_width="wrap_content"

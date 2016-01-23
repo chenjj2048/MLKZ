@@ -33,6 +33,7 @@ import ecust.main.R;
 import utils.Const;
 import utils.Global;
 import ecust.main.App;
+import utils.ToastUtil;
 import utils.clsFailureBar;
 import utils.InputStreamUtils;
 import utils.fileUtil;
@@ -404,7 +405,7 @@ public class act_News_Detail extends BaseAppCompatActivity implements clsFailure
         }
 
         if (url.contains("http://172.") && picHolder.getBitmap() == null) {
-            abstract_LogUtil.toast("当前非校园网，无法加载内网图片!");
+            ToastUtil.toast("当前非校园网，无法加载内网图片!");
         }
     }
 

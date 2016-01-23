@@ -1,20 +1,6 @@
 /**
- * =============================================================================
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2,
- * as published by the Free Software Foundation.
- * .
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * .
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * =============================================================================
  * .
  * Created by 彩笔怪盗基德 on 2015/11/25
- * Copyright (C) 2015 彩笔怪盗基德
  * 托管地址：https://github.com/chenjj2048
  * .
  */
@@ -37,5 +23,18 @@ public class WebResponse {
     //查询到的书的总数
     public int booksTotalCount = 0;
     //当前的页面下标（第几页）
-    public int pageIndex = 0;
+    public int currentPageIndex = 0;
+
+    @Override
+    public String toString() {
+        return "WebResponse{" +
+                "booksTotalCount=" + booksTotalCount +
+                ", currentPageIndex=" + currentPageIndex +
+                ", mBooks=" + mBooks +
+                '}';
+    }
+
+    public boolean isEmpty() {
+        return booksTotalCount <= 0;
+    }
 }

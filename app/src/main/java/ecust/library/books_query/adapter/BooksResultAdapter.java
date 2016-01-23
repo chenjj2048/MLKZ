@@ -18,19 +18,20 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import ecust.library.books_query.modles.Book;
 import ecust.main.R;
-import utils.InjectViewUtil;
 
 /**
  * ListView适配器
  */
-public class BooksAdapter extends BaseAdapter {
+public class BooksResultAdapter extends BaseAdapter {
     private Context context;
 
-    private List<Book> mBooks = new ArrayList<>();
+    private List<Book> mBooks = new ArrayList<>(50);
 
-    public BooksAdapter(Context context) {
+    public BooksResultAdapter(Context context) {
         this.context = context;
     }
 
@@ -73,7 +74,7 @@ public class BooksAdapter extends BaseAdapter {
         if (convertView == null) {
             viewHolder = new ViewHolder();
             convertView = LayoutInflater.from(context).inflate(R.layout.library_book_item, null);
-            InjectViewUtil.inject(viewHolder, convertView);
+            ButterKnife.bind(viewHolder, convertView);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -85,33 +86,27 @@ public class BooksAdapter extends BaseAdapter {
         viewHolder.mPublisher.setText(mBook.getPublisher());
         viewHolder.mPublishTime.setText(mBook.getPublishTime());
         viewHolder.mCLCIndex.setText(mBook.getCLCIndex());
+        viewHolder.mBook = mBook;
         return convertView;
     }
 
-    /**
-     * @return 下一页的页码
-     */
-    public int getNextPage() {
-        //一页是30条数据
-        int count = getCount() / 30;
-        return count + 1;
-    }
+    public class ViewHolder {
+        public Book mBook;
 
-    class ViewHolder {
         //书名
-        @InjectViewUtil.InjectView(R.id.library_book_query_item_title)
+        @Bind(R.id.library_book_query_item_title)
         TextView mTitle;
         //作者
-        @InjectViewUtil.InjectView(R.id.library_book_query_item_author)
+        @Bind(R.id.library_book_query_item_author)
         TextView mAuthor;
         //出版社
-        @InjectViewUtil.InjectView(R.id.library_book_query_item_publisher)
+        @Bind(R.id.library_book_query_item_publisher)
         TextView mPublisher;
         //出版时间
-        @InjectViewUtil.InjectView(R.id.library_book_query_item_publishetime)
+        @Bind(R.id.library_book_query_item_publishetime)
         TextView mPublishTime;
         //索书号
-        @InjectViewUtil.InjectView(R.id.library_book_query_item_clcindex)
+        @Bind(R.id.library_book_query_item_clcindex)
         TextView mCLCIndex;
     }
 }

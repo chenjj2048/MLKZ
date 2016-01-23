@@ -30,6 +30,7 @@ import java.util.List;
 import ecust.main.R;
 import utils.Const;
 import ecust.main.App;
+import utils.ToastUtil;
 import utils.clsExpiredTimeMangment;
 import utils.httpUtil;
 import utils.logUtils.abstract_LogUtil;
@@ -135,7 +136,7 @@ public class fragment_News_Catalog extends Fragment implements
     //加载下一页
     public void loadNextPage() {
         if (mNewsCatalog.nextPage == mNewsCatalog.itemIsLastOne) {
-            abstract_LogUtil.toast("已无更多数据");
+            ToastUtil.toast("已无更多数据");
         } else {
             //不要重复加载
             if (!isLoading && App.receiver.isWebConnected()) {
@@ -236,7 +237,7 @@ public class fragment_News_Catalog extends Fragment implements
     @Override
     public void onHttpLoadCompleted(String url, String cookie, boolean bSucceed, String rtnHtmlMessage) {
         if (!bSucceed) {
-            abstract_LogUtil.toast("服务器连接失败,请稍后再试");
+            ToastUtil.toast("服务器连接失败,请稍后再试");
             isLoading = false;
             return;
         }

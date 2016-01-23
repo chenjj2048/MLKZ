@@ -2,9 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
     android:orientation="vertical"
-    tools:context="ecust.library.books_query.activity.BooksQueryActivity">
+    tools:context="ecust.demotest.testDemoActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -12,13 +11,13 @@
         android:layout_height="wrap_content" />
 
     <SearchView
-        android:id="@+id/library_book_query_searchview"
+        android:id="@+id/searchview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:queryHint="输入搜索信息" />
+        android:queryHint="enter"/>
 
-    <FrameLayout
-        android:id="@+id/library_book_query_container"
+    <ListView
+        android:id="@+id/lv"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"></ListView>
 </LinearLayout>

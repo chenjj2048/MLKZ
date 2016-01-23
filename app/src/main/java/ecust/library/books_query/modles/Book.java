@@ -20,6 +20,7 @@ public class Book {
     private String CLCIndex;
 
     /**
+     * html编码进行转换
      * &#183;转为·
      * trim()
      */
@@ -91,6 +92,17 @@ public class Book {
     @Override
     public int hashCode() {
         return CLCIndex != null ? CLCIndex.hashCode() : 0;
+    }
+
+    @Override
+    public String toString() {
+        return "Book{" +
+                "title='" + getTitle() + '\'' +
+                ", author='" + getAuthor() + '\'' +
+                ", publisher='" + getPublisher() + '\'' +
+                ", publishTime='" + getPublishTime() + '\'' +
+                ", CLCIndex='" + getCLCIndex() + '\'' +
+                '}';
     }
 }
 

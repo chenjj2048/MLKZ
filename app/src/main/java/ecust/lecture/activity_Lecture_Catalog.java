@@ -28,6 +28,7 @@ import java.util.List;
 import ecust.main.R;
 import utils.Const;
 import ecust.main.App;
+import utils.ToastUtil;
 import utils.clsExpiredTimeMangment;
 import utils.httpUtil;
 import utils.timeUtil;
@@ -109,7 +110,7 @@ public class activity_Lecture_Catalog extends BaseAppCompatActivity implements
     @Override
     public void onHttpLoadCompleted(String url, String cookie, boolean bSucceed, String rtnHtmlMessage) {
         if (!bSucceed) {
-            abstract_LogUtil.toast("服务器连接失败,请稍后再试");
+            ToastUtil.toast("服务器连接失败,请稍后再试");
         } else {
             //取出缓存数据
             List<struct_LectureCatalogItem> result = cacheData.get(url);
@@ -206,7 +207,7 @@ public class activity_Lecture_Catalog extends BaseAppCompatActivity implements
 
     public void loadNextPage() {
         if (nextPage == itemIsLastOne)
-            abstract_LogUtil.toast("已无更多数据");
+            ToastUtil.toast("已无更多数据");
         else {
             //不要重复加载
             if (!flag_isLoading) {
@@ -217,7 +218,7 @@ public class activity_Lecture_Catalog extends BaseAppCompatActivity implements
                     abstract_LogUtil.i(this, "[正在加载下一页]" + website);
                     httpUtil.getSingleton().getHttp(website, this);
                 } else
-                    abstract_LogUtil.toast("网络不可用");
+                    ToastUtil.toast("网络不可用");
             } else
                 abstract_LogUtil.i(this, "[正在加载下一页]加载中，请勿重复");
         }

@@ -25,4 +25,5 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:23.1.0'
     compile files('libs/jsoup-1.8.2.jar')
     compile 'com.squareup.okhttp:okhttp:2.6.0'
+    compile files('libs/butterknife-7.0.1.jar')
 }

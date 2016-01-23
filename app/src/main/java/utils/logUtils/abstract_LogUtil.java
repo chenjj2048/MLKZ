@@ -30,13 +30,6 @@ import ecust.main.BuildConfig;
 public abstract class abstract_LogUtil {
     //Release时是否输出日志
     public static final boolean isDebug = BuildConfig.DEBUG;
-    //Toast时间间隔(重复消息的最短间隔)
-    private static final long DeltaSeconds = 2000;
-
-    //最后的toast时间
-    private static long lastToastTime;
-    //最后toast的消息
-    private static String lastToastMsg = "";
 
     /**
      * 断言
@@ -47,27 +40,6 @@ public abstract class abstract_LogUtil {
         if (isDebug && !condition) {
             abstract_LogUtil.w(object.getClass().getCanonicalName(), errorMessage);
         }
-    }
-
-    /**
-     * ============================================================
-     * 保证Toast不会短时间内产生大量消息
-     * ============================================================
-     *
-     * @param msg 内容
-     */
-    public static void toast(String msg) {
-        if (msg == null || msg.equals("")) return;
-
-        //取得当前时间
-        long nowTime = new Date().getTime();
-
-        //同样消息，太过频繁就退出
-        if (nowTime - lastToastTime <= DeltaSeconds && msg.equals(lastToastMsg)) return;
-
-        lastToastMsg = msg;
-        lastToastTime = nowTime;
-        Toast.makeText(App.getContext(), msg, Toast.LENGTH_SHORT).show();
     }
 
     @Deprecated

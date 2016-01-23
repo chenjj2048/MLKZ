@@ -53,6 +53,7 @@ public class HtmlParser {
                 xmlUtil.getNextNonBlankText();
                 //找到了共多少条记录
                 try {
+                    //结果值1
                     mWebResponse.booksTotalCount = Integer.parseInt(xmlUtil.getNextNonBlankText().trim());
                 } catch (NumberFormatException e) {
                     logUtil.printExceptionLog(HtmlParser.class, e);
@@ -61,8 +62,6 @@ public class HtmlParser {
             } else
                 xmlUtil.next();
         }
-
-        logUtil.d(HtmlParser.class, "共查询到 " + mWebResponse.booksTotalCount + " 条记录");
         if (mWebResponse.booksTotalCount <= 0) return mWebResponse;
 
         //主体部分开始
@@ -75,7 +74,7 @@ public class HtmlParser {
                         if (xmlUtil.next() != XmlPullParser.END_TAG || !"span".equals(xmlUtil.getName()))
                             continue;
                         try {
-                            mWebResponse.pageIndex = Integer.parseInt(pageIndex);
+                            mWebResponse.currentPageIndex = Integer.parseInt(pageIndex);
                         } catch (NumberFormatException e) {
                             logUtil.printExceptionLog(HtmlParser.class, e);
                         }

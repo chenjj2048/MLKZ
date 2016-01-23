@@ -34,6 +34,7 @@ import utils.logUtils.logUtil;
 /**
  * 动态加载布局
  */
+@Deprecated
 public class InjectViewUtil {
 
     /**

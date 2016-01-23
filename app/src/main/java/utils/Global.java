@@ -27,6 +27,7 @@ import ecust.main.App;
  * Created by 彩笔怪盗基德 on 2015/7/11
  * Copyright (C) 2015 彩笔怪盗基德
  */
+@Deprecated
 public class Global {
 
 
